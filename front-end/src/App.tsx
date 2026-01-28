@@ -1,35 +1,63 @@
-import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <aside className="sidebar">
+        <div className="logo">Zest</div>
+        <nav>
+          <div className="nav-item active">Projects</div>
+          <div className="nav-item">Calendar</div>
+          <div className="nav-item">Settings</div>
+        </nav>
+      </aside>
+
+      <main className="main">
+        <header className="header">
+          <input className="search" placeholder="Type to search..." />
+          <div className="profile">Shawn</div>
+        </header>
+
+        <section className="board">
+          <div className="column">
+            <h3>TODO</h3>
+            <Card title="Design App" />
+            <Card title="Review & Feedback" />
+            <Card title="Reiterate" />
+          </div>
+
+          <div className="column">
+            <h3>DOING</h3>
+            <Card title="Interview & Prototyping" />
+            <Card title="UX Copy & Content" />
+          </div>
+
+          <div className="column">
+            <h3>IN REVIEW</h3>
+            <Card title="Flow Identification" />
+            <Card title="Create Wireframe" />
+            <Card title="Testing MVP Flow" />
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function Card({ title }) {
+  return (
+    <div className="card">
+      <div className="badge">High</div>
+      <h4>{title}</h4>
+      <div className="card-footer">
+        <span>May 10</span>
+        <span>•••</span>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
+
 }
 
 export default App
