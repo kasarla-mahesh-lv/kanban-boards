@@ -1,18 +1,14 @@
 import React from "react";
 import "./App.css";
-import Header from "./components/layout/Header";
-
+import Sidebar from "./components/layout/Sidebar";
 const App: React.FC = () => {
   return (
     <div className="app-container">
+      <Sidebar />
      
-      <Header />
+      
 
-      {/* Main Content */}
-      {/* <main className="main-content">
-        <h1>Dashboard</h1>
-        <p>Welcome to your project management system 🚀</p>
-      </main> */}
+      
     </div>
   );
 };
