@@ -24,9 +24,6 @@
 
 /* RIGHT SIDE */
 .right-container {
-  margin-left: 280px;   /* SAME AS SIDEBAR WIDTH */
-  width: calc(100% - 280px);
-  min-height: 100vh;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -115,4 +112,43 @@
 .stat-icon {
   font-size: 30px;
   color: #6366f1;
+}
+
+/* BELOW CARDS SECTION */
+.dashboard-bottom {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* RECENT ACTIVITY CARD */
+.recent-activity {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.recent-activity-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #0f172a;
+}
+
+.activity-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.activity-text {
+  font-size: 14px;
+  color: #334155;
+}
+
+.activity-time {
+  font-size: 12px;
+  color: #94a3b8;
 }

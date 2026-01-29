@@ -43,7 +43,7 @@ type Team = {
 const projects: Project[] = [
   { id: 1, name: "PROJECT 1", color: "#6366f1" },
   { id: 2, name: "PROJECT 2", color: "#22c55e" },
-  
+  { id: 3, name: "PROJECT 3", color: "#f97316" },
 ];
 
 const teams: Team[] = [
