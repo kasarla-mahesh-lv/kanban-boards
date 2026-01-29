@@ -1,20 +1,18 @@
+import Sidebar from "./components/layout/Sidebar";
+import Dashboard from "./components/dashboard/Dashboard";
 
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Layout from './components/layout/Layout'
-import Header from './components/layout/Header'
-
-
-const App: React.FC = () => {
+const App = () => {
   return (
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <Sidebar />
 
-    <>
-    <Layout children={undefined}/>
-    <Header/>
-    </>
-  )
-}
+      {/* Main content */}
+      <main className="flex-1 overflow-y-auto bg-gray-50">
+        <Dashboard />
+      </main>
+    </div>
+  );
+};
 
-export default App
-   
+export default App;

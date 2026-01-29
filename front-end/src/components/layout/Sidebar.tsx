@@ -83,7 +83,7 @@ const teams: Team[] = [
 ];
 
 /* ---------- COMPONENT ---------- */
-const Header: React.FC = () => {
+const Sidebar: React.FC = () => {
   const [activeProject, setActiveProject] = useState<number>(1);
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
