@@ -1,15 +1,14 @@
-import './App.css'
-import Dashboard from './components/dashboard/Dashboard'
-import Sidebar from './components/layout/Sidebar'
-const App: React.FC = () => {
-  return (
+import { Taskbar } from "./components/Taskbar";
+import { Topbar } from "./components/Topbar"
 
-    <>
-    <Sidebar />
-    <Dashboard/>
-   
-    </>
+
+
+ const App = () => {
+  return (
+    <div>
+        <Topbar/>
+        <Taskbar/>
+    </div>
   )
 }
-
-export default App
+export default App;

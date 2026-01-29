@@ -249,6 +249,7 @@
 }
 
 .logout {
+   background: linear-gradient(180deg, #f8fafc, #eef2ff);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -265,6 +266,8 @@
 }
 
 .settings {
+  
+  
   display: flex;
   align-items: center;
   gap: 10px;
