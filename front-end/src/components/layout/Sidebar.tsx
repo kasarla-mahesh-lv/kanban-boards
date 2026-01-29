@@ -12,6 +12,11 @@ import {
   FaServer,
   FaDatabase,
   FaBug,
+  FaSignOutAlt,
+  FaCalendarCheck,
+  FaMoneyBill,
+  FaFileAlt,
+  FaBell,
 } from "react-icons/fa";
 
 /* ---------- TYPES ---------- */
@@ -36,9 +41,9 @@ type Team = {
 
 /* ---------- DATA ---------- */
 const projects: Project[] = [
-  { id: 1, name: "Revamp Flynt", color: "#6366f1" },
-  { id: 2, name: "Company Website", color: "#22c55e" },
-  { id: 3, name: "Mobile App", color: "#f97316" },
+  { id: 1, name: "PROJECT 1", color: "#6366f1" },
+  { id: 2, name: "PROJECT 2", color: "#22c55e" },
+  { id: 3, name: "PROJECT 3", color: "#f97316" },
 ];
 
 const teams: Team[] = [
@@ -50,7 +55,6 @@ const teams: Team[] = [
     members: [
       { id: 1, name: "Alice" },
       { id: 2, name: "Rahul" },
-      { id: 3, name: "Sneha" },
     ],
   },
   {
@@ -58,33 +62,20 @@ const teams: Team[] = [
     name: "Backend",
     icon: <FaServer />,
     color: "#22c55e",
-    members: [
-      { id: 1, name: "John" },
-      { id: 2, name: "Amit" },
-    ],
+    members: [{ id: 1, name: "Amit" }],
   },
   {
     id: 3,
-    name: "Database",
-    icon: <FaDatabase />,
-    color: "#f97316",
-    members: [{ id: 1, name: "Priya" }],
-  },
-  {
-    id: 4,
-    name: "Tester",
+    name: "QA",
     icon: <FaBug />,
     color: "#ef4444",
-    members: [
-      { id: 1, name: "Kiran" },
-      { id: 2, name: "Neha" },
-    ],
+    members: [{ id: 1, name: "Neha" }],
   },
 ];
 
 /* ---------- COMPONENT ---------- */
 const Sidebar: React.FC = () => {
-  const [activeProject, setActiveProject] = useState<number>(1);
+  const [activeProject, setActiveProject] = useState(1);
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
   const [openTeamId, setOpenTeamId] = useState<number | null>(null);
@@ -94,33 +85,48 @@ const Sidebar: React.FC = () => {
       {/* Logo */}
       <div className="sidebar-logo">
         <span className="logo-icon">⚡</span>
-        <h2>Zest</h2>
+        <h2>HRM</h2>
       </div>
 
       <nav className="sidebar-menu">
-        {/* Dashboard */}
         <div className="menu-item active">
           <FaHome />
           <span>Dashboard</span>
         </div>
 
-        {/* Tasks */}
         <div className="menu-item">
           <FaTasks />
           <span>Tasks</span>
         </div>
 
-        {/* TEAM MENU (MAIN TOGGLE) */}
-        <div
-          className="menu-item"
-          onClick={() => setOpenTeams(!openTeams)}
-        >
+        <div className="menu-item">
+          <FaCalendarCheck />
+          <span>Attendance</span>
+        </div>
+
+        <div className="menu-item">
+          <FaMoneyBill />
+          <span>Payroll</span>
+        </div>
+
+        <div className="menu-item">
+          <FaFileAlt />
+          <span>Reports</span>
+        </div>
+
+        <div className="menu-item notification">
+          <FaBell />
+          <span>Notifications</span>
+          <span className="badge">3</span>
+        </div>
+
+        {/* TEAM */}
+        <div className="menu-item" onClick={() => setOpenTeams(!openTeams)}>
           <FaUsers />
           <span>Team</span>
           {openTeams ? <FaChevronDown /> : <FaChevronRight />}
         </div>
 
-        {/* TEAMS LIST */}
         {openTeams && (
           <div className="teams-wrapper">
             {teams.map((team) => (
@@ -134,27 +140,20 @@ const Sidebar: React.FC = () => {
                   <div className="team-left">
                     <span
                       className="team-icon"
-                      style={{ backgroundColor: team.color }}
+                      style={{ background: team.color }}
                     >
                       {team.icon}
                     </span>
-                    <span className="team-name">{team.name}</span>
+                    <span>{team.name}</span>
                   </div>
-
-                  <span
-                    className="team-count"
-                    style={{ backgroundColor: team.color }}
-                  >
-                    {team.members.length}
-                  </span>
+                  <span className="team-count">{team.members.length}</span>
                 </div>
 
-                {/* MEMBERS */}
                 {openTeamId === team.id && (
                   <div className="members-list">
-                    {team.members.map((member) => (
-                      <div key={member.id} className="member-item">
-                        👤 {member.name}
+                    {team.members.map((m) => (
+                      <div key={m.id} className="member-item">
+                        👤 {m.name}
                       </div>
                     ))}
                   </div>
@@ -177,19 +176,19 @@ const Sidebar: React.FC = () => {
 
           {openProjects && (
             <div className="projects-list">
-              {projects.map((project) => (
+              {projects.map((p) => (
                 <div
-                  key={project.id}
+                  key={p.id}
                   className={`project-item ${
-                    activeProject === project.id ? "active" : ""
+                    activeProject === p.id ? "active" : ""
                   }`}
-                  onClick={() => setActiveProject(project.id)}
+                  onClick={() => setActiveProject(p.id)}
                 >
                   <span
                     className="project-badge"
-                    style={{ backgroundColor: project.color }}
+                    style={{ background: p.color }}
                   />
-                  <span className="project-name">{project.name}</span>
+                  {p.name}
                 </div>
               ))}
             </div>
@@ -197,8 +196,13 @@ const Sidebar: React.FC = () => {
         </div>
       </nav>
 
-      {/* Bottom */}
+      {/* BOTTOM */}
       <div className="sidebar-bottom">
+        <div className="logout">
+          <FaSignOutAlt />
+          <span>Logout</span>
+        </div>
+
         <div className="settings">
           <FaCog />
           <span>Settings</span>
@@ -208,4 +212,4 @@ const Sidebar: React.FC = () => {
   );
 };
 
-export default Header;
+export default Sidebar;
