@@ -5,7 +5,7 @@ import './Topbar.css';
 export const Topbar = () => {
   return (
     <div className="container-fluid mt-3 topbar">
-      <div className="d-flex align-items-center justify-content-between">
+      <div className="d-flex align-items-center justify-content-around">
 
 
         <input
@@ -21,7 +21,7 @@ export const Topbar = () => {
           </div>
           <div className="topbar-icon">
             <i className="bi bi-cloud"></i>
-            
+
           </div>
         </div>
 

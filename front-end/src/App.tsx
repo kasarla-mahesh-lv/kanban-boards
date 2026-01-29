@@ -1,5 +1,6 @@
-import { Taskbar } from "./components/Taskbar";
-import { Topbar } from "./components/Topbar"
+
+ import { Taskbar } from "./components/Taskbar";
+ import { Topbar } from "./components/Topbar";
 
 
 
