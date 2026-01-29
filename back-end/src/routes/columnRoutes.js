@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const { createColumn } = require("../controllers/columnController");
+const express = require("express");
+const router = express.Router();
+const columnController = require("../controllers/columnController");
 
-router.post("/boards/:boardId/columns", createColumn); // POST /api/boards/:boardId/columns
+// The "||" check prevents the crash if the controller is missing a function
+router.get("/", columnController.getAllColumns || ((req, res) => res.send("Controller not found")));
 
 module.exports = router;

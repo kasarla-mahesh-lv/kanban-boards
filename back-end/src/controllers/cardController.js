@@ -1,24 +1,20 @@
 const Card = require("../models/card");
-const Column = require("../models/column");
 
 exports.createCard = async (req, res) => {
-  const { columnId } = req.params;
-  const { title, description = "" } = req.body;
-  if (!title) return res.status(400).json({ message: "title is required" });
+    try {
+        const newCard = new Card(req.body);
+        const savedCard = await newCard.save();
+        res.status(201).json(savedCard);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
 
-  const column = await Column.findById(columnId).lean();
-  if (!column) return res.status(404).json({ message: "Column not found" });
-
-  const last = await Card.findOne({ columnId }).sort({ order: -1 }).lean();
-  const nextOrder = last ? last.order + 1 : 1;
-
-  const card = await Card.create({
-    boardId: column.boardId,
-    columnId,
-    title,
-    description,
-    order: nextOrder
-  });
-
-  res.status(201).json(card);
+exports.getCardsByColumnId = async (req, res) => {
+    try {
+        const cards = await Card.find({ columnId: req.params.columnId });
+        res.status(200).json(cards);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };

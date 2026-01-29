@@ -1,13 +1,19 @@
 const mongoose = require("mongoose");
 
-const columnSchema = new mongoose.Schema(
-  {
-    boardId: { type: mongoose.Schema.Types.ObjectId, ref: "Board", required: true },
-    name: { type: String, required: true, trim: true },
-    order: { type: Number, required: true }
-  },
-  { timestamps: true }
-);
+const columnSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    boardId: { type: mongoose.Schema.Types.ObjectId, ref: "Board", required: true }
+}, { 
+    toJSON: { virtuals: true }, 
+    toObject: { virtuals: true },
+    versionKey: false 
+});
 
-columnSchema.index({ boardId: 1, order: 1 });
+// Link Column to Cards
+columnSchema.virtual('cards', {
+    ref: 'Card',
+    localField: '_id',
+    foreignField: 'columnId'
+});
+
 module.exports = mongoose.model("Column", columnSchema);

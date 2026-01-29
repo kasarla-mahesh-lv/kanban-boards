@@ -12,10 +12,12 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
-app.get("/health", (req, res) => res.json({ ok: true, message: "Kanban API running" }));
+app.get("/", (req, res) => {
+  res.send("Kanban Boards API is running 🚀");
+});
 
 app.use("/api/boards", boardRoutes);
-app.use("/api", columnRoutes);
-app.use("/api", cardRoutes);
+app.use("/api/columns", columnRoutes);
+app.use("/api/cards", cardRoutes);
 
 module.exports = app;
