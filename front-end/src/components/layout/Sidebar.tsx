@@ -212,4 +212,8 @@ const Sidebar: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Sidebar;
+=======
+export default Sidebar;
+>>>>>>> ae7f02c9e9ce35a797f3a79d8b130308be36ec81
