@@ -21,6 +21,7 @@ export const Topbar = () => {
           </div>
           <div className="topbar-icon">
             <i className="bi bi-cloud"></i>
+            
           </div>
         </div>
 
