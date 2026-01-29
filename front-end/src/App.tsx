@@ -1,10 +1,13 @@
-import { Header } from "./components/layout/Header"
+import { Taskbar } from "./components/Taskbar";
+import { Topbar } from "./components/Topbar"
+
 
 
  const App = () => {
   return (
     <div>
-      <Header/>
+        <Topbar/>
+        <Taskbar/>
     </div>
   )
 }
