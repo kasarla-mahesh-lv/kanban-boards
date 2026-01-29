@@ -4,12 +4,11 @@ const cardSchema = new mongoose.Schema(
   {
     boardId: { type: mongoose.Schema.Types.ObjectId, ref: "Board", required: true },
     columnId: { type: mongoose.Schema.Types.ObjectId, ref: "Column", required: true },
-    title: { type: String, required: true, trim: true },
+    title: { type: String, required: true },
     description: { type: String, default: "" },
-    order: { type: Number, required: true }
+    order: { type: Number, default: 1 }
   },
   { timestamps: true }
 );
 
-cardSchema.index({ columnId: 1, order: 1 });
-module.exports = mongoose.model("Card", cardSchema);
+module.exports = mongoose.models.Card || mongoose.model("Card", cardSchema);
