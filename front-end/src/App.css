@@ -24,6 +24,9 @@
 
 /* RIGHT SIDE */
 .right-container {
+  margin-left: 280px;   /* SAME AS SIDEBAR WIDTH */
+  width: calc(100% - 280px);
+  min-height: 100vh;
   flex: 1;
   display: flex;
   flex-direction: column;
