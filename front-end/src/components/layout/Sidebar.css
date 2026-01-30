@@ -1,0 +1,317 @@
+/* ================= ROOT ================= */
+:root {
+  --primary: #6366f1;
+  --primary-soft: #eef2ff;
+  --text-dark: #0f172a;
+  --text-muted: #475569;
+  --danger: #ef4444;
+  --bg-main: #f9fafb;
+  --bg-card: rgba(255, 255, 255, 0.75);
+  --border-light: #e5e7eb;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  position: fixed;              /* FIXED SIDEBAR */
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;                /* FULL HEIGHT */
+  background: linear-gradient(180deg, #f8fafc, #eef2ff);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: auto;             /* ENABLE SCROLL */
+  overflow-x: hidden;
+
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.08);
+  animation: slideIn 0.6s ease;
+  font-family: "Inter", system-ui, sans-serif;
+  z-index: 1000;                /* STAYS ABOVE CONTENT */
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.08);
+  animation: slideIn 0.6s ease;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ================= LOGO ================= */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.logo-icon {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: #fff;
+  padding: 12px;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
+}
+
+.sidebar-logo h2 {
+  color: var(--text-dark);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ================= MENU ITEMS ================= */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.35s ease;
+  margin-bottom: 4px;
+}
+
+.menu-item svg {
+  font-size: 17px;
+  transition: transform 0.3s ease;
+}
+
+.menu-item:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+  transform: translateX(6px);
+}
+
+.menu-item:hover svg {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.menu-item.active {
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  color: white;
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* ================= NOTIFICATION ================= */
+.notification {
+  position: relative;
+}
+
+.badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: white;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  box-shadow: 0 5px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* ================= TEAMS ================= */
+.teams-wrapper {
+  margin-left: 14px;
+  margin-top: 6px;
+}
+
+.team-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.team-item:hover {
+  background: rgba(99, 102, 241, 0.12);
+  transform: translateX(4px);
+}
+
+.team-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-icon {
+  color: white;
+  padding: 7px;
+  border-radius: 10px;
+  font-size: 13px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.team-name {
+  color: var(--text-dark);
+}
+
+.team-count {
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ================= MEMBERS ================= */
+.members-list {
+  padding-left: 36px;
+  margin: 6px 0 10px;
+  animation: fadeIn 0.4s ease;
+}
+
+.member-item {
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ================= PROJECTS ================= */
+.projects-section {
+  margin-top: 18px;
+}
+
+.projects-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 12px;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.projects-header:hover {
+  background: var(--primary-soft);
+}
+
+.add-project {
+  margin-left: auto;
+  font-size: 14px;
+}
+
+.project-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.project-item:hover {
+  background: rgba(99, 102, 241, 0.12);
+  transform: translateX(4px);
+}
+
+.project-item.active {
+  background: #e0e7ff;
+}
+
+.project-name {
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.project-item.active .project-name {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.project-badge {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ================= BOTTOM ================= */
+.sidebar-bottom {
+  margin-top: auto;
+  border-top: 1px solid var(--border-light);
+  padding-top: 16px;
+}
+
+.logout {
+   background: linear-gradient(180deg, #f8fafc, #eef2ff);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--danger);
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout:hover {
+  background: #fee2e2;
+  transform: translateX(6px);
+}
+
+.settings {
+  
+  
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.settings:hover {
+  background: var(--primary-soft);
+  transform: translateX(6px);
+}
+
+/* ================= SIDEBAR SCROLLBAR ================= */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}

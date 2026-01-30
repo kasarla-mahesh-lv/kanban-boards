@@ -1,23 +1,31 @@
 {
-  "name": "back-end",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "mongoose": "^9.1.5",
+    "morgan": "^1.10.1"
+  },
+  "name": "kanban-boards",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kasarla-mahesh-lv/kanban-boards.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "dependencies": {
-    "cors": "^2.8.6",
-    "dotenv": "^17.2.3",
-    "express": "^5.2.1",
-    "mongoose": "^9.1.5",
-    "morgan": "^1.10.1"
+  "bugs": {
+    "url": "https://github.com/kasarla-mahesh-lv/kanban-boards/issues"
   },
+  "homepage": "https://github.com/kasarla-mahesh-lv/kanban-boards#readme",
   "devDependencies": {
     "nodemon": "^3.1.11"
   }
