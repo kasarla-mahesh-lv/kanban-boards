@@ -1,5 +1,4 @@
-const Column = require("../models/column");
-
+const Column = require("../models/Column");
 exports.createColumn = async (req, res) => {
   const { boardId } = req.params;
   const { name } = req.body;
@@ -28,3 +27,6 @@ exports.deleteColumn = async (req,res) => {
     res.status(400).json({ message: "Invalid column id" });
   }
 };
+
+
+

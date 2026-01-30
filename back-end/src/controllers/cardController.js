@@ -1,7 +1,5 @@
 const card = require("../models/card");
 const Card = require("../models/card");
-const Column = require("../models/column");
-
 exports.createCard = async (req, res) => {
   const { columnId } = req.params;
   const { title, description = "" } = req.body;
@@ -37,4 +35,6 @@ exports.deleteCard = async(req,res) => {
   return res.status(400).json({message:"Invalid Card Id"});
  }
 };
+
+
 

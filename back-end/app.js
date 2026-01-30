@@ -14,6 +14,7 @@ app.use(morgan("dev"));
 
 app.get("/", (req, res) => res.json({ ok: true, message: "Welcome to kanban boards app🙏🤝" }));
 
+// API Routes
 app.use("/api/boards", boardRoutes);
 app.use("/api", columnRoutes);
 app.use("/api", cardRoutes);

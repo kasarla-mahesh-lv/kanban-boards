@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 
 const columnSchema = new mongoose.Schema(
   {
-    boardId: { type: mongoose.Schema.Types.ObjectId, ref: "Board", required: true },
-    name: { type: String, required: true },
-    order: { type: Number, default: 1 }
+    name: String,
+    boardId: String,
+    order: Number,
+    cards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Card" }]
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.models.Column || mongoose.model("Column", columnSchema);
+module.exports = mongoose.model("Column", columnSchema);
