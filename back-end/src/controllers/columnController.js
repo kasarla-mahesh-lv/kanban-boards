@@ -17,7 +17,7 @@ exports.deleteColumn = async (req,res) => {
   const{columnId} =req.params;
   const column = await Column.findByIdAndUpdate(columnId);
   if(!column) 
-    return res.status(400).json({message: "board id not found"});
+    return res.status(400).json({message: "column not found"});
   res.status(200).json({message:"column deleted succesfully"});
 
 
