@@ -1,8 +1,8 @@
-const card = require("../models/card");
 const Card = require("../models/card");
+
 exports.createCard = async (req, res) => {
   const { columnId } = req.params;
-  const { title, description = "" } = req.body;
+  const { title} = req.body;
   if (!title) return res.status(400).json({ message: "title is required" });
 
   const column = await Column.findById(columnId).lean();
@@ -15,7 +15,6 @@ exports.createCard = async (req, res) => {
     boardId: column.boardId,
     columnId,
     title,
-    description,
     order: nextOrder
   });
 
