@@ -1,8 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const columnController = require("../controllers/columnController");
+const Column = require("../models/Column");
 
-// The "||" check prevents the crash if the controller is missing a function
-router.get("/", columnController.getAllColumns || ((req, res) => res.send("Controller not found")));
+router.get("/api/columns", async (req, res) => {
+  try {
+    const columns = await Column.find()
+      .sort({ order: 1 })
+      .populate({
+        path: "cards",
+        options: { sort: { order: 1 } }
+      });
+
+    res.status(200).json(columns);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router;
