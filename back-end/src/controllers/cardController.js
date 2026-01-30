@@ -1,4 +1,5 @@
 const Card = require("../models/card");
+const Column = require("../models/Column");
 
 exports.createCard = async (req, res) => {
   const { columnId } = req.params;
