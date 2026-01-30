@@ -28,7 +28,7 @@ exports.createCard = async (req, res) => {
 exports.deleteCard = async(req,res) => {
   const{cardId} =req.params;
 
-  const card=await card.findByIdAndUpdate(cardId);
+  const card=await Card.findByIdAndUpdate(cardId);
   if(!card)
     return res.status(404).json({message:"card not found"});
   res.status(200).json({message:"card deleted succesfully"});

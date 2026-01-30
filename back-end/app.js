@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
-app.get("/", (req, res) => res.json({ ok: true, message: "Welcome to luvetha tech" }));
+app.get("/", (req, res) => res.json({ ok: true, message: "Welcome to kanban boards app🙏🤝" }));
 
 app.use("/api/boards", boardRoutes);
 app.use("/api", columnRoutes);
