@@ -1,5 +1,7 @@
+const mongoose = require("mongoose");
 const Card = require("../models/card");
 const Column = require("../models/column");
+
 
 exports.createCard = async (req, res) => {
   const { columnId } = req.params;
@@ -22,3 +24,35 @@ exports.createCard = async (req, res) => {
 
   res.status(201).json(card);
 };
+// PATCH - update card (title/description)
+exports.updateCard = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+
+    // validate card id
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid card id" });
+    }
+
+    // at least one field must be present
+    if (!title && !description) {
+      return res.status(400).json({ message: "title or description is required" });
+    }
+
+    const updatedCard = await Card.findByIdAndUpdate(
+      id,
+      { $set: req.body }, // updates given fields only
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCard) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    res.status(200).json(updatedCard);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

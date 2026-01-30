@@ -1,6 +1,7 @@
 const router = require("express").Router();
-const { createColumn } = require("../controllers/columnController");
+const { createColumn, updateColumn } = require("../controllers/columnController");
 
-router.post("/boards/:boardId/columns", createColumn); // POST /api/boards/:boardId/columns
+router.post("/boards/:boardId/columns", createColumn);
+router.patch("/boards/:boardId/columns/:columnId", updateColumn);
 
 module.exports = router;
