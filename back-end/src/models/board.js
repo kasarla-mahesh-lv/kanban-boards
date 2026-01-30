@@ -6,3 +6,6 @@ const boardSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.models.Board || mongoose.model("Board", boardSchema);
+
+
+

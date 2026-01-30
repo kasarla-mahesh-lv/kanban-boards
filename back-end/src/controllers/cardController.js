@@ -1,3 +1,4 @@
+const card = require("../models/card");
 const Card = require("../models/card");
 const Column = require("../models/column");
 
@@ -22,3 +23,14 @@ exports.createCard = async (req, res) => {
 
   res.status(201).json(card);
 };
+
+
+exports.deleteCard = async(req,res) => {
+  const{cardId} =req.params;
+
+  const card=await card.findByIdAndUpdate(cardId);
+  if(!card)
+    return res.status(404).json({message:"card not found"});
+  res.status(200).json({message:"card deleted succesfully"});
+};
+
