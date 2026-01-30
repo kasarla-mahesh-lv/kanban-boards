@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const { createCard } = require("../controllers/cardController");
+const express = require("express");
+const router = express.Router();
+const cardController = require("../controllers/cardController");
 
-router.post("/columns/:columnId/cards", createCard); // POST /api/columns/:columnId/cards
+// Only the GET route
+router.get("/", cardController.getAllCards);
 
 module.exports = router;

@@ -1,6 +1,20 @@
-const router = require("express").Router();
-const { createColumn } = require("../controllers/columnController");
+const express = require("express");
+const router = express.Router();
+const Column = require("../models/Column");
 
-router.post("/boards/:boardId/columns", createColumn); // POST /api/boards/:boardId/columns
+router.get("/api/columns", async (req, res) => {
+  try {
+    const columns = await Column.find()
+      .sort({ order: 1 })
+      .populate({
+        path: "cards",
+        options: { sort: { order: 1 } }
+      });
+
+    res.status(200).json(columns);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router;
