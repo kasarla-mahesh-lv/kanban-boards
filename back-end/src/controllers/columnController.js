@@ -1,4 +1,4 @@
-const Column = require("../models/column");
+const Column = require("../models/Column");
 
 // MUST have 'exports.' before the function name
 exports.getAllColumns = async (req, res) => { 
