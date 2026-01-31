@@ -12,12 +12,23 @@
 
 /* ================= SIDEBAR ================= */
 .sidebar {
+  position: fixed;              /* FIXED SIDEBAR */
+  top: 0;
+  left: 0;
   width: 280px;
-  height: 100vh;
+  height: 100vh;                /* FULL HEIGHT */
   background: linear-gradient(180deg, #f8fafc, #eef2ff);
   padding: 22px;
   display: flex;
   flex-direction: column;
+
+  overflow-y: auto;             /* ENABLE SCROLL */
+  overflow-x: hidden;
+
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.08);
+  animation: slideIn 0.6s ease;
+  font-family: "Inter", system-ui, sans-serif;
+  z-index: 1000;                /* STAYS ABOVE CONTENT */
   box-shadow: 8px 0 30px rgba(0, 0, 0, 0.08);
   animation: slideIn 0.6s ease;
   font-family: "Inter", system-ui, sans-serif;
@@ -285,4 +296,22 @@
 .settings:hover {
   background: var(--primary-soft);
   transform: translateX(6px);
+}
+
+/* ================= SIDEBAR SCROLLBAR ================= */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
 }

@@ -1,4 +1,4 @@
-const Column = require("../models/column");
+const Column = require("../models/Column");
 
 exports.createColumn = async (req, res) => {
   const { boardId } = req.params;
@@ -41,4 +41,14 @@ exports.updateColumn = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Update failed", error: err.message });
   }
+};
+
+// MUST have 'exports.' before the function name
+exports.getAllColumns = async (req, res) => { 
+    try {
+        const columns = await Column.find().populate('cards');
+        res.status(200).json(columns);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
