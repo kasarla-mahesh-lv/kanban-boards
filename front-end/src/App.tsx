@@ -1,28 +1,22 @@
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import Sidebar from "./components/layout/Sidebar";
-import Dashboard from "./components/dashboards/Dashboard";
-import ProjectsPage from "./Pages/ProjectsPage";
-import BoardPage from "./Pages/BoardPage";
+import { Topbar } from "./components/Topbar";
+import { Taskbar } from "./components/Taskbar";
+import Dashboard from "./components/dashboard/Dashboard";
+import "./App.css";
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <div className="app-container">
-        {/* LEFT */}
-        <Sidebar />
+    <div className="app-layout ">
+      <Sidebar />
 
-        {/* RIGHT (changes dynamically) */}
-        <div className="right-container">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/projects/:projectId" element={<BoardPage />} />
-          </Routes>
+      <div className="right-container" >
+        <div className="content-container ">
+          <Topbar />
+          <Taskbar />
+          <Dashboard />
         </div>
       </div>
-    </BrowserRouter>
+    </div>
   );
 };
 

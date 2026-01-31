@@ -220,5 +220,5 @@ const Sidebar: React.FC = () => {
     </aside>
   );
 };
-export default Sidebar;
 
+export default Sidebar;
