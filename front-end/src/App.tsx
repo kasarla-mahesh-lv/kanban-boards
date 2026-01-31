@@ -1,5 +1,5 @@
 import Sidebar from "./components/layout/Sidebar";
-import { Topbar } from "./components/Topbar";
+import { Topbar } from "./components/Topbar"
 import { Taskbar } from "./components/Taskbar";
 import Dashboard from "./components/dashboard/Dashboard";
 import "./App.css";
