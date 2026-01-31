@@ -44,11 +44,13 @@ exports.login=async(req,res)=>{
 
         const user=await User.findOne({email});
         if(!user){
+          console.log(error.email);
             return res.status(400).json({message:"Invalid email, please type valid emailid"});
         }
 
         const isMatch=await bcrypt.compare(password,user.password);
         if(!isMatch) {
+          console.log(password);
             return res.status(400).json({message:"Invalid password, please type valid password"});
         }
 
@@ -66,6 +68,6 @@ exports.login=async(req,res)=>{
             }
         });
     }catch(error){
-        res.status(500).json({message:"error.message"});
+        res.status(500).json({message:"please do Register first"});
     }
 };
