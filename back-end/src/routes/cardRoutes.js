@@ -1,15 +1,13 @@
 
 const router = require("express").Router();
-const { createCard ,updateCard} = require("../controllers/cardController");
+//const {cardController}=require("../controllers/cardController");
+const { createCard ,updateCard,deleteCard,getAllCards} = require("../controllers/cardController");
 
 router.post("/columns/:columnId/cards", createCard); // POST /api/columns/:columnId/cards
 router.patch("/cards/:id",updateCard);
-module.exports = router;
-
-const cardController = require("../controllers/cardController");
 
 // Only the GET route
-router.get("/", cardController.getAllCards);
+router.get("/",getAllCards);
 // only delete route
 router.delete("/cards/:cardId",deleteCard);
 
