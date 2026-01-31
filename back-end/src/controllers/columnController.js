@@ -1,8 +1,4 @@
 const Column = require("../models/Column");
-exports.createColumn = async (req, res) => {
-  const { boardId } = req.params;
-  const { name } = req.body;
-  if (!name) return res.status(400).json({ message: "name is required" });
 
 exports.createColumn = async (req, res) => {
   const { boardId } = req.params;

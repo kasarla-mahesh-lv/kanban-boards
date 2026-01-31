@@ -1,4 +1,3 @@
-
 const router = require("express").Router();
 const { createColumn, updateColumn } = require("../controllers/columnController");
 
@@ -8,8 +7,23 @@ router.patch("/boards/:boardId/columns/:columnId", updateColumn);
 
 const Column = require("../models/Column");
 
+router.get("/api/columns", async (req, res) => {
+  try {
+    const columns = await Column.find()
+      .sort({ order: 1 })
+      .populate({
+        path: "cards",
+        options: { sort: { order: 1 } }
+      });
 
-router.post("/boards/:boardId/columns", createColumn);
+    res.status(200).json(columns);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// delete route 
 router.delete("/columns/:columnId",deleteColumn);
+
 
 module.exports = router;
