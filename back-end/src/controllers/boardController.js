@@ -13,7 +13,7 @@ exports.createBoard = async (req, res) => {
 
 
 
-
+//patch api 
 exports.updateBoard = async (req, res) => {
   try {
     const { id } = req.params;     // URL lo /:id
@@ -43,6 +43,7 @@ exports.updateBoard = async (req, res) => {
 };
 
 // Make sure the name matches what you use in boardRoutes.js
+// get api
 exports.getBoardWithDetails = async (req, res) => {
     try {
         const board = await Board.findById(req.params.id).populate({
@@ -57,6 +58,7 @@ exports.getBoardWithDetails = async (req, res) => {
 };
 
 // Add a generic get all boards function if you need it
+// get api
 exports.getAllBoards = async (req, res) => {
     try {
         const boards = await Board.find();
@@ -65,4 +67,17 @@ exports.getAllBoards = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+// delete api
+exports.deleteBoard =async(req,res) =>{
+  try{
+    const {id} =req.params;
 
+  const board=await Board.findByIdAndDelete(id);
+  if(!board) return res.status(404).json({message:"Board is not found"});
+
+  res.status(200).json({message:"Board deleted succesfully"});
+  }catch(error){
+    res.status(400).json({message:"Invalid Board Id"});
+  }
+
+};

@@ -22,4 +22,9 @@ router.get("/api/columns", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+// delete route 
+router.delete("/columns/:columnId",deleteColumn);
+
+
 module.exports = router;

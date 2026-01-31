@@ -66,3 +66,17 @@ exports.getAllCards = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+// delete api
+exports.deleteCard = async(req,res) => {
+ try{
+  const{cardId} =req.params;
+
+  const card=await Card.findByIdAndDelete(cardId);
+  if(!card)
+    return res.status(404).json({message:"card not found"});
+  res.status(200).json({message:"card deleted succesfully"});
+ } catch(error){
+  return res.status(400).json({message:"Invalid Card Id"});
+ }
+};
+
