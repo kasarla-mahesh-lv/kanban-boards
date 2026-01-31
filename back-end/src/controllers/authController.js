@@ -49,7 +49,7 @@ exports.login=async(req,res)=>{
 
         const isMatch=await bcrypt.compare(password,user.password);
         if(!isMatch) {
-            return res.statsu(400).json({message:"Invalid password, please type valid password"});
+            return res.status(400).json({message:"Invalid password, please type valid password"});
         }
 
         const token = jwt.sign(
