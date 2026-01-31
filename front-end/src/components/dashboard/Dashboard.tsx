@@ -8,9 +8,10 @@ import {
   FaBuilding,
 } from "react-icons/fa";
 
+
 const Dashboard = () => {
   return (
-    <div className="dashboard-wrapper">
+    <div>
       <h1 className="dashboard-title">Dashboard</h1>
 
       <div className="dashboard-grid">
