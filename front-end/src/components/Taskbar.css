@@ -1,34 +1,96 @@
- .taskbar{
-    padding:16px 0;
+/* ================= TASKBAR WRAPPER ================= */
+.taskbar {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border-radius: 16px;
+  padding: 28px 32px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  margin-bottom: 28px;
 }
-.breadcrum-line a{
-    color:#0d6efd;
-    font-weight:500;
-}
-.project-title{
-    margin:8px 0;
-    font-weight:600;
-}
-.meta-line span{
-    color:#6c757d;
-    font-size:14px;
-}
-.nav-line{
-    padding:0;
-    margin-top:12px;
-}
-.nav-line li{
-    list-style:none;
-}
-.nav-line a{
-    text-decoration:none;
-    font-weight:500;
-    color:#495057;
-}
-.nav-line a:hover{
-    color:#0d6efd;
-}
-.main-div{
-    padding-left: 170px;
-} 
 
+/* ================= TOP LINE ================= */
+.breadcrum-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6366f1;
+  margin-bottom: 12px;
+}
+
+/* ================= PROJECT TITLE ================= */
+.project-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+/* ================= META ROW ================= */
+.meta-line {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.meta-line span strong {
+  color: #475569;
+  font-weight: 600;
+}
+
+/* ================= NAV TABS ================= */
+.nav-line {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+}
+
+.nav-line li {
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  padding-bottom: 6px;
+  position: relative;
+  transition: color 0.25s ease;
+}
+
+/* UNDERLINE */
+.nav-line li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 3px;
+  background: #6366f1;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.nav-line li:hover {
+  color: #6366f1;
+}
+
+.nav-line li:hover::after {
+  width: 100%;
+}
+
+/* ACTIVE TAB */
+.nav-line li.active {
+  color: #6366f1;
+}
+
+.nav-line li.active::after {
+  width: 100%;
+}
