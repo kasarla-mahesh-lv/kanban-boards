@@ -38,7 +38,7 @@ type Team = {
   color: string;
   members: Member[];
 };
-
+   
 /* ---------- DATA ---------- */
 const projects: Project[] = [
   { id: 1, name: "PROJECT 1", color: "#6366f1" },
