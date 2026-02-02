@@ -1,30 +1,25 @@
-
 const router = require("express").Router();
-const { createColumn, updateColumn } = require("../controllers/columnController");
 
+// ✅ import ALL required functions
+const {
+  createColumn,
+  updateColumn,
+  deleteColumn,
+  getAllColumns
+} = require("../controllers/columnController");
+
+// 🔹 app.js lo already: app.use("/api/columns", columnRoutes)
+
+// Create column under a board
 router.post("/boards/:boardId/columns", createColumn);
+
+// Update column under a board
 router.patch("/boards/:boardId/columns/:columnId", updateColumn);
 
+// Get all columns
+router.get("/", getAllColumns);
 
-const Column = require("../models/Column");
-
-router.get("/api/columns", async (req, res) => {
-  try {
-    const columns = await Column.find()
-      .sort({ order: 1 })
-      .populate({
-        path: "cards",
-        options: { sort: { order: 1 } }
-      });
-
-    res.status(200).json(columns);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// delete route 
-router.delete("/columns/:columnId",deleteColumn);
-
+// Delete column
+router.delete("/:columnId", deleteColumn);
 
 module.exports = router;

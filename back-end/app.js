@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const boardRoutes = require("./src/routes/boardRoutes");
 const columnRoutes = require("./src/routes/columnRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
+const projectRoutes = require("./src/routes/projectRoutes"); // ✅ add here
 
 const app = express();
 
@@ -21,5 +22,8 @@ app.get("/", (req, res) => {
 app.use("/api/boards", boardRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/cards", cardRoutes);
+
+// ✅ your new route (taskId search will come under this)
+app.use("/api/projects", projectRoutes);
 
 module.exports = app;

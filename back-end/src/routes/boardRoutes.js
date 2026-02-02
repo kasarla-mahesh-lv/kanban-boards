@@ -1,21 +1,27 @@
+const express = require("express");
+const router = express.Router();
 
-const router = require("express").Router();
-const { 
-    createBoard,
-    updateBoard,
-    getAllBoards,
-    getBoardWithDetails,
-    deleteBoard
+const {
+  getAllBoards,
+  getBoardWithDetails,
+  createBoard,
+  updateBoard,
+  deleteBoard,
 } = require("../controllers/boardController");
 
-router.post("/", createBoard); // POST /api/boards
-router.patch("/:id", updateBoard); // PATCH /api/boards/:id
+// GET all boards
+router.get("/", getAllBoards);
 
-const { getAllBoards, getBoardWithDetails } = require("../controllers/boardController");
+// GET board full details (if you have it)
+router.get("/:boardId", getBoardWithDetails);
 
-router.get("/", getAllBoards); // This is likely line 7 where the error is
-router.get("/:id", getBoardWithDetails);                                 
-router.delete("/:id",deleteBoard);// delete api routes
+// POST create board
+router.post("/", createBoard);
 
+// PATCH update board
+router.patch("/:boardId", updateBoard);
+
+// DELETE board
+router.delete("/:boardId", deleteBoard);
 
 module.exports = router;

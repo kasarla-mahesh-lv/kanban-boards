@@ -1,0 +1,132 @@
+const mongoose = require("mongoose");
+const Project = require("../models/project");
+
+// ✅ GET /api/projects -> all projects
+exports.getAllProjects = async (req, res) => {
+  try {
+    const projects = await Project.find().sort({ createdAt: -1 });
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ POST /api/projects -> create project
+exports.createProject = async (req, res) => {
+  try {
+    const { title, description } = req.body;
+
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ message: "Project name required" });
+    }
+
+    const project = await Project.create({
+      title: title.trim(),
+      description: description || "",
+      tasks: [],
+    });
+
+    return res.status(201).json(project);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ GET /api/projects/:projectId -> project full details
+exports.getProjectById = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    res.json(project);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ GET /api/projects/:projectId/tasks -> all tasks of a project
+exports.getProjectTasks = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    res.json(project.tasks);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ POST /api/projects/:projectId/tasks -> add task to project
+exports.addTaskToProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { title, description, status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ message: "title is required" });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    project.tasks.push({
+      title: title.trim(),
+      description: description || "",
+      status: status || "todo",
+    });
+
+    await project.save();
+
+    const newTask = project.tasks[project.tasks.length - 1];
+
+    res.status(201).json({
+      message: "Task added",
+      task: newTask,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ GET /api/projects/:projectId/tasks/:taskId -> single task in project (by Mongo _id)
+exports.getTaskByTaskIdInProject = async (req, res) => {
+  try {
+    const { projectId, taskId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: "Invalid taskId" });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    const task = project.tasks.id(taskId); // ✅ subdocument by _id
+    if (!task) {
+      return res.status(404).json({ message: "Task not found in this project" });
+    }
+
+    res.json(task);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
