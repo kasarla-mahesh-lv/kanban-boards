@@ -18,6 +18,7 @@ import {
   FaBell,
   FaHistory
 } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
 
 /* ---------- TYPES ---------- */
 type Project = {
@@ -109,10 +110,10 @@ const Sidebar: React.FC = () => {
           <span>History</span>
         </div>
 
-        <div className="menu-item">
+       <NavLink to="/reports" className="menu-item">
           <FaFileAlt />
           <span>Reports</span>
-        </div>
+        </NavLink>
 
         <div className="menu-item notification">
           <FaBell />
@@ -198,10 +199,10 @@ const Sidebar: React.FC = () => {
 
       {/* BOTTOM */}
       <div className="sidebar-bottom">
-        <div className="logout">
-          <FaSignOutAlt />
-          <span>Logout</span>
-        </div>
+        <NavLink to="/logout" className="logout">
+  <FaSignOutAlt />
+  <span>Logout</span>
+</NavLink>
 
         <div className="settings">
           <FaCog />
