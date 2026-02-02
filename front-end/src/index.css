@@ -28,7 +28,24 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+} */
+
+
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  width: 100%;
+  display: block;         /* ✅ remove flex centering */
+  overflow-x: hidden;     /* ✅ prevents right-side space */
+  background: #ffffff;    /* ✅ removes black background */
 }
+
+
+
+
+
 
 h1 {
   font-size: 3.2em;
