@@ -130,3 +130,62 @@ exports.getTaskByTaskIdInProject = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// ✅ Update task inside a project
+exports.updateTaskInProject = async (req, res) => {
+  try {
+    const { projectId, taskId } = req.params;
+    const { title, description, status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: "Invalid taskId" });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    const task = project.tasks.id(taskId);
+    if (!task) return res.status(404).json({ message: "Task not found in this project" });
+
+    // update only fields you send
+    if (title !== undefined) task.title = title;
+    if (description !== undefined) task.description = description;
+    if (status !== undefined) task.status = status;
+
+    await project.save();
+
+    res.json({ message: "Task updated", task });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ Delete task inside a project
+exports.deleteTaskInProject = async (req, res) => {
+  try {
+    const { projectId, taskId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: "Invalid taskId" });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    const task = project.tasks.id(taskId);
+    if (!task) return res.status(404).json({ message: "Task not found in this project" });
+
+    task.deleteOne(); // remove subdocument
+    await project.save();
+
+    res.json({ message: "Task deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
