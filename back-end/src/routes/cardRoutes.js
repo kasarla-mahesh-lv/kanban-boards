@@ -9,7 +9,7 @@ router.patch("/cards/:id",updateCard);
 // Only the GET route
 router.get("/",getAllCards);
 // only delete route
-router.delete("/cards/:cardId",deleteCard);
+router.delete("/:cardId",deleteCard);
 
 
 module.exports = router;

@@ -23,7 +23,7 @@ router.get("/api/columns", async (req, res) => {
 });
 
 // delete route 
-router.delete("/columns/:columnId",deleteColumn);
+router.delete("/:columnId",deleteColumn);
 
 
 module.exports = router;

@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
-app.get("/", (req, res) => res.json({ ok: true, message: "Welcome to Register Page 🙏🤝" }));
+app.get("/", (req, res) => res.json({ ok: true, message: "Welcome to Register and Login Page 🙏🤝" }));
 
 // API Routes
 app.use("/api/boards", boardRoutes);
