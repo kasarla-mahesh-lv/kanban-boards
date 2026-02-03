@@ -16,7 +16,7 @@ const App: React.FC = () => {
           <Dashboard />
         </div>
       </div>
-    </div>
+    </div>      
   );
 };
 

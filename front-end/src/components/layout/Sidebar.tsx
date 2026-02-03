@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Sidebar.css";
+
+import NotificationPanel from "../notifications/NotificationPanel";
+import { getUnreadCount } from "../notifications/NotificationApi";
+
 import {
   FaHome,
   FaTasks,
@@ -10,13 +14,12 @@ import {
   FaChevronRight,
   FaCode,
   FaServer,
-  FaDatabase,
   FaBug,
   FaSignOutAlt,
   FaCalendarCheck,
   FaFileAlt,
   FaBell,
-  FaHistory
+  FaHistory,
 } from "react-icons/fa";
 
 /* ---------- TYPES ---------- */
@@ -38,7 +41,7 @@ type Team = {
   color: string;
   members: Member[];
 };
-   
+
 /* ---------- DATA ---------- */
 const projects: Project[] = [
   { id: 1, name: "PROJECT 1", color: "#6366f1" },
@@ -75,11 +78,36 @@ const teams: Team[] = [
 
 /* ---------- COMPONENT ---------- */
 const Sidebar: React.FC = () => {
+  /* ================= STATES ================= */
   const [activeProject, setActiveProject] = useState(1);
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
   const [openTeamId, setOpenTeamId] = useState<number | null>(null);
 
+  // ✅ Notifications (MUST BE INSIDE COMPONENT)
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [count, setCount] = useState(0);
+  const userId = 1; // replace with logged-in user id
+
+  /* ================= EFFECT ================= */
+  useEffect(() => {
+    loadCount();
+
+    const interval = setInterval(loadCount, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  /* ================= FUNCTIONS ================= */
+  const loadCount = async () => {
+    try {
+      const c = await getUnreadCount(userId);
+      setCount(c);
+    } catch (err) {
+      console.error("Failed to fetch notification count", err);
+    }
+  };
+
+  /* ================= UI ================= */
   return (
     <aside className="sidebar">
       {/* Logo */}
@@ -105,7 +133,7 @@ const Sidebar: React.FC = () => {
         </div>
 
         <div className="menu-item">
-          <FaHistory/>
+          <FaHistory />
           <span>History</span>
         </div>
 
@@ -114,13 +142,25 @@ const Sidebar: React.FC = () => {
           <span>Reports</span>
         </div>
 
-        <div className="menu-item notification">
+        {/* ================= NOTIFICATIONS ================= */}
+        <div
+          className="menu-item notification"
+          onClick={() => setShowNotifications(!showNotifications)}
+        >
           <FaBell />
           <span>Notifications</span>
-          <span className="badge">3</span>
+
+          {count > 0 && <span className="badge">{count}</span>}
         </div>
 
-        {/* TEAM */}
+        {showNotifications && (
+          <NotificationPanel
+            userId={userId}
+            onClose={() => setShowNotifications(false)}
+          />
+        )}
+
+        {/* ================= TEAMS ================= */}
         <div className="menu-item" onClick={() => setOpenTeams(!openTeams)}>
           <FaUsers />
           <span>Team</span>
@@ -163,7 +203,7 @@ const Sidebar: React.FC = () => {
           </div>
         )}
 
-        {/* PROJECTS */}
+        {/* ================= PROJECTS ================= */}
         <div className="projects-section">
           <div
             className="projects-header"
@@ -196,7 +236,7 @@ const Sidebar: React.FC = () => {
         </div>
       </nav>
 
-      {/* BOTTOM */}
+      {/* ================= BOTTOM ================= */}
       <div className="sidebar-bottom">
         <div className="logout">
           <FaSignOutAlt />
