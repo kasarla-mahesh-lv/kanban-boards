@@ -14,9 +14,9 @@ import {
   FaBug,
   FaSignOutAlt,
   FaCalendarCheck,
-  FaMoneyBill,
   FaFileAlt,
   FaBell,
+  FaHistory
 } from "react-icons/fa";
 
 /* ---------- TYPES ---------- */
@@ -105,8 +105,8 @@ const Sidebar: React.FC = () => {
         </div>
 
         <div className="menu-item">
-          <FaMoneyBill />
-          <span>Payroll</span>
+          <FaHistory/>
+          <span>History</span>
         </div>
 
         <div className="menu-item">
