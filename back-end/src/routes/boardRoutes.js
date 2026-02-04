@@ -31,14 +31,6 @@ router.delete("/:boardId", deleteBoard);
  *     description: Board related APIs
  */
 
-const router = require("express").Router();
-const { 
-    createBoard,
-    updateBoard,
-    getAllBoards,
-    getBoardWithDetails,
-    deleteBoard,
-} = require("../controllers/boardController");
 
 /**
  * @openapi

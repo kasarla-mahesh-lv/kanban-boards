@@ -1,25 +1,114 @@
-const router = require("express").Router();
+const express = require("express");
+const router = express.Router();
 
-// ✅ import ALL required functions
 const {
-  createColumn,
-  updateColumn,
-  deleteColumn,
-  getAllColumns
-} = require("../controllers/columnController");
+  createCard,
+  updateCard,
+  deleteCard,
+  getCardsByColumn,
+} = require("../controllers/cardController");
 
-// 🔹 app.js lo already: app.use("/api/columns", columnRoutes)
+/**
+ * @openapi
+ * tags:
+ *   - name: Cards
+ *     description: Card related APIs
+ */
 
-// Create column under a board
-router.post("/boards/:boardId/columns", createColumn);
+/**
+ * @openapi
+ * /api/cards/columns/{columnId}/cards:
+ *   get:
+ *     tags: [Cards]
+ *     summary: Get all cards in a column
+ *     parameters:
+ *       - in: path
+ *         name: columnId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cards list
+ */
+router.get("/columns/:columnId/cards", getCardsByColumn);
 
-// Update column under a board
-router.patch("/boards/:boardId/columns/:columnId", updateColumn);
+/**
+ * @openapi
+ * /api/cards/columns/{columnId}/cards:
+ *   post:
+ *     tags: [Cards]
+ *     summary: Create a card in a column
+ *     parameters:
+ *       - in: path
+ *         name: columnId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title]
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Implement login"
+ *               description:
+ *                 type: string
+ *                 example: "Add JWT auth"
+ *     responses:
+ *       201:
+ *         description: Card created
+ */
+router.post("/columns/:columnId/cards", createCard);
 
-// Get all columns
-router.get("/", getAllColumns);
+/**
+ * @openapi
+ * /api/cards/columns/{columnId}/cards/{cardId}:
+ *   patch:
+ *     tags: [Cards]
+ *     summary: Update a card
+ *     parameters:
+ *       - in: path
+ *         name: columnId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: cardId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Card updated
+ */
+router.patch("/columns/:columnId/cards/:cardId", updateCard);
 
-// Delete column
-router.delete("/:columnId", deleteColumn);
+/**
+ * @openapi
+ * /api/cards/columns/{columnId}/cards/{cardId}:
+ *   delete:
+ *     tags: [Cards]
+ *     summary: Delete a card
+ *     parameters:
+ *       - in: path
+ *         name: columnId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: cardId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Card deleted
+ */
+router.delete("/columns/:columnId/cards/:cardId", deleteCard);
 
 module.exports = router;
