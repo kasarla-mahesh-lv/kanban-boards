@@ -9,6 +9,8 @@ import History from "./components/History";
 import Reports from "./Pages/Reports";
 import Logout from "./Pages/Logout";
 
+ 
+
 
 const AppLayout: React.FC = () => {
   const location=useLocation();
