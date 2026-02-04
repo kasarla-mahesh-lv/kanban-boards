@@ -41,7 +41,7 @@ exports.getProjectById = async (req, res) => {
       return res.status(400).json({ message: "Invalid projectId" });
     }
 
-    const project = await Project.findById(projectId);
+    const projects = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     res.json(project);
