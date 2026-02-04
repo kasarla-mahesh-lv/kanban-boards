@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Sidebar.css";
+import {useNavigate} from "react-router-dom"
 import {
   FaHome,
   FaTasks,
@@ -10,7 +11,7 @@ import {
   FaChevronRight,
   FaCode,
   FaServer,
-  FaDatabase,
+  
   FaBug,
   FaSignOutAlt,
   FaCalendarCheck,
@@ -79,6 +80,7 @@ const Sidebar: React.FC = () => {
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
   const [openTeamId, setOpenTeamId] = useState<number | null>(null);
+  const navigate=useNavigate();
 
   return (
     <aside className="sidebar">
@@ -182,7 +184,10 @@ const Sidebar: React.FC = () => {
                   className={`project-item ${
                     activeProject === p.id ? "active" : ""
                   }`}
-                  onClick={() => setActiveProject(p.id)}
+                  onClick={()=>{
+                    setActiveProject(p.id);
+                    navigate(`/projects/${p.id}`);
+                  }}
                 >
                   <span
                     className="project-badge"
