@@ -1,4 +1,4 @@
-const Board = require("../models/board");
+const BoardModel = require("../models/board");
 const mongoose = require("mongoose");
 
 
@@ -7,7 +7,7 @@ exports.createBoard = async (req, res) => {
   if (!name) 
     return res.status(400).json({ message: "name is required" });
 
-  const board = await Board.create({ name });
+  const board = await BoardModel.create({ name });
   res.status(201).json(board);
 };
 
@@ -25,7 +25,7 @@ exports.updateBoard = async (req, res) => {
       return res.status(400).json({ message: "name is required" });
     }
 
-    const updatedBoard = await Board.findByIdAndUpdate(
+    const updatedBoard = await BoardModel.findByIdAndUpdate(
       id,
       { name },
       { new: true, runValidators: true }
@@ -45,7 +45,7 @@ exports.updateBoard = async (req, res) => {
 // get api
 exports.getBoardWithDetails = async (req, res) => {
     try {
-        const board = await Board.findById(req.params.id).populate({
+        const board = await BoardModel.findById(req.params.id).populate({
             path: 'columns',
             populate: { path: 'cards' }
         });
@@ -60,7 +60,7 @@ exports.getBoardWithDetails = async (req, res) => {
 // get api
 exports.getAllBoards = async (req, res) => {
     try {
-        const boards = await Board.find();
+        const boards = await BoardModel.find();
         res.status(200).json(boards);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -71,7 +71,7 @@ exports.deleteBoard =async(req,res) =>{
   try{
     const {id} =req.params;
 
-  const board=await Board.findByIdAndDelete(id);
+  const board=await BoardModel.findByIdAndDelete(id);
   if(!board) return res.status(404).json({message:"Board is not found"});
 
   res.status(200).json({message:"Board deleted succesfully"});
