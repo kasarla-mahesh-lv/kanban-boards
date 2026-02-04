@@ -12,17 +12,17 @@ const {
 // GET all boards
 router.get("/", getAllBoards);
 
-// GET board full details (if you have it)
-router.get("/:boardId", getBoardWithDetails);
+
+
 
 // POST create board
 router.post("/", createBoard);
 
 // PATCH update board
-router.patch("/:boardId", updateBoard);
+router.patch("/:id", updateBoard);
 
 // DELETE board
-router.delete("/:boardId", deleteBoard);
+router.delete("/:id", deleteBoard);
 
  /*
  * @openapi
