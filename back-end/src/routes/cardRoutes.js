@@ -50,7 +50,7 @@ const {
  *       404:
  *         description: Column not found
  */
-router.post("/columns/:columnID/cards",createCard);
+router.post("/columns/:columnId/cards",createCard);
 
 /**
  * @openapi

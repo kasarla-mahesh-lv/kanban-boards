@@ -67,6 +67,7 @@ exports.getAllCards = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 // delete api
 exports.deleteCard = async(req,res) => {
  try{
@@ -80,4 +81,3 @@ exports.deleteCard = async(req,res) => {
   return res.status(400).json({message:"Invalid Card Id"});
  }
 };
-
