@@ -2,47 +2,48 @@
   height: 72px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
-
-  display: grid;
-  grid-template-columns: 1fr auto 1fr; /* CENTER MAGIC */
+  display: flex;
   align-items: center;
-
-  padding: 0 550px;
+  /* Removed justify-content: flex-end to restore default alignment */
+  padding: 0 30px;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* CENTER SEARCH */
 .topbar-search {
-  grid-column: 2;          /* FORCE CENTER */
-  width: 480px;
-  max-width: 100%;
-
-  padding: 10px 60px;
+  flex: 1;
+  /* Restore flex: 1 to fill available space */
+  /* Remove max-width so it covers all space as requested */
+  padding: 10px 20px;
   border-radius: 12px;
   border: none;
   background: #f1f5f9;
+  outline: none;
 }
 
-/* RIGHT ICONS */
 .topbar-actions {
-  grid-column: 3;
-  justify-self: end;
   display: flex;
+  align-items: center;
   gap: 12px;
-}
+  /* margin-left: auto is not strictly needed if search is flex: 1, 
+     but keeping it removed ensures they stick to the right side of the search */
 
+}
 
 .topbar-icon {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--primary-soft);
-  color: var(--primary);
+  background: var(--primary-soft, #eef2ff);
+  color: var(--primary, #4f46e5);
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-
-
-
-
+.topbar-icon:hover {
+  background: #e0e7ff;
+}

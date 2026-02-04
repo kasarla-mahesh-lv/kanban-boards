@@ -43,14 +43,12 @@ exports.login=async(req,res)=>{
         }
 
         const user=await User.findOne({email});
-        if(!user){
-          console.log(error.email);
-            return res.status(400).json({message:"Invalid email, please type valid emailid"});
-        }
+        if (!user) {
+          return res.status(400).json({ message: "Invalid email" });
+}
 
         const isMatch=await bcrypt.compare(password,user.password);
         if(!isMatch) {
-          console.log(password);
             return res.status(400).json({message:"Invalid password, please type valid password"});
         }
 

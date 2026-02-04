@@ -1,23 +1,29 @@
-const Column = require("../models/Column");
+const ColumnModel = require("../models/column");
 
+// ✅ Create Column
 exports.createColumn = async (req, res) => {
-  const { boardId } = req.params;
-  const { name } = req.body;
-  if (!name) return res.status(400).json({ message: "name is required" });
+  try {
+    const { boardId } = req.params;
+    const { name } = req.body;
 
-  const last = await Column.findOne({ boardId }).sort({ order: -1 }).lean();
-  const nextOrder = last ? last.order + 1 : 1;
+    if (!name) return res.status(400).json({ message: "name is required" });
 
-  const column = await Column.create({ boardId, name, order: nextOrder });
-  res.status(201).json(column);
+    const last = await ColumnModel.findOne({ boardId }).sort({ order: -1 }).lean();
+    const nextOrder = last ? last.order + 1 : 1;
+
+    const column = await ColumnModel.create({ boardId, name, order: nextOrder });
+    res.status(201).json(column);
+  } catch (error) {
+    res.status(500).json({ message: "Create column failed", error: error.message });
+  }
 };
 
+// ✅ Update Column
 exports.updateColumn = async (req, res) => {
   try {
     const { boardId, columnId } = req.params;
     const { name, order } = req.body;
 
-    // At least one field must be provided
     if (name === undefined && order === undefined) {
       return res.status(400).json({ message: "Provide name or order to update" });
     }
@@ -26,9 +32,8 @@ exports.updateColumn = async (req, res) => {
     if (name !== undefined) updateData.name = name;
     if (order !== undefined) updateData.order = order;
 
-    // boardId check + columnId match
-    const updated = await Column.findOneAndUpdate(
-      { _id: columnId, boardId: boardId },
+    const updated = await ColumnModel.findOneAndUpdate(
+      { _id: columnId, boardId },
       { $set: updateData },
       { new: true }
     );
@@ -43,24 +48,37 @@ exports.updateColumn = async (req, res) => {
   }
 };
 
-// MUST have 'exports.' before the function name
-exports.getAllColumns = async (req, res) => { 
-    try {
-        const columns = await Column.find().populate('cards');
-        res.status(200).json(columns);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-// delete api 
-exports.deleteColumn = async (req,res) => {
+// ✅ GET Columns by Board (FIX for your undefined error)
+exports.getColumnsByBoard = async (req, res) => {
   try {
-    const { columnId } = req.params;
+    const { boardId } = req.params;
 
-    const column = await Column.findByIdAndDelete(columnId);
+    const columns = await ColumnModel.find({ boardId }).sort({ order: 1 });
+    res.status(200).json(columns);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch columns", error: error.message });
+  }
+};
 
-    if (!column) {
-      return res.status(404).json({ message: "Column not found" });
+// ✅ GET All Columns (Optional)
+exports.getAllColumns = async (req, res) => {
+  try {
+    const columns = await ColumnModel.find();
+    res.status(200).json(columns);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch all columns", error: error.message });
+  }
+};
+
+// ✅ Delete Column (boardId check added)
+exports.deleteColumn = async (req, res) => {
+  try {
+    const { boardId, columnId } = req.params;
+
+    const deleted = await ColumnModel.findOneAndDelete({ _id: columnId, boardId });
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Column not found for this board" });
     }
 
     res.status(200).json({ message: "Column deleted successfully" });
@@ -68,4 +86,3 @@ exports.deleteColumn = async (req,res) => {
     res.status(400).json({ message: "Invalid column id" });
   }
 };
-
