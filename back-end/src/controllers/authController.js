@@ -9,7 +9,7 @@ exports.register = async (req, res) => {
     if (!name || !email || !password || !mobilenumber) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    const existingUser = await User.findOne({ email });
+    const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
+    const user = await UserModel.create({
       name,
       email,
       password:hashedPassword,
@@ -42,7 +42,7 @@ exports.login=async(req,res)=>{
             return res.status(400).json({message:"Email and password are required"})
         }
 
-        const user=await User.findOne({email});
+        const user=await UserModel.findOne({email});
         if (!user) {
           console.log(email);
           return res.status(400).json({ message: "Invalid email, please type valid email" });
