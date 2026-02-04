@@ -20,7 +20,7 @@ exports.createProject = async (req, res) => {
       return res.status(400).json({ message: "Project name required" });
     }
 
-    const project = await Project.create({
+    const projects = await Project.create({
       title: title.trim(),
       description: description || "",
       tasks: [],
@@ -59,7 +59,7 @@ exports.getProjectTasks = async (req, res) => {
       return res.status(400).json({ message: "Invalid projectId" });
     }
 
-    const project = await Project.findById(projectId);
+    const projects = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     res.json(project.tasks);
@@ -82,7 +82,7 @@ exports.addTaskToProject = async (req, res) => {
       return res.status(400).json({ message: "title is required" });
     }
 
-    const project = await Project.findById(projectId);
+    const projects = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     project.tasks.push({
@@ -93,7 +93,7 @@ exports.addTaskToProject = async (req, res) => {
 
     await project.save();
 
-    const newTask = project.tasks[project.tasks.length - 1];
+    const newTask = projects.tasks[project.tasks.length - 1];
 
     res.status(201).json({
       message: "Task added",
@@ -117,7 +117,7 @@ exports.getTaskByTaskIdInProject = async (req, res) => {
       return res.status(400).json({ message: "Invalid taskId" });
     }
 
-    const project = await Project.findById(projectId);
+    const projects = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     const task = project.tasks.id(taskId); // ✅ subdocument by _id
@@ -144,7 +144,7 @@ exports.updateTaskInProject = async (req, res) => {
       return res.status(400).json({ message: "Invalid taskId" });
     }
 
-    const project = await Project.findById(projectId);
+    const projects = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     const task = project.tasks.id(taskId);
