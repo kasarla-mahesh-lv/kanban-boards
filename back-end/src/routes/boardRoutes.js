@@ -52,14 +52,11 @@ const {
  *         application/json:
  *           schema:
  *             type: object
- *             required: [title]
+ *             required: [name]
  *             properties:
- *               title:
+ *               name:
  *                 type: string
  *                 example: "My First Board"
- *               description:
- *                 type: string
- *                 example: "Project management board"
  *     responses:
  *       201:
  *         description: Board created
