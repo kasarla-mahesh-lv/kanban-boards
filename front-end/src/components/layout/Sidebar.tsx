@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {useNavigate} from "react-router-dom";
 import "./Sidebar.css";
 import {
   FaHome,
@@ -80,6 +81,7 @@ const Sidebar: React.FC = () => {
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
   const [openTeamId, setOpenTeamId] = useState<number | null>(null);
+  const navigate=useNavigate();
 
   return (
     <aside className="sidebar">
@@ -105,10 +107,14 @@ const Sidebar: React.FC = () => {
           <span>Attendance</span>
         </div>
 
-        <div className="menu-item">
-          <FaHistory/>
+        <NavLink
+          to="/history"
+          className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <FaHistory />
           <span>History</span>
-        </div>
+        </NavLink>
 
        <NavLink to="/reports" className="menu-item">
           <FaFileAlt />
@@ -183,7 +189,10 @@ const Sidebar: React.FC = () => {
                   className={`project-item ${
                     activeProject === p.id ? "active" : ""
                   }`}
-                  onClick={() => setActiveProject(p.id)}
+                    onClick={()=>{
+                    setActiveProject(p.id);
+                    navigate(`/projects/${p.id}`);
+                  }}
                 >
                   <span
                     className="project-badge"
