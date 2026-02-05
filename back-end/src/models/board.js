@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const boardSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
+    name: { type: String, required: true },
 
     // ✅ ADD THIS
-    columns: [{ type: mongoose.Schema.Types.ObjectId, ref: "Column" }],
+    columns: [ String],
   },
   { timestamps: true }
 );

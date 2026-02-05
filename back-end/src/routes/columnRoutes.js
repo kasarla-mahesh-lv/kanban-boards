@@ -1,13 +1,14 @@
+const router = require("express").Router();
+const { createColumn, updateColumn, deleteColumn,getColumnsByBoard } = require("../controllers/columnController");
 /**
  * @openapi
  * tags:
  *   - name: Columns
  *     description: Column related APIs
  */
-const router = require("express").Router();
-const { createColumn, updateColumn, deleteColumn, getColumnsByBoard } = require("../controllers/columnController");
 
 router.get("/boards/:boardId/columns", getColumnsByBoard); // ✅ ADD THIS
+
 
 router.post("/boards/:boardId/columns", createColumn);
 router.patch("/boards/:boardId/columns/:columnId", updateColumn);
