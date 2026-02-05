@@ -41,14 +41,17 @@ exports.getProjectById = async (req, res) => {
       return res.status(400).json({ message: "Invalid projectId" });
     }
 
-    const projects = await Project.findById(projectId);
-    if (!project) return res.status(404).json({ message: "Project not found" });
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
 
-    res.json(project);
+    return res.status(200).json(project);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
+
 
 // ✅ GET /api/projects/:projectId/tasks -> all tasks of a project
 exports.getProjectTasks = async (req, res) => {
@@ -59,14 +62,17 @@ exports.getProjectTasks = async (req, res) => {
       return res.status(400).json({ message: "Invalid projectId" });
     }
 
-    const projects = await Project.findById(projectId);
-    if (!project) return res.status(404).json({ message: "Project not found" });
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
 
     res.json(project.tasks);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // ✅ POST /api/projects/:projectId/tasks -> add task to project
 exports.addTaskToProject = async (req, res) => {
@@ -117,19 +123,27 @@ exports.getTaskByTaskIdInProject = async (req, res) => {
       return res.status(400).json({ message: "Invalid taskId" });
     }
 
-    const projects = await Project.findById(projectId);
+    const project = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
-    const task = project.tasks.id(taskId); // ✅ subdocument by _id
+    const task = project.tasks.id(taskId);
     if (!task) {
       return res.status(404).json({ message: "Task not found in this project" });
     }
 
-    res.json(task);
+    return res.status(200).json({
+      project: {
+        _id: project._id,
+        title: project.title,
+        description: project.description
+      },
+      task
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
+
 
 // ✅ Update task inside a project
 exports.updateTaskInProject = async (req, res) => {
