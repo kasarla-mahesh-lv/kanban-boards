@@ -9,24 +9,25 @@ import History from "./components/History";
 import Reports  from "./Pages/Reports"
 import Logout from "./Pages/Logout";
 import "./App.css";
+import NotificationPage from "./components/notifications/NotificationPage";
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
 
-  // ✅ Dashboard page lo matrame Taskbar chupinchu
+  
   const showTaskbar = location.pathname === "/";
 
   return (
     <div className="app-layout">
-      {/* LEFT */}
+  
       <Sidebar />
 
-      {/* RIGHT */}
+      
       <div className="right-container">
         {/* TOPBAR ALWAYS */}
         <Topbar />
 
-        {/* TASKBAR ONLY FOR DASHBOARD */}
+        
         {showTaskbar && <Taskbar />}
 
         {/* PAGE CONTENT */}
@@ -35,6 +36,7 @@ const AppLayout: React.FC = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/history" element={<History />} /> 
             <Route path="/reports" element={<Reports />} />
+            <Route path="/notifications" element={<NotificationPage />} />
             <Route path="/projects/:projectId" element={<ProjectDetails />} />
             <Route path="/logout" element={<Logout />} />
           </Routes>
@@ -45,14 +47,7 @@ const AppLayout: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  return (
-    <BrowserRouter>
-      <AppLayout />
-    </BrowserRouter>
-  );
+  return <AppLayout />;
 };
 
 export default App;
-
-
-
