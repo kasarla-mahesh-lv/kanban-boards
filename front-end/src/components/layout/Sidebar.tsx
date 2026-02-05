@@ -208,10 +208,10 @@ const Sidebar: React.FC = () => {
 
       {/* BOTTOM */}
       <div className="sidebar-bottom">
-        <NavLink to="/logout" className="logout">
-  <FaSignOutAlt />
-  <span>Logout</span>
-</NavLink>
+          <NavLink to="/Login" className="login">
+          <FaSignOutAlt />
+          <span>Login</span>
+          </NavLink>
 
         <div className="settings">
           <FaCog />

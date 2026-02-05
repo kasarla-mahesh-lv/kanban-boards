@@ -3,11 +3,11 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "./components/layout/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { Taskbar } from "./components/Taskbar";
-import ProjectDetails from "./components/Projects/ProjectDetails";
+// import ProjectDetails from "./components/Projects/ProjectDetails";
 import Dashboard from "./components/dashboard/Dashboard";
 import History from "./components/History";
 import Reports  from "./Pages/Reports"
-import Logout from "./Pages/Logout";
+import LoginForm from "./Pages/Login";
 import "./App.css";
 
 const AppLayout: React.FC = () => {
@@ -35,8 +35,8 @@ const AppLayout: React.FC = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/history" element={<History />} /> 
             <Route path="/reports" element={<Reports />} />
-            <Route path="/projects/:projectId" element={<ProjectDetails />} />
-            <Route path="/logout" element={<Logout />} />
+            {/* <Route path="/projects/:projectId" element={<ProjectDetails />} /> */}
+           <Route path="/Login" element={<LoginForm onClose={() => {}} />} />
           </Routes>
         </div>
       </div>
