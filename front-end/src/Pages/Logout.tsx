@@ -40,8 +40,4 @@ const Logout: React.FC = () => {
   );
 };
 
-<<<<<<< HEAD
 export default Logout;
-=======
-export default Logout;
->>>>>>> 46f5bd4392fd85db61bd38c89c6544bbcbdad7ac
