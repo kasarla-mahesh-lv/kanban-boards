@@ -11,29 +11,31 @@ import Reports from "./Pages/Reports";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Login from "./Pages/Login";
 
 import "./App.css";
+import NotificationPage from "./components/notifications/NotificationPage";
 
 /* ================= APP LAYOUT ================= */
 const AppLayout: React.FC = () => {
 
   const location = useLocation();
 
+  
   const showTaskbar = location.pathname === "/";
 
   return (
     <div className="app-layout">
-
-      {/* LEFT SIDEBAR */}
+  
       <Sidebar />
 
-      {/* RIGHT SIDE */}
+      
       <div className="right-container">
 
         {/* TOPBAR */}
         <Topbar />
 
-        {/* TASKBAR ONLY DASHBOARD */}
+        
         {showTaskbar && <Taskbar />}
 
         {/* PAGE ROUTES */}
@@ -42,6 +44,9 @@ const AppLayout: React.FC = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/notifications" element={<NotificationPage />} />
+            {/* <Route path="/projects/:projectId" element={<ProjectDetails />} /> */}
+            <Route path="/login" element={<Login onClose={() => {}} />} />
           </Routes>
         </div>
 
@@ -64,11 +69,7 @@ const AppLayout: React.FC = () => {
 
 /* ================= ROOT APP ================= */
 const App: React.FC = () => {
-  return (
-    <BrowserRouter>
-      <AppLayout />
-    </BrowserRouter>
-  );
+  return <AppLayout />;
 };
 
 export default App;
