@@ -1,5 +1,8 @@
+
 import React, { useState } from "react";
 import "./Sidebar.css";
+import {NavLink} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 import {
   FaHome,
   FaTasks,
@@ -10,7 +13,7 @@ import {
   FaChevronRight,
   FaCode,
   FaServer,
-  FaDatabase,
+  
   FaBug,
   FaSignOutAlt,
   FaCalendarCheck,
@@ -79,6 +82,7 @@ const Sidebar: React.FC = () => {
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
   const [openTeamId, setOpenTeamId] = useState<number | null>(null);
+  const navigate=useNavigate();
 
   return (
     <aside className="sidebar">
@@ -104,15 +108,26 @@ const Sidebar: React.FC = () => {
           <span>Attendance</span>
         </div>
 
-        <div className="menu-item">
+        {/* <div className="menu-item">
           <FaHistory/>
           <span>History</span>
-        </div>
+        </div> */}
+        <NavLink to="/history"
+        className={({isActive})=>(isActive ? "menu-item active":"menu-item")} style={{textDecoration:"none",color:"inherit"}}>
+         <FaHistory/>
+         <span>History</span>
+        </NavLink>
 
-        <div className="menu-item">
+
+        {/* <div className="menu-item">
           <FaFileAlt />
           <span>Reports</span>
-        </div>
+        </div> */}
+        <NavLink to="/reports" className="menu-item">
+        <FaFileAlt/>
+        <span>Reports</span>
+
+        </NavLink>
 
         <div className="menu-item notification">
           <FaBell />
@@ -182,7 +197,10 @@ const Sidebar: React.FC = () => {
                   className={`project-item ${
                     activeProject === p.id ? "active" : ""
                   }`}
-                  onClick={() => setActiveProject(p.id)}
+                  onClick={()=>{
+                    setActiveProject(p.id);
+                    navigate(`/projects/${p.id}`);
+                  }}
                 >
                   <span
                     className="project-badge"
@@ -198,10 +216,15 @@ const Sidebar: React.FC = () => {
 
       {/* BOTTOM */}
       <div className="sidebar-bottom">
-        <div className="logout">
+        {/* <div className="logout" >
           <FaSignOutAlt />
           <span>Logout</span>
-        </div>
+        </div> */}
+        <NavLink to="/logout" className="logout">
+        <FaSignOutAlt/>
+        <span>Logout</span>
+
+        </NavLink>
 
         <div className="settings">
           <FaCog />
