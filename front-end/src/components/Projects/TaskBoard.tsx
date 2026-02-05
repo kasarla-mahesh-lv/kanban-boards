@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { Task, Status } from "./types";
 import KanbanColumn from "./KanbanColumn";
+import "./kanban.css";
 
 const INITIAL_TASKS: Task[] = [
   { id: "1", projectId: "1", code: "PRJ-12", title: "Something", status: "backlog" },
