@@ -55,7 +55,7 @@ const Sidebar: React.FC = () => {
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
   const [openTeamId, setOpenTeamId] = useState<number | null>(null);
-  const navigate=useNavigate();
+  
 
   /* NEW INPUT STATES */
   const [newProjectName, setNewProjectName] = useState("");
