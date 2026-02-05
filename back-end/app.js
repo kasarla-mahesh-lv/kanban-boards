@@ -8,6 +8,7 @@ const swaggerSpec = require("./swagger"); // swagger.js file in root
 const boardRoutes = require("./src/routes/boardRoutes");
 const columnRoutes = require("./src/routes/columnRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
+const authRoutes=require("./src/routes/authRoutes");
 
 const app = express();
 
@@ -34,5 +35,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/boards", boardRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/cards", cardRoutes);
+app.use("/api/auth",authRoutes);
 
 module.exports = app;
