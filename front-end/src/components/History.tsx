@@ -225,4 +225,8 @@ const History: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default History;
+=======
+export default History;
+>>>>>>> 46f5bd4392fd85db61bd38c89c6544bbcbdad7ac

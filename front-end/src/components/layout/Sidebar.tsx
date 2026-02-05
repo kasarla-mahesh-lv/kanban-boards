@@ -1,8 +1,8 @@
 
 import React, { useState } from "react";
+import {useNavigate} from "react-router-dom";
 import "./Sidebar.css";
 import {NavLink} from "react-router-dom"
-import {useNavigate} from "react-router-dom"
 import {
   FaHome,
   FaTasks,
@@ -108,25 +108,18 @@ const Sidebar: React.FC = () => {
           <span>Attendance</span>
         </div>
 
-        {/* <div className="menu-item">
-          <FaHistory/>
+        <NavLink
+          to="/history"
+          className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <FaHistory />
           <span>History</span>
-        </div> */}
-        <NavLink to="/history"
-        className={({isActive})=>(isActive ? "menu-item active":"menu-item")} style={{textDecoration:"none",color:"inherit"}}>
-         <FaHistory/>
-         <span>History</span>
         </NavLink>
 
-
-        {/* <div className="menu-item">
+       <NavLink to="/reports" className="menu-item">
           <FaFileAlt />
           <span>Reports</span>
-        </div> */}
-        <NavLink to="/reports" className="menu-item">
-        <FaFileAlt/>
-        <span>Reports</span>
-
         </NavLink>
 
         <div className="menu-item notification">
@@ -197,7 +190,7 @@ const Sidebar: React.FC = () => {
                   className={`project-item ${
                     activeProject === p.id ? "active" : ""
                   }`}
-                  onClick={()=>{
+                    onClick={()=>{
                     setActiveProject(p.id);
                     navigate(`/projects/${p.id}`);
                   }}
@@ -216,15 +209,10 @@ const Sidebar: React.FC = () => {
 
       {/* BOTTOM */}
       <div className="sidebar-bottom">
-        {/* <div className="logout" >
-          <FaSignOutAlt />
-          <span>Logout</span>
-        </div> */}
         <NavLink to="/logout" className="logout">
-        <FaSignOutAlt/>
-        <span>Logout</span>
-
-        </NavLink>
+  <FaSignOutAlt />
+  <span>Logout</span>
+</NavLink>
 
         <div className="settings">
           <FaCog />

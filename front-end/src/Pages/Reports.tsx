@@ -72,4 +72,8 @@ const Reports: FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Reports;
+=======
+export default Reports;
+>>>>>>> 46f5bd4392fd85db61bd38c89c6544bbcbdad7ac
