@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import type { Task, Status } from "./types";
 import KanbanColumn from "./KanbanColumn";
@@ -17,7 +16,6 @@ type Props = {
 };
 
 const TaskBoard = ({ projectId }: Props) => {
-  // 🔥 MASTER STATE (ALL TASKS)
   const [allTasks, setAllTasks] = useState<Task[]>(INITIAL_TASKS);
 
   const moveTask = (taskId: string, newStatus: Status) => {
@@ -28,37 +26,40 @@ const TaskBoard = ({ projectId }: Props) => {
     );
   };
 
-  // 🔥 FILTER ONLY FOR DISPLAY
   const projectTasks = allTasks.filter(
     (t) => t.projectId === projectId
   );
 
   return (
-    <div style={{ display: "flex", gap: 16 }}>
-      <KanbanColumn
-        title="Backlog"
-        status="backlog"
-        tasks={projectTasks.filter((t) => t.status === "backlog")}
-        onDropTask={moveTask}
-      />
-      <KanbanColumn
-        title="Todo"
-        status="todo"
-        tasks={projectTasks.filter((t) => t.status === "todo")}
-        onDropTask={moveTask}
-      />
-      <KanbanColumn
-        title="In Progress"
-        status="inprogress"
-        tasks={projectTasks.filter((t) => t.status === "inprogress")}
-        onDropTask={moveTask}
-      />
-      <KanbanColumn
-        title="Done"
-        status="done"
-        tasks={projectTasks.filter((t) => t.status === "done")}
-        onDropTask={moveTask}
-      />
+    <div className="board">
+      
+
+      <div className="columns">
+        <KanbanColumn
+          title="Backlog"
+          status="backlog"
+          tasks={projectTasks.filter((t) => t.status === "backlog")}
+          onDropTask={moveTask}
+        />
+        <KanbanColumn
+          title="Todo"
+          status="todo"
+          tasks={projectTasks.filter((t) => t.status === "todo")}
+          onDropTask={moveTask}
+        />
+        <KanbanColumn
+          title="In Progress"
+          status="inprogress"
+          tasks={projectTasks.filter((t) => t.status === "inprogress")}
+          onDropTask={moveTask}
+        />
+        <KanbanColumn
+          title="Done"
+          status="done"
+          tasks={projectTasks.filter((t) => t.status === "done")}
+          onDropTask={moveTask}
+        />
+      </div>
     </div>
   );
 };
