@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import "./Sidebar.css";
+import Login from "../../Pages/Login"
+
 import {
   FaHome,
   FaTasks,
@@ -11,7 +13,6 @@ import {
   FaChevronRight,
   FaCode,
   FaServer,
-  FaDatabase,
   FaBug,
   FaSignOutAlt,
   FaCalendarCheck,
@@ -19,7 +20,6 @@ import {
   FaBell,
   FaHistory
 } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
 
 /* ---------- TYPES ---------- */
 type Project = {
@@ -77,14 +77,19 @@ const teams: Team[] = [
 
 /* ---------- COMPONENT ---------- */
 const Sidebar: React.FC = () => {
+
   const [activeProject, setActiveProject] = useState(1);
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
   const [openTeamId, setOpenTeamId] = useState<number | null>(null);
-  const navigate=useNavigate();
+
+  const [showAuth, setShowAuth] = useState(false);
+
+  const navigate = useNavigate();
 
   return (
     <aside className="sidebar">
+
       {/* Logo */}
       <div className="sidebar-logo">
         <span className="logo-icon">⚡</span>
@@ -92,6 +97,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       <nav className="sidebar-menu">
+
         <div className="menu-item active">
           <FaHome />
           <span>Dashboard</span>
@@ -109,14 +115,15 @@ const Sidebar: React.FC = () => {
 
         <NavLink
           to="/history"
-          className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
-          style={{ textDecoration: "none", color: "inherit" }}
+          className={({ isActive }) =>
+            isActive ? "menu-item active" : "menu-item"
+          }
         >
           <FaHistory />
           <span>History</span>
         </NavLink>
 
-       <NavLink to="/reports" className="menu-item">
+        <NavLink to="/reports" className="menu-item">
           <FaFileAlt />
           <span>Reports</span>
         </NavLink>
@@ -153,7 +160,10 @@ const Sidebar: React.FC = () => {
                     </span>
                     <span>{team.name}</span>
                   </div>
-                  <span className="team-count">{team.members.length}</span>
+
+                  <span className="team-count">
+                    {team.members.length}
+                  </span>
                 </div>
 
                 {openTeamId === team.id && (
@@ -189,7 +199,7 @@ const Sidebar: React.FC = () => {
                   className={`project-item ${
                     activeProject === p.id ? "active" : ""
                   }`}
-                    onClick={()=>{
+                  onClick={() => {
                     setActiveProject(p.id);
                     navigate(`/projects/${p.id}`);
                   }}
@@ -204,20 +214,29 @@ const Sidebar: React.FC = () => {
             </div>
           )}
         </div>
+
       </nav>
 
       {/* BOTTOM */}
       <div className="sidebar-bottom">
-          <NavLink to="/Login" className="login">
+
+        {/* LOGIN BUTTON */}
+        <div className="login" onClick={() => setShowAuth(true)}>
           <FaSignOutAlt />
           <span>Login</span>
-          </NavLink>
+        </div>
 
         <div className="settings">
           <FaCog />
           <span>Settings</span>
         </div>
       </div>
+
+      {/* LOGIN MODAL */}
+      {showAuth && (
+        <Login onClose={() => setShowAuth(false)} />
+      )}
+
     </aside>
   );
 };

@@ -1,35 +1,86 @@
 import { useState } from "react";
-import { FaUser, FaLock, FaSignInAlt } from "react-icons/fa";
-import { loginApi } from "../components/Api/ApiService";
+import {
+  FaUser,
+  FaLock,
+  FaPhone,
+  FaEnvelope,
+  FaSignInAlt
+} from "react-icons/fa";
+
+import { toast } from "react-toastify";
+import { loginApi, registerApi } from "../components/Api/ApiService";
 import "./Login.css";
 
 type Props = {
   onClose: () => void;
 };
 
-const LoginForm = ({ onClose }: Props) => {
+const Login = ({ onClose }: Props) => {
+
+  const [isLogin, setIsLogin] = useState(true);
+
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [mobilenumber, setMobilenumber] = useState("");
+
   const [loading, setLoading] = useState(false);
 
+  /* ---------------- LOGIN ---------------- */
   const handleLogin = async () => {
-    setError("");
 
-    if (!email) return setError("Email is required");
-    if (!password) return setError("Password is required");
+    if (!email || !password) {
+      toast.error("All fields required ❌");
+      return;
+    }
 
     try {
       setLoading(true);
 
       const res = await loginApi({ email, password });
 
-      // 🔐 Store JWT
       localStorage.setItem("token", res.token);
 
-      onClose();
-    } catch (err) {
-      setError("Invalid email or password");
+      console.log("Login Successful");
+
+      // ✅ Toast success
+      toast.success("Login Successful 🎉");
+
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+
+    } catch {
+      toast.error("Invalid email or password ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ---------------- REGISTER ---------------- */
+  const handleRegister = async () => {
+
+    if (!name || !email || !password || !mobilenumber) {
+      toast.error("All fields required ❌");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await registerApi({
+        name,
+        email,
+        password,
+        mobilenumber
+      });
+
+      toast.success("Registration Successful 🎉");
+
+      setIsLogin(true);
+
+    } catch {
+      toast.error("Registration Failed ❌");
     } finally {
       setLoading(false);
     }
@@ -38,18 +89,26 @@ const LoginForm = ({ onClose }: Props) => {
   return (
     <div className="login-overlay">
       <div className="login-card">
+
         <span className="close-btn" onClick={onClose}>✕</span>
 
-        <h2>Welcome Back</h2>
-        <p>Please login to your account</p>
+        <h2>{isLogin ? "Welcome Back" : "Create Account"}</h2>
 
-        {error && <p className="error-text">{error}</p>}
+        {!isLogin && (
+          <div className="input-box">
+            <FaUser className="input-icon" />
+            <input
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+        )}
 
         <div className="input-box">
-          <FaUser className="input-icon" />
+          <FaEnvelope className="input-icon" />
           <input
-            type="email"
-            placeholder="Email address"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -65,17 +124,36 @@ const LoginForm = ({ onClose }: Props) => {
           />
         </div>
 
+        {!isLogin && (
+          <div className="input-box">
+            <FaPhone className="input-icon" />
+            <input
+              placeholder="Mobile Number"
+              value={mobilenumber}
+              onChange={(e) => setMobilenumber(e.target.value)}
+            />
+          </div>
+        )}
+
         <button
           className="login-btn"
-          onClick={handleLogin}
+          onClick={isLogin ? handleLogin : handleRegister}
           disabled={loading}
         >
           <FaSignInAlt />
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
         </button>
+
+        <p className="switch-text">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
+          <span onClick={() => setIsLogin(!isLogin)}>
+            {isLogin ? " Register" : " Login"}
+          </span>
+        </p>
+
       </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default Login;
