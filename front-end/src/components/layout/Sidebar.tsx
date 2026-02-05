@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
-import {NavLink} from "react-router-dom"
-import {useNavigate} from "react-router-dom"
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import {
   FaHome,
   FaTasks,
@@ -10,15 +9,11 @@ import {
   FaCog,
   FaChevronDown,
   FaChevronRight,
-  FaCode,
-  FaServer,
-  
-  FaBug,
   FaSignOutAlt,
   FaCalendarCheck,
   FaFileAlt,
   FaBell,
-  FaHistory
+  FaHistory,
 } from "react-icons/fa";
 
 /* ---------- TYPES ---------- */
@@ -36,156 +31,187 @@ type Member = {
 type Team = {
   id: number;
   name: string;
-  icon: JSX.Element;
   color: string;
   members: Member[];
 };
 
-/* ---------- DATA ---------- */
-const projects: Project[] = [
-  { id: 1, name: "PROJECT 1", color: "#6366f1" },
-  { id: 2, name: "PROJECT 2", color: "#22c55e" },
-  { id: 3, name: "PROJECT 3", color: "#f97316" },
-];
-
-const teams: Team[] = [
-  {
-    id: 1,
-    name: "Frontend",
-    icon: <FaCode />,
-    color: "#6366f1",
-    members: [
-      { id: 1, name: "Alice" },
-      { id: 2, name: "Rahul" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Backend",
-    icon: <FaServer />,
-    color: "#22c55e",
-    members: [{ id: 1, name: "Amit" }],
-  },
-  {
-    id: 3,
-    name: "QA",
-    icon: <FaBug />,
-    color: "#ef4444",
-    members: [{ id: 1, name: "Neha" }],
-  },
-];
+/* ---------- STORAGE KEYS ---------- */
+const PROJECT_KEY = "hrm-projects";
+const TEAM_KEY = "hrm-teams";
 
 /* ---------- COMPONENT ---------- */
 const Sidebar: React.FC = () => {
-  const [activeProject, setActiveProject] = useState(1);
+  const navigate = useNavigate();
+  const { projectId } = useParams();
+
+  /* ================= STATE ================= */
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
-  const [openTeamId, setOpenTeamId] = useState<number | null>(null);
-  const navigate=useNavigate();
 
+  const [newProjectName, setNewProjectName] = useState("");
+  const [newTeamName, setNewTeamName] = useState("");
+
+  const [showProjectInput, setShowProjectInput] = useState(false);
+  const [showTeamInput, setShowTeamInput] = useState(false);
+
+  /* ================= LOAD FROM STORAGE ================= */
+  useEffect(() => {
+    setProjects(JSON.parse(localStorage.getItem(PROJECT_KEY) || "[]"));
+    setTeams(JSON.parse(localStorage.getItem(TEAM_KEY) || "[]"));
+  }, []);
+
+  const saveProjects = (data: Project[]) => {
+    setProjects(data);
+    localStorage.setItem(PROJECT_KEY, JSON.stringify(data));
+  };
+
+  const saveTeams = (data: Team[]) => {
+    setTeams(data);
+    localStorage.setItem(TEAM_KEY, JSON.stringify(data));
+  };
+
+  /* ================= PROJECT CRUD ================= */
+  const addProject = () => {
+    if (!newProjectName.trim()) return;
+
+    const project: Project = {
+      id: Date.now(),
+      name: newProjectName,
+      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+    };
+
+    saveProjects([...projects, project]);
+    setNewProjectName("");
+    setShowProjectInput(false);
+  };
+
+  const deleteProject = (id: number) => {
+    saveProjects(projects.filter((p) => p.id !== id));
+  };
+
+  /* ================= TEAM CRUD ================= */
+  const addTeam = () => {
+    if (!newTeamName.trim()) return;
+
+    const team: Team = {
+      id: Date.now(),
+      name: newTeamName,
+      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+      members: [],
+    };
+
+    saveTeams([...teams, team]);
+    setNewTeamName("");
+    setShowTeamInput(false);
+  };
+
+  const deleteTeam = (id: number) => {
+    saveTeams(teams.filter((t) => t.id !== id));
+  };
+
+  /* ================= UI ================= */
   return (
     <aside className="sidebar">
-      {/* Logo */}
+      {/* LOGO */}
       <div className="sidebar-logo">
-        <span className="logo-icon">⚡</span>
-        <h2>HRM</h2>
+        ⚡ <h2>HRM</h2>
       </div>
 
       <nav className="sidebar-menu">
-        <div className="menu-item active">
-          <FaHome />
-          <span>Dashboard</span>
+        <div className="menu-item" onClick={() => navigate("/")}>
+          <FaHome /> Dashboard
         </div>
 
         <div className="menu-item">
-          <FaTasks />
-          <span>Tasks</span>
+          <FaTasks /> Tasks
         </div>
 
         <div className="menu-item">
-          <FaCalendarCheck />
-          <span>Attendance</span>
+          <FaCalendarCheck /> Attendance
         </div>
 
-        {/* <div className="menu-item">
-          <FaHistory/>
-          <span>History</span>
-        </div> */}
-        <NavLink to="/history"
-        className={({isActive})=>(isActive ? "menu-item active":"menu-item")} style={{textDecoration:"none",color:"inherit"}}>
-         <FaHistory/>
-         <span>History</span>
+        <NavLink
+          to="/history"
+          className={({ isActive }) =>
+            isActive ? "menu-item active" : "menu-item"
+          }
+        >
+          <FaHistory /> History
         </NavLink>
 
-
-        {/* <div className="menu-item">
-          <FaFileAlt />
-          <span>Reports</span>
-        </div> */}
-        <NavLink to="/reports" className="menu-item">
-        <FaFileAlt/>
-        <span>Reports</span>
-
+        <NavLink
+          to="/reports"
+          className={({ isActive }) =>
+            isActive ? "menu-item active" : "menu-item"
+          }
+        >
+          <FaFileAlt /> Reports
         </NavLink>
 
-        <div className="menu-item notification">
-          <FaBell />
-          <span>Notifications</span>
-          <span className="badge">3</span>
+        <div className="menu-item" onClick={() => navigate("/notifications")}>
+          <FaBell /> Notifications
         </div>
 
-        {/* TEAM */}
+        {/* ================= TEAMS ================= */}
         <div className="menu-item" onClick={() => setOpenTeams(!openTeams)}>
-          <FaUsers />
-          <span>Team</span>
+          <FaUsers /> Teams
           {openTeams ? <FaChevronDown /> : <FaChevronRight />}
+          <FaPlus
+            style={{ marginLeft: "auto" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowTeamInput(true);
+            }}
+          />
         </div>
 
         {openTeams && (
           <div className="teams-wrapper">
             {teams.map((team) => (
-              <div key={team.id}>
-                <div
-                  className="team-item"
-                  onClick={() =>
-                    setOpenTeamId(openTeamId === team.id ? null : team.id)
-                  }
+              <div key={team.id} className="team-item">
+                <span>{team.name}</span>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteTeam(team.id);
+                  }}
                 >
-                  <div className="team-left">
-                    <span
-                      className="team-icon"
-                      style={{ background: team.color }}
-                    >
-                      {team.icon}
-                    </span>
-                    <span>{team.name}</span>
-                  </div>
-                  <span className="team-count">{team.members.length}</span>
-                </div>
-
-                {openTeamId === team.id && (
-                  <div className="members-list">
-                    {team.members.map((m) => (
-                      <div key={m.id} className="member-item">
-                        👤 {m.name}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  ❌
+                </span>
               </div>
             ))}
+
+            {showTeamInput && (
+              <input
+                className="sidebar-input"
+                placeholder="Team name..."
+                autoFocus
+                value={newTeamName}
+                onChange={(e) => setNewTeamName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addTeam()}
+              />
+            )}
           </div>
         )}
 
-        {/* PROJECTS */}
+        {/* ================= PROJECTS ================= */}
         <div className="projects-section">
           <div
             className="projects-header"
             onClick={() => setOpenProjects(!openProjects)}
           >
             {openProjects ? <FaChevronDown /> : <FaChevronRight />}
-            <span>Projects</span>
-            <FaPlus className="add-project" />
+            Projects
+            <FaPlus
+              style={{ marginLeft: "auto" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowProjectInput(true);
+              }}
+            />
           </div>
 
           {openProjects && (
@@ -194,20 +220,32 @@ const Sidebar: React.FC = () => {
                 <div
                   key={p.id}
                   className={`project-item ${
-                    activeProject === p.id ? "active" : ""
+                    Number(projectId) === p.id ? "active" : ""
                   }`}
-                  onClick={()=>{
-                    setActiveProject(p.id);
-                    navigate(`/projects/${p.id}`);
-                  }}
+                  onClick={() => navigate(`/projects/${p.id}`)}
                 >
-                  <span
-                    className="project-badge"
-                    style={{ background: p.color }}
-                  />
                   {p.name}
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteProject(p.id);
+                    }}
+                  >
+                    ❌
+                  </span>
                 </div>
               ))}
+
+              {showProjectInput && (
+                <input
+                  className="sidebar-input"
+                  placeholder="Project name..."
+                  autoFocus
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addProject()}
+                />
+              )}
             </div>
           )}
         </div>
@@ -215,19 +253,12 @@ const Sidebar: React.FC = () => {
 
       {/* BOTTOM */}
       <div className="sidebar-bottom">
-        {/* <div className="logout" >
-          <FaSignOutAlt />
-          <span>Logout</span>
-        </div> */}
         <NavLink to="/logout" className="logout">
-        <FaSignOutAlt/>
-        <span>Logout</span>
-
+          <FaSignOutAlt /> Logout
         </NavLink>
 
         <div className="settings">
-          <FaCog />
-          <span>Settings</span>
+          <FaCog /> Settings
         </div>
       </div>
     </aside>
