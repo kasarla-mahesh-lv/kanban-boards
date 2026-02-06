@@ -13,6 +13,23 @@ const swaggerOptions = {
         url: "http://localhost:5000", // ✅ mee server 5000 lo run avuthundi
       },
     ],
+
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    
     // ✅ ORDER CONTROL: Boards -> Columns -> Cards
     tags: [
       {

@@ -60,6 +60,12 @@ exports.login=async(req,res)=>{
             {expiresIn:"1d"}
         );
 
+        user.tokens = user.tokens.concat({ token });
+        await user.save();
+
+         // send token in header
+        res.setHeader("Authorization", `Bearer ${token}`);
+
         res.status(200).json({message:"Login successful",token,
             user:{
                 id:user._id,
