@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaLock,
   FaPhone,
   FaEnvelope,
-  FaSignInAlt
+  FaSignInAlt,
 } from "react-icons/fa";
 
 import { toast } from "react-toastify";
@@ -12,10 +13,11 @@ import { loginApi, registerApi } from "../components/Api/ApiService";
 import "./Login.css";
 
 type Props = {
-  onClose: () => void;
+  onClose?: () => void; // ✅ optional (so page mode also works)
 };
 
 const Login = ({ onClose }: Props) => {
+  const nav = useNavigate(); // ✅ ADD
 
   const [isLogin, setIsLogin] = useState(true);
 
@@ -28,7 +30,6 @@ const Login = ({ onClose }: Props) => {
 
   /* ---------------- LOGIN ---------------- */
   const handleLogin = async () => {
-
     if (!email || !password) {
       toast.error("All fields required ❌");
       return;
@@ -39,17 +40,18 @@ const Login = ({ onClose }: Props) => {
 
       const res = await loginApi({ email, password });
 
+      // ✅ store token
       localStorage.setItem("token", res.token);
 
-      console.log("Login Successful");
-
-      // ✅ Toast success
       toast.success("Login Successful 🎉");
 
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+      // ✅ close modal if exists
+      if (onClose) onClose();
 
+      // ✅ go to dashboard
+      setTimeout(() => {
+        nav("/", { replace: true });
+      }, 600);
     } catch {
       toast.error("Invalid email or password ❌");
     } finally {
@@ -59,7 +61,6 @@ const Login = ({ onClose }: Props) => {
 
   /* ---------------- REGISTER ---------------- */
   const handleRegister = async () => {
-
     if (!name || !email || !password || !mobilenumber) {
       toast.error("All fields required ❌");
       return;
@@ -68,17 +69,21 @@ const Login = ({ onClose }: Props) => {
     try {
       setLoading(true);
 
+      // ✅ Register API
       await registerApi({
         name,
         email,
         password,
-        mobilenumber
+        mobilenumber,
       });
 
       toast.success("Registration Successful 🎉");
 
+      // ✅ After register -> switch to login
       setIsLogin(true);
 
+      // Optional: clear fields
+      setPassword("");
     } catch {
       toast.error("Registration Failed ❌");
     } finally {
@@ -89,8 +94,12 @@ const Login = ({ onClose }: Props) => {
   return (
     <div className="login-overlay">
       <div className="login-card">
-
-        <span className="close-btn" onClick={onClose}>✕</span>
+        {/* ✅ Close button only if modal */}
+        {onClose && (
+          <span className="close-btn" onClick={onClose}>
+            ✕
+          </span>
+        )}
 
         <h2>{isLogin ? "Welcome Back" : "Create Account"}</h2>
 
@@ -150,10 +159,10 @@ const Login = ({ onClose }: Props) => {
             {isLogin ? " Register" : " Login"}
           </span>
         </p>
-
       </div>
     </div>
   );
 };
 
 export default Login;
+

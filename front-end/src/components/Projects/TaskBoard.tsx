@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Task, Status } from "./types";
+import type { Task, TaskStatus } from "./types";
 import KanbanColumn from "./KanbanCloumn";
 
 const INITIAL_TASKS: Task[] = [
@@ -18,7 +18,7 @@ const TaskBoard = ({ projectId }: Props) => {
   // 🔥 MASTER STATE (ALL TASKS)
   const [allTasks, setAllTasks] = useState<Task[]>(INITIAL_TASKS);
 
-  const moveTask = (taskId: string, newStatus: Status) => {
+  const moveTask = (taskId: string, newStatus: TaskStatus) => {
     setAllTasks((prev) =>
       prev.map((t) =>
         t.id === taskId ? { ...t, status: newStatus } : t
