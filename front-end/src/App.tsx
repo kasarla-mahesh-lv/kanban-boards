@@ -1,17 +1,24 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+
 import Sidebar from "./components/layout/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { Taskbar } from "./components/Taskbar";
-import ProjectDetails from "./components/Projects/ProjectDetails";
+
 import Dashboard from "./components/dashboard/Dashboard";
 import History from "./components/History";
-import Reports  from "./Pages/Reports"
-import Logout from "./Pages/Logout";
+import Reports from "./Pages/Reports";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Login from "./Pages/Login";
+
 import "./App.css";
 import NotificationPage from "./components/notifications/NotificationPage";
 
+/* ================= APP LAYOUT ================= */
 const AppLayout: React.FC = () => {
+
   const location = useLocation();
 
   
@@ -24,28 +31,43 @@ const AppLayout: React.FC = () => {
 
       
       <div className="right-container">
-        {/* TOPBAR ALWAYS */}
+
+        {/* TOPBAR */}
         <Topbar />
 
         
         {showTaskbar && <Taskbar />}
 
-        {/* PAGE CONTENT */}
+        {/* PAGE ROUTES */}
         <div className="content-container">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/history" element={<History />} /> 
+            <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/notifications" element={<NotificationPage />} />
-            <Route path="/projects/:projectId" element={<ProjectDetails />} />
-            <Route path="/logout" element={<Logout />} />
+            {/* <Route path="/projects/:projectId" element={<ProjectDetails />} /> */}
+            <Route path="/login" element={<Login onClose={() => {}} />} />
           </Routes>
         </div>
+
       </div>
+
+      {/* ⭐ TOAST CONTAINER GLOBAL */}
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
+
     </div>
   );
 };
 
+/* ================= ROOT APP ================= */
 const App: React.FC = () => {
   return <AppLayout />;
 };
