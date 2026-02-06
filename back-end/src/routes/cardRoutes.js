@@ -7,6 +7,7 @@
 
 const router = require("express").Router();
 
+
 const {
   createCard,
   updateCard,
@@ -49,7 +50,7 @@ const {
  *       404:
  *         description: Column not found
  */
-router.post("/columns/:columnId/cards", createCard);
+router.post("/columns/:columnId/cards",createCard);
 
 /**
  * @openapi

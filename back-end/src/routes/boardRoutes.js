@@ -1,3 +1,28 @@
+const express = require("express");
+const router = express.Router();
+
+const {
+  getAllBoards,
+  getBoardWithDetails,
+  createBoard,
+  updateBoard,
+  deleteBoard,
+} = require("../controllers/boardController");
+
+// GET all boards
+router.get("/", getAllBoards);
+
+
+
+
+// POST create board
+router.post("/", createBoard);
+
+// PATCH update board
+router.patch("/:id", updateBoard);
+
+// DELETE board
+router.delete("/:id", deleteBoard);
 
  /*
  * @openapi
@@ -6,14 +31,6 @@
  *     description: Board related APIs
  */
 
-const router = require("express").Router();
-const { 
-    createBoard,
-    updateBoard,
-    getAllBoards,
-    getBoardWithDetails,
-    deleteBoard,
-} = require("../controllers/boardController");
 
 /**
  * @openapi

@@ -27,6 +27,15 @@ const swaggerOptions = {
         name: "Cards",
         description: "Card related APIs",
       },
+      {
+        name:"Register",
+        description:"Register related APIs",
+      },
+      {
+        name:"Login",
+        description:"Login related APIS"
+      },
+      
     ],
   },
   
