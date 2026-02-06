@@ -1,5 +1,6 @@
-import type { Task,Status} from "./types";
+import type { Task,TaskStatus} from "./types";
 import TaskCard from "./TaskCard";
+import type { Status } from "../../types";
 
 type Props = {
   title: string;
