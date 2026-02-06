@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
+import { useAuth } from "../../components/Auth/AuthContext";
 import "./Sidebar.css";
-import Login from "../../Pages/Login";
-
-
-import {NavLink} from "react-router-dom"
 import {
   FaHome,
   FaTasks,
@@ -30,6 +27,7 @@ type Project = {
 type Member = {
   id: number;
   name: string;
+  color: string;
 };
 
 type Team = {
@@ -45,9 +43,7 @@ const TEAM_KEY = "hrm-teams";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
-
-  /* ---------- AUTH MODAL ---------- */
-  const [showAuth, setShowAuth] = useState(false);
+  const { logout } = useAuth();
 
   /* ---------- STATE ---------- */
   const [projects, setProjects] = useState<Project[]>([]);
@@ -119,6 +115,12 @@ const Sidebar: React.FC = () => {
     saveTeams(teams.filter((t) => t.id !== id));
   };
 
+  /* ---------- LOGOUT ---------- */
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <aside className="sidebar">
       {/* LOGO */}
@@ -135,9 +137,9 @@ const Sidebar: React.FC = () => {
           <FaTasks /> Tasks
         </div>
 
-        <div className="menu-item">
+        {/* <div className="menu-item">
           <FaCalendarCheck /> Attendance
-        </div>
+        </div> */}
 
         <NavLink
           to="/history"
@@ -213,9 +215,8 @@ const Sidebar: React.FC = () => {
               {projects.map((p) => (
                 <div
                   key={p.id}
-                  className={`project-item ${
-                    activeProject === p.id ? "active" : ""
-                  }`}
+                  className={`project-item ${activeProject === p.id ? "active" : ""
+                    }`}
                   onClick={() => {
                     setActiveProject(p.id);
                     navigate(`/projects/${p.id}`);
@@ -243,18 +244,15 @@ const Sidebar: React.FC = () => {
 
       {/* ---------- BOTTOM ---------- */}
       <div className="sidebar-bottom">
-        <div className="login" onClick={() => setShowAuth(true)}>
+        <div className="login" onClick={handleLogout}>
           <FaSignOutAlt />
-          <span>Login</span>
+          <span>Logout</span>
         </div>
 
         <div className="settings">
           <FaCog /> Settings
         </div>
       </div>
-
-      {/* ---------- LOGIN MODAL ---------- */}
-      {showAuth && <Login onClose={() => setShowAuth(false)} />}
     </aside>
   );
 };
