@@ -1,11 +1,11 @@
-.history-page {
+/* /* .history-page {
   width: 100%;
   padding: 18px;
   box-sizing: border-box;
 }
 
 /* HEADER */
-.history-header {
+/* .history-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -28,7 +28,7 @@
 }
 
 /* CONTROLS */
-.history-controls {
+/* .history-controls {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -66,10 +66,10 @@
 .search-icon,
 .filter-icon {
   color: #64748b;
-}
+} */
 
 /* STATS (LIKE DASHBOARD CARDS) */
-.history-stats {
+/* .history-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(160px, 1fr));
   gap: 16px;
@@ -94,10 +94,10 @@
   margin: 10px 0 0;
   font-size: 26px;
   color: #0f172a;
-}
+} */
 
 /* MAIN CARD */
-.history-card {
+/* .history-card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 18px;
@@ -123,10 +123,10 @@
 .muted {
   color: #64748b;
   font-size: 13px;
-}
+} */
 
 /* TABLE */
-.history-table-wrap {
+/* .history-table-wrap {
   width: 100%;
   overflow-x: auto;
 }
@@ -158,10 +158,10 @@
   text-align: center;
   padding: 24px !important;
   color: #64748b !important;
-}
+} */
 
 /* ACTIVITY CELL */
-.activity-title {
+/* .activity-title {
   font-weight: 800;
   margin-bottom: 4px;
 }
@@ -169,10 +169,10 @@
 .activity-desc {
   font-size: 13px;
   color: #64748b;
-}
+} */ */
 
 /* TYPE BADGE */
-.type-badge {
+/* .type-badge {
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
@@ -203,10 +203,10 @@
   background: #f1f5f9;
   color: #334155;
   border-color: #e2e8f0;
-}
+} */
 
 /* STATUS PILLS */
-.pill {
+/* .pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -239,10 +239,10 @@
   background: #fef2f2;
   color: #b91c1c;
   border-color: #fecaca;
-}
+} */
 
 /* RESPONSIVE */
-@media (max-width: 1100px) {
+/* @media (max-width: 1100px) {
   .history-stats {
     grid-template-columns: repeat(2, minmax(160px, 1fr));
   }
@@ -252,8 +252,147 @@
   .search-box input {
     width: 160px;
   }
-<<<<<<< HEAD
 }
-=======
+} */
+
+
+.history-page {
+  padding: 18px;
 }
->>>>>>> 46f5bd4392fd85db61bd38c89c6544bbcbdad7ac
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.history-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.history-search {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  min-width: 280px;
+}
+
+.history-filter {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.history-refresh {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  background: #fff;
+}
+
+.history-state {
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.history-state.error {
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.history-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-table {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.table-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: top;
+}
+
+.activity-title {
+  font-weight: 700;
+}
+
+.activity-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+  display: inline-block;
+}
+
+/* status colors */
+.success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.updated {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+.deleted {
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+@media (max-width: 900px) {
+  .history-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
