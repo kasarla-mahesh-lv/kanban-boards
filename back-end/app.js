@@ -35,9 +35,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/boards", boardRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/cards", cardRoutes);
-<<<<<<< HEAD
-=======
 app.use("/api/projects", projectRoutes); // ✅ ADD THIS
->>>>>>> 7cf1e8aeaf45bdbff53de41ac0c77f8494bf161a
 
 module.exports = app;
