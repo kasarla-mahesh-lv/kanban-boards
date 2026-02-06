@@ -259,7 +259,7 @@
   padding-top: 16px;
 }
 
-.logout {
+.login {
    background: linear-gradient(180deg, #f8fafc, #eef2ff);
   display: flex;
   align-items: center;
@@ -271,7 +271,7 @@
   transition: all 0.3s ease;
 }
 
-.logout:hover {
+.llogin:hover {
   background: #fee2e2;
   transform: translateX(6px);
 }
