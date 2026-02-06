@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, NavLink, useParams } from "react-router-dom";
 import "./Sidebar.css";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import Login from "../../Pages/Login";
+
 import {
   FaHome,
   FaTasks,
@@ -39,14 +41,17 @@ type Team = {
 const PROJECT_KEY = "hrm-projects";
 const TEAM_KEY = "hrm-teams";
 
-/* ---------- COMPONENT ---------- */
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
 
-  /* ================= STATE ================= */
+  /* ---------- AUTH MODAL ---------- */
+  const [showAuth, setShowAuth] = useState(false);
+
+  /* ---------- STATE ---------- */
   const [projects, setProjects] = useState<Project[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [activeProjects, setActiveProjects] = useState<number | null []>([]);
 
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
@@ -57,7 +62,7 @@ const Sidebar: React.FC = () => {
   const [showProjectInput, setShowProjectInput] = useState(false);
   const [showTeamInput, setShowTeamInput] = useState(false);
 
-  /* ================= LOAD FROM STORAGE ================= */
+  /* ---------- LOAD STORAGE ---------- */
   useEffect(() => {
     setProjects(JSON.parse(localStorage.getItem(PROJECT_KEY) || "[]"));
     setTeams(JSON.parse(localStorage.getItem(TEAM_KEY) || "[]"));
@@ -73,7 +78,7 @@ const Sidebar: React.FC = () => {
     localStorage.setItem(TEAM_KEY, JSON.stringify(data));
   };
 
-  /* ================= PROJECT CRUD ================= */
+  /* ---------- PROJECT CRUD ---------- */
   const addProject = () => {
     if (!newProjectName.trim()) return;
 
@@ -92,7 +97,7 @@ const Sidebar: React.FC = () => {
     saveProjects(projects.filter((p) => p.id !== id));
   };
 
-  /* ================= TEAM CRUD ================= */
+  /* ---------- TEAM CRUD ---------- */
   const addTeam = () => {
     if (!newTeamName.trim()) return;
 
@@ -112,7 +117,6 @@ const Sidebar: React.FC = () => {
     saveTeams(teams.filter((t) => t.id !== id));
   };
 
-  /* ================= UI ================= */
   return (
     <aside className="sidebar">
       {/* LOGO */}
@@ -142,12 +146,7 @@ const Sidebar: React.FC = () => {
           <FaHistory /> History
         </NavLink>
 
-        <NavLink
-          to="/reports"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-        >
+        <NavLink to="/reports" className="menu-item">
           <FaFileAlt /> Reports
         </NavLink>
 
@@ -155,7 +154,7 @@ const Sidebar: React.FC = () => {
           <FaBell /> Notifications
         </div>
 
-        {/* ================= TEAMS ================= */}
+        {/* ---------- TEAMS ---------- */}
         <div className="menu-item" onClick={() => setOpenTeams(!openTeams)}>
           <FaUsers /> Teams
           {openTeams ? <FaChevronDown /> : <FaChevronRight />}
@@ -197,7 +196,7 @@ const Sidebar: React.FC = () => {
           </div>
         )}
 
-        {/* ================= PROJECTS ================= */}
+        {/* ---------- PROJECTS ---------- */}
         <div className="projects-section">
           <div
             className="projects-header"
@@ -222,7 +221,10 @@ const Sidebar: React.FC = () => {
                   className={`project-item ${
                     Number(projectId) === p.id ? "active" : ""
                   }`}
-                  onClick={() => navigate(`/projects/${p.id}`)}
+                  onClick={() => {
+                    setActiveProjects(p.id);
+                    navigate(`/projects/${p.id}`);
+                  }}
                 >
                   {p.name}
                   <span
@@ -251,16 +253,20 @@ const Sidebar: React.FC = () => {
         </div>
       </nav>
 
-      {/* BOTTOM */}
+      {/* ---------- BOTTOM ---------- */}
       <div className="sidebar-bottom">
-        <NavLink to="/logout" className="logout">
-          <FaSignOutAlt /> Logout
-        </NavLink>
+        <div className="login" onClick={() => setShowAuth(true)}>
+          <FaSignOutAlt />
+          <span>Login</span>
+        </div>
 
         <div className="settings">
           <FaCog /> Settings
         </div>
       </div>
+
+      {/* ---------- LOGIN MODAL ---------- */}
+      {showAuth && <Login onClose={() => setShowAuth(false)} />}
     </aside>
   );
 };
