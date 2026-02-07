@@ -51,7 +51,8 @@ const swaggerOptions = {
       {
         name:"Login",
         description:"Login related APIS"
-      }
+      },
+      
     ],
   },
   

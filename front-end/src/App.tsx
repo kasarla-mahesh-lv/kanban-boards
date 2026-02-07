@@ -1,58 +1,81 @@
+
 import React from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+
 import Sidebar from "./components/layout/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { Taskbar } from "./components/Taskbar";
-import ProjectDetails from "./components/Projects/ProjectDetails";
+
 import Dashboard from "./components/dashboard/Dashboard";
 import History from "./components/History";
-import Reports  from "./Pages/Reports"
-import Logout from "./Pages/Logout";
+import Reports from "./Pages/Reports";
+import NotificationPage from "./components/notifications/NotificationPage";
+
+import Login from "./Pages/Login";
+import Register from "./components/Auth/Register";
+
+import ProtectedRoute from "./components/Auth/ProtectedRoute";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "./App.css";
 
-const AppLayout: React.FC = () => {
+/* ✅ Dashboard Layout only (NO login/register here) */
+const DashboardLayout: React.FC = () => {
   const location = useLocation();
-
-  // ✅ Dashboard page lo matrame Taskbar chupinchu
   const showTaskbar = location.pathname === "/";
 
   return (
     <div className="app-layout">
-      {/* LEFT */}
       <Sidebar />
 
-      {/* RIGHT */}
       <div className="right-container">
-        {/* TOPBAR ALWAYS */}
         <Topbar />
-
-        {/* TASKBAR ONLY FOR DASHBOARD */}
         {showTaskbar && <Taskbar />}
 
-        {/* PAGE CONTENT */}
         <div className="content-container">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/history" element={<History />} /> 
+            <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
-            <Route path="/projects/:projectId" element={<ProjectDetails />} />
-            <Route path="/logout" element={<Logout />} />
+            <Route path="/notifications" element={<NotificationPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </div>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
     </div>
   );
 };
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <AppLayout />
-    </BrowserRouter>
+    <Routes>
+      {/* ✅ PUBLIC (no dashboard layout) */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* ✅ PROTECTED (dashboard layout only) */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 };
 
 export default App;
-
-
-

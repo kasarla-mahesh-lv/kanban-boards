@@ -1,11 +1,9 @@
-
- /*
+/*
  * @openapi
  * tags:
  *   - name: Boards
  *     description: Board related APIs
  */
-
 const router = require("express").Router();
 const authMiddleware=require("../middlewares/authmiddlewares");
 const { 

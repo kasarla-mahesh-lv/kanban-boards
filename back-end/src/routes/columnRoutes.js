@@ -136,7 +136,3 @@ router.get("/api/columns", async (req, res) => {
  *       200:
  *         description: Column deleted
  */
-
-
-
-

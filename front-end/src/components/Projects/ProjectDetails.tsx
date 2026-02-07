@@ -5,7 +5,6 @@ const ProjectDetails = () => {
   const { projectId } = useParams<{ projectId: string }>();
 
   if (!projectId) return null;
-
   return (
     <div>
       <h2 style={{ marginBottom: 16 }}>Project {projectId}</h2>
