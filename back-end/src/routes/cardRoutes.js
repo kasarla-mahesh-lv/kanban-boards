@@ -14,6 +14,7 @@ const {
   getAllCards,
   deleteCard,
 } = require("../controllers/cardController");
+const authMiddleware = require("../middlewares/authmiddlewares");
 
 /**
  * @openapi
@@ -50,7 +51,7 @@ const {
  *       404:
  *         description: Column not found
  */
-router.post("/columns/:columnId/cards",createCard);
+router.post("/columns/:columnId/cards",authMiddleware, createCard);
 
 /**
  * @openapi
@@ -82,7 +83,7 @@ router.post("/columns/:columnId/cards",createCard);
  *       404:
  *         description: Card not found
  */
-router.patch("/cards/:id", updateCard);
+router.patch("/cards/:id",authMiddleware, updateCard);
 
 /**
  * @openapi
@@ -94,7 +95,7 @@ router.patch("/cards/:id", updateCard);
  *       200:
  *         description: Cards list
  */
-router.get("/", getAllCards);
+router.get("/", authMiddleware,getAllCards);
 
 /**
  * @openapi
@@ -114,6 +115,6 @@ router.get("/", getAllCards);
  *       404:
  *         description: Card not found
  */
-router.delete("/cards/:cardId", deleteCard);
+router.delete("/cards/:cardId",authMiddleware, deleteCard);
 
 module.exports = router;
