@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const { register,login } = require("../controllers/authController");
-
+const {getAllProjects,createProject,getProjectById,getProjectTasks,
+    addTaskToProject,getTaskByTaskIdInProject,updateTaskInProject,
+     deleteTaskInProject}=require("../controllers/projectController");
 /**
  * @swagger
  * /api/auth/register:
@@ -248,7 +250,5 @@ router.patch("/:projectId/tasks/:taskId", updateTaskInProject);
  *         description: Task deleted
  */
 router.delete("/:projectId/tasks/:taskId", deleteTaskInProject);
-
-module.exports = router;
 
 module.exports = router;
