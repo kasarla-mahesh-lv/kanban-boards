@@ -1,5 +1,10 @@
 const router = require("express").Router();
 const { register,login } = require("../controllers/authController");
+const authMiddleware=require("../middlewares/authmiddlewares");
+const {getAllProjects,createProject,getProjectById,getProjectTasks,
+    addTaskToProject,getTaskByTaskIdInProject,updateTaskInProject,
+     deleteTaskInProject}=require("../controllers/projectController");
+
 
 /**
  * @swagger
@@ -76,7 +81,7 @@ router.post("/login", login);
  *       200:
  *         description: Projects list
  */
-router.get("/", getAllProjects);
+router.get("/",authMiddleware, getAllProjects);
 
 /**
  * @openapi
@@ -102,7 +107,7 @@ router.get("/", getAllProjects);
  *       201:
  *         description: Project created
  */
-router.post("/", createProject);
+router.post("/",authMiddleware, createProject);
 
 /**
  * @openapi
@@ -120,7 +125,7 @@ router.post("/", createProject);
  *       200:
  *         description: Project details
  */
-router.get("/:projectId", getProjectById);
+router.get("/:projectId",authMiddleware, getProjectById);
 
 /**
  * @openapi
@@ -138,7 +143,7 @@ router.get("/:projectId", getProjectById);
  *       200:
  *         description: Task list
  */
-router.get("/:projectId/tasks", getProjectTasks);
+router.get("/:projectId/tasks",authMiddleware, getProjectTasks);
 
 /**
  * @openapi
@@ -173,7 +178,7 @@ router.get("/:projectId/tasks", getProjectTasks);
  *       201:
  *         description: Task added
  */
-router.post("/:projectId/tasks", addTaskToProject);
+router.post("/:projectId/tasks",authMiddleware, addTaskToProject);
 
 /**
  * @openapi
@@ -196,7 +201,7 @@ router.post("/:projectId/tasks", addTaskToProject);
  *       200:
  *         description: Task details
  */
-router.get("/:projectId/tasks/:taskId", getTaskByTaskIdInProject);
+router.get("/:projectId/tasks/:taskId",authMiddleware, getTaskByTaskIdInProject);
 
 /**
  * @openapi
@@ -228,7 +233,7 @@ router.get("/:projectId/tasks/:taskId", getTaskByTaskIdInProject);
  *       200:
  *         description: Task updated
  */
-router.patch("/:projectId/tasks/:taskId", updateTaskInProject);
+router.patch("/:projectId/tasks/:taskId",authMiddleware, updateTaskInProject);
 
 /**
  * @openapi
@@ -247,8 +252,6 @@ router.patch("/:projectId/tasks/:taskId", updateTaskInProject);
  *       200:
  *         description: Task deleted
  */
-router.delete("/:projectId/tasks/:taskId", deleteTaskInProject);
-
-module.exports = router;
+router.delete("/:projectId/tasks/:taskId", authMiddleware,deleteTaskInProject);
 
 module.exports = router;

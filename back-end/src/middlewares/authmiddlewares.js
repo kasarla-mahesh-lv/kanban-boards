@@ -1,26 +1,34 @@
 const jwt = require("jsonwebtoken");
+const UserModel = require("../models/User");
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-      return res.status(401).json({ message: "Authorization token missing" });
-    }
+    if (!authHeader)
+      return res.status(401).json({ message: "Token missing" });
 
     const token = authHeader.split(" ")[1];
 
-    if (!token) {
-      return res.status(401).json({ message: "Invalid token format" });
-    }
-
+    // verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = decoded; // { userId, iat, exp }
+    // check token exists in DB
+    const user = await UserModel.findOne({
+      _id: decoded.userId,
+      "tokens.token": token
+    });
+    
+    if (!user)
+      return res.status(401).json({ message: "Unauthorized" });
+
+    req.user = user;
+    req.token = token;
 
     next();
-  } catch (error) {
-    return res.status(401).json({ message: "Unauthorized or invalid token" });
+
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
   }
 };
 
