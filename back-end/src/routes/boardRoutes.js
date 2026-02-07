@@ -1,12 +1,11 @@
-
- /*
+/*
  * @openapi
  * tags:
  *   - name: Boards
  *     description: Board related APIs
  */
-
 const router = require("express").Router();
+const authMiddleware=require("../middlewares/authmiddlewares");
 const { 
     createBoard,
     updateBoard,
@@ -39,7 +38,7 @@ const {
 
 
 
-router.post("/", createBoard); // POST /api/boards
+router.post("/",authMiddleware, createBoard); // POST /api/boards
 
 /**
  * @openapi
@@ -72,7 +71,7 @@ router.post("/", createBoard); // POST /api/boards
  */
 
 
-router.patch("/:id", updateBoard); // PATCH /api/boards/:id
+router.patch("/:id",authMiddleware, updateBoard); // PATCH /api/boards/:id
 /**
  * @openapi
  * /api/boards:
@@ -84,7 +83,7 @@ router.patch("/:id", updateBoard); // PATCH /api/boards/:id
  *         description: Boards list
  */
 
-router.get("/", getAllBoards); // This is likely line 7 where the error is
+router.get("/",authMiddleware, getAllBoards); // This is likely line 7 where the error is
 /**
  * @openapi
  * /api/boards/{id}:
@@ -102,7 +101,7 @@ router.get("/", getAllBoards); // This is likely line 7 where the error is
  *         description: Board details
  */
 
-router.get("/:id", getBoardWithDetails);   
+router.get("/:id",authMiddleware, getBoardWithDetails);   
 /**
  * @openapi
  * /api/boards/{id}:
@@ -120,6 +119,6 @@ router.get("/:id", getBoardWithDetails);
  *         description: Board deleted
  */
                       
-router.delete("/:id",deleteBoard);// delete api routes
+router.delete("/:id",authMiddleware,deleteBoard);// delete api routes
 
 module.exports = router;

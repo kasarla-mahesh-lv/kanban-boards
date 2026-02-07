@@ -26,6 +26,13 @@ const userSchema=new mongoose.Schema(
             required:true,
             minlength:10
         },
+        tokens: [{
+          token: {
+          type: String,
+          required: true
+        }
+    }
+]
     },
     {timestamps:true}
 );

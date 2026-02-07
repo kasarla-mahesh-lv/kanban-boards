@@ -20,8 +20,8 @@ const KanbanColumn = ({ title, tasks,status,onDropTask }: Props) => {
 
   return (
     <div
-    onDragOver={onDragOver}
-    onDrop={onDrop}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
       style={{
         width: 260,
         background: "#f8fafc",
