@@ -15,7 +15,7 @@ type Props = {
 };
 
 const TaskBoard = ({ projectId }: Props) => {
-  // 🔥 MASTER STATE (ALL TASKS)
+
   const [allTasks, setAllTasks] = useState<Task[]>(INITIAL_TASKS);
 
   const moveTask = (taskId: string, newStatus: TaskStatus) => {
@@ -26,7 +26,7 @@ const TaskBoard = ({ projectId }: Props) => {
     );
   };
 
-  // 🔥 FILTER ONLY FOR DISPLAY
+    
   const projectTasks = allTasks.filter(
     (t) => t.projectId === projectId
   );

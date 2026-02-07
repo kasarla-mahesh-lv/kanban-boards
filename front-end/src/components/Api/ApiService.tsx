@@ -1,6 +1,5 @@
 import api from "./Apiwrapper";
 
-/* ================= LOGIN TYPES ================= */
 
 export type LoginPayload = {
   email: string;
@@ -16,7 +15,7 @@ export type LoginResponse = {
   };
 };
 
-/* ================= REGISTER TYPES ================= */
+
 
 export type RegisterPayload = {
   name: string;
@@ -30,7 +29,7 @@ export type RegisterResponse = {
   userId: string;
 };
 
-/* ================= LOGIN API ================= */
+
 
 export const loginApi = async (
   payload: LoginPayload
@@ -39,7 +38,7 @@ export const loginApi = async (
   return res.data;
 };
 
-/* ================= REGISTER API ================= */
+
 
 export const registerApi = async (
   payload: RegisterPayload

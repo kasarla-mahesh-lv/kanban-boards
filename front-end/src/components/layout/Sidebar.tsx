@@ -17,7 +17,7 @@ import {
   FaHistory,
 } from "react-icons/fa";
 
-/* ---------- TYPES ---------- */
+
 type Project = {
   id: number;
   name: string;
@@ -37,15 +37,17 @@ type Team = {
   members: Member[];
 };
 
-/* ---------- STORAGE KEYS ---------- */
+
+
 const PROJECT_KEY = "hrm-projects";
 const TEAM_KEY = "hrm-teams";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const [showAuth, setShowAuth] = useState(false);
   const { logout } = useAuth();
 
-  /* ---------- STATE ---------- */
+  
   const [projects, setProjects] = useState<Project[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
 
@@ -60,7 +62,7 @@ const Sidebar: React.FC = () => {
   const [showProjectInput, setShowProjectInput] = useState(false);
   const [showTeamInput, setShowTeamInput] = useState(false);
 
-  /* ---------- LOAD STORAGE ---------- */
+  
   useEffect(() => {
     setProjects(JSON.parse(localStorage.getItem(PROJECT_KEY) || "[]"));
     setTeams(JSON.parse(localStorage.getItem(TEAM_KEY) || "[]"));
@@ -76,7 +78,7 @@ const Sidebar: React.FC = () => {
     localStorage.setItem(TEAM_KEY, JSON.stringify(data));
   };
 
-  /* ---------- PROJECT CRUD ---------- */
+  
   const addProject = () => {
     if (!newProjectName.trim()) return;
 
@@ -95,7 +97,7 @@ const Sidebar: React.FC = () => {
     saveProjects(projects.filter((p) => p.id !== id));
   };
 
-  /* ---------- TEAM CRUD ---------- */
+  
   const addTeam = () => {
     if (!newTeamName.trim()) return;
 
@@ -123,7 +125,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside className="sidebar">
-      {/* LOGO */}
+      
       <div className="sidebar-logo">
         ⚡ <h2>HRM</h2>
       </div>
@@ -158,7 +160,7 @@ const Sidebar: React.FC = () => {
           <FaBell /> Notifications
         </div>
 
-        {/* ---------- TEAMS ---------- */}
+        
         <div className="menu-item" onClick={() => setOpenTeams(!openTeams)}>
           <FaUsers /> Teams
           {openTeams ? <FaChevronDown /> : <FaChevronRight />}
@@ -193,7 +195,7 @@ const Sidebar: React.FC = () => {
           </div>
         )}
 
-        {/* ---------- PROJECTS ---------- */}
+        
         <div className="projects-section">
           <div
             className="projects-header"
@@ -242,7 +244,7 @@ const Sidebar: React.FC = () => {
         </div>
       </nav>
 
-      {/* ---------- BOTTOM ---------- */}
+      
       <div className="sidebar-bottom">
         <div className="login" onClick={handleLogout}>
           <FaSignOutAlt />
@@ -253,6 +255,7 @@ const Sidebar: React.FC = () => {
           <FaCog /> Settings
         </div>
       </div>
+      {/* {showAuth && <Login onClose={() => setShowAuth(false)} />} */}
     </aside>
   );
 };

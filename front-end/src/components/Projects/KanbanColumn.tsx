@@ -1,19 +1,19 @@
-import type { Task, Status } from "./types";
+import type { Task, TaskStatus} from "./types";
 import TaskCard from "./TaskCard";
 
 type Props = {
   title: string;
-  status: Status;
+  status:TaskStatus;
   tasks: Task[];
-  onDropTask: (taskId: string, status: Status) => void;
-
+  onDropTask:(taskId:string,status:TaskStatus)=>void;
+  
 };
-
-const KanbanColumn = ({ title, tasks, status, onDropTask }: Props) => {
-  const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+ 
+const KanbanColumn = ({ title, tasks,status,onDropTask }: Props) => {
+    const onDragOver=(e:React.DragEvent<HTMLDivElement>)=>{
+        e.preventDefault();
+    };
+     const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     const taskId = e.dataTransfer.getData("taskId");
     onDropTask(taskId, status);
   };
