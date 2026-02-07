@@ -11,7 +11,6 @@ import {
   FaChevronDown,
   FaChevronRight,
   FaSignOutAlt,
-  FaCalendarCheck,
   FaFileAlt,
   FaBell,
   FaHistory,
@@ -44,7 +43,6 @@ const TEAM_KEY = "hrm-teams";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
-  const [showAuth, setShowAuth] = useState(false);
   const { logout } = useAuth();
 
   

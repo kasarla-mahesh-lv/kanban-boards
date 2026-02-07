@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Task, TaskStatus } from "./types";
-import KanbanColumn from "./KanbanCloumn";
+import KanbanColumn from "./KanbanColumn";
 
 const INITIAL_TASKS: Task[] = [
   { id: "1", projectId: "1", code: "PRJ-12", title: "Something", status: "backlog" },
