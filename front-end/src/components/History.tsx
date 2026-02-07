@@ -12,7 +12,7 @@ type HistoryItem = {
   type: HistoryType;
   status: HistoryStatus;
   user: string;
-  time: string; // e.g. "Today • 10:45 AM"
+  time: string; 
 };
 
 const historyData: HistoryItem[] = [

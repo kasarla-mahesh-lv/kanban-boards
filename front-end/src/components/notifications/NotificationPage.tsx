@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getNotifications, markRead } from "./notificationApi";
+import { getNotifications, markRead } from "./notificationApi"
 import type { Notification } from "./types";
 import "./NotificationPage.css";
 
