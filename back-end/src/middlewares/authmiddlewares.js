@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const UserModel = require("../models/User");
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -14,7 +14,7 @@ const authMiddleware = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // check token exists in DB
-    const user = await User.findOne({
+    const user = await UserModel.findOne({
       _id: decoded.userId,
       "tokens.token": token
     });
