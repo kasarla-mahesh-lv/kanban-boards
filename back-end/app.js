@@ -45,6 +45,7 @@ app.use("/api/projects", projectRoutes);
 
 /* -------------------- Start App -------------------- */
 (async () => {
+  // Connect to MongoDB
   await connectDB();
 
   app.listen(PORT, () => {
