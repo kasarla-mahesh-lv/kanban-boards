@@ -1,18 +1,23 @@
-const cors = require("cors");
+require("dotenv").config();
+
 const express = require("express");
+const cors = require("cors");
 const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
+const connectDB = require("./src/config/mongo");
 
 // Routes
+const authRoutes = require("./src/routes/authRoutes");
 const boardRoutes = require("./src/routes/boardRoutes");
 const columnRoutes = require("./src/routes/columnRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
-const projectRoutes = require("./src/routes/projectRoutes"); // ✅ ADD THIS
+const projectRoutes = require("./src/routes/projectRoutes");
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Middlewares
+/* -------------------- Middlewares -------------------- */
 app.use(express.json());
 app.use(
   cors({
@@ -23,18 +28,27 @@ app.use(
 );
 app.use(morgan("dev"));
 
-// Health route
+/* -------------------- Health -------------------- */
 app.get("/", (req, res) => {
   res.json({ ok: true, message: "Kanban Boards API is running 🚀" });
 });
 
-// Swagger
+/* -------------------- Swagger -------------------- */
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// API Routes
+/* -------------------- Routes -------------------- */
+app.use("/api/auth", authRoutes);
 app.use("/api/boards", boardRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/cards", cardRoutes);
-app.use("/api/projects", projectRoutes); // ✅ ADD THIS
+app.use("/api/projects", projectRoutes);
 
-module.exports = app;
+/* -------------------- Start App -------------------- */
+(async () => {
+  // Connect to MongoDB
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+})();

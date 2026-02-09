@@ -1,9 +1,11 @@
+
 import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import Sidebar from "./components/layout/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { Taskbar } from "./components/Taskbar";
+
 
 import Dashboard from "./components/dashboard/Dashboard";
 import History from "./components/History";
@@ -11,57 +13,46 @@ import Reports from "./Pages/Reports";
 import NotificationPage from "./components/notifications/NotificationPage";
 
 import Login from "./Pages/Login";
-import Logout from "./Pages/Logout";
+import Register from "./components/Auth/Register";
 
-import Kanban from "./components/Projects/Kanban";
-import ProjectDetails from "./components/Projects/ProjectDetails";
+import ProtectedRoute from "./components/Auth/ProtectedRoute";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import "./App.css";
 
-/* ================= APP LAYOUT ================= */
-const AppLayout: React.FC = () => {
+/* ✅ Dashboard Layout only (NO login/register here) */
+const DashboardLayout: React.FC = () => {
   const location = useLocation();
-
-  // Taskbar only on dashboard
   const showTaskbar = location.pathname === "/";
 
   return (
     <div className="app-layout">
-      {/* LEFT SIDEBAR */}
       <Sidebar />
 
-      {/* RIGHT CONTENT */}
       <div className="right-container">
-        {/* TOP BAR */}
         <Topbar />
-
         {showTaskbar && <Taskbar />}
 
-        {/* MAIN CONTENT */}
         <div className="content-container">
           <Routes>
             {/* DASHBOARD */}
             <Route path="/" element={<Dashboard />} />
 
             {/* PROJECTS */}
-            <Route path="/projects" element={<Kanban />} />
-            <Route path="/projects/:projectId" element={<ProjectDetails />} />
+            
+            
 
             {/* OTHER PAGES */}
             <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/notifications" element={<NotificationPage />} />
-
-            {/* AUTH */}
-            <Route path="/login" element={<Login onClose={() => {}} />} />
-            <Route path="/logout" element={<Logout />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </div>
 
-      {/* GLOBAL TOAST */}
       <ToastContainer
         position="top-right"
         autoClose={2000}
@@ -75,9 +66,24 @@ const AppLayout: React.FC = () => {
   );
 };
 
-/* ================= ROOT APP ================= */
 const App: React.FC = () => {
-  return <AppLayout />;
+  return (
+    <Routes>
+      {/* ✅ PUBLIC (no dashboard layout) */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* ✅ PROTECTED (dashboard layout only) */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
 };
 
 export default App;

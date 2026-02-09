@@ -1,17 +1,18 @@
+const router = require("express").Router();
+const { createColumn, updateColumn, deleteColumn,getColumnsByBoard } = require("../controllers/columnController");
+const authMiddleware = require("../middlewares/authmiddlewares");
 /**
  * @openapi
  * tags:
  *   - name: Columns
  *     description: Column related APIs
  */
-const router = require("express").Router();
-const { createColumn, updateColumn, deleteColumn, getColumnsByBoard } = require("../controllers/columnController");
+router.get("/boards/:boardId/columns",authMiddleware, getColumnsByBoard); // ✅ ADD THIS
 
-router.get("/boards/:boardId/columns", getColumnsByBoard); // ✅ ADD THIS
 
-router.post("/boards/:boardId/columns", createColumn);
-router.patch("/boards/:boardId/columns/:columnId", updateColumn);
-router.delete("/boards/:boardId/columns/:columnId", deleteColumn);
+router.post("/boards/:boardId/columns",authMiddleware, createColumn);
+router.patch("/boards/:boardId/columns/:columnId",authMiddleware, updateColumn);
+router.delete("/boards/:boardId/columns/:columnId",authMiddleware, deleteColumn);
 
 module.exports = router;
 
