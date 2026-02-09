@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { register,login } = require("../controllers/authController");
+const { sendOtp, verifyOtp, register, login } = require("../controllers/authController");
 const authMiddleware=require("../middlewares/authmiddlewares");
 const {getAllProjects,createProject,getProjectById,getProjectTasks,
     addTaskToProject,getTaskByTaskIdInProject,updateTaskInProject,
@@ -8,37 +8,28 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
 
 /**
  * @swagger
+ * /api/auth/send-otp:
+ *   post:
+ *     tags: [Register]
+ *     summary: Send OTP to email
+ */
+router.post("/send-otp", sendOtp);
+
+/**
+ * @swagger
+ * /api/auth/verify-otp:
+ *   post:
+ *     tags: [Register]
+ *     summary: Verify OTP
+ */
+router.post("/verify-otp", verifyOtp);
+
+/**
+ * @swagger
  * /api/auth/register:
  *   post:
  *     tags: [Register]
- *     summary: Register a new user (Send OTP / Verify OTP)
- *     description: First call sends OTP, second call with OTP creates account
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *               - mobilenumber
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               mobilenumber:
- *                 type: number
- *               otp:
- *                 type: string
- *                 description: Required only for second request (verification)
- *     responses:
- *       200:
- *         description: OTP sent OR Registered successfully
+ *     summary: Register after OTP verification
  */
 router.post("/register", register);
 

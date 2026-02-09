@@ -4,76 +4,44 @@ const jwt = require("jsonwebtoken");
 const OtpUser=require("../models/OTPModel");
 const nodemailer = require("nodemailer");
 
-exports.register = async (req, res) => {
+// ================= SEND OTP =================
+exports.sendOtp = async (req, res) => {
   try {
-    const { name, email, password, mobilenumber, otp } = req.body;
+    const { email } = req.body;
 
-    // STEP 1 — If OTP not provided → send OTP
-    if (!otp) {
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "User already registered" });
 
-      const existingUser = await User.findOne({ email });
-      if (existingUser)
-        return res.status(400).json({ message: "User already exists" });
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+    await OtpUser.findOneAndUpdate(
+      { email },
+      {
+        email,
+        otp,
+        isVerified: false,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+      },
+      { upsert: true }
+    );
 
-      const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-
-      // store temp data
-      await OtpUser.findOneAndUpdate(
-        { email },
-        {
-          name,
-          email,
-          password: hashedPassword,
-          mobilenumber,
-          otp: generatedOtp,
-          otpExpiry: new Date(Date.now() + 5 * 60 * 1000)
-        },
-        { upsert: true }
-      );
-
-      // send mail
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
-      });
-
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Your OTP Code",
-        text: `Your OTP is ${generatedOtp}`
-      });
-
-      return res.json({ message: "OTP sent to email" });
-    }
-
-    // STEP 2 — OTP provided → verify and create account
-    const tempUser = await OtpUser.findOne({ email });
-
-    if (!tempUser)
-      return res.status(400).json({ message: "Please request OTP first" });
-
-    if (tempUser.otp !== otp)
-      return res.status(400).json({ message: "Invalid OTP" });
-
-    if (tempUser.otpExpiry < Date.now())
-      return res.status(400).json({ message: "OTP expired" });
-
-    await UserModel.create({
-      name: tempUser.name,
-      email: tempUser.email,
-      password: tempUser.password,
-      mobilenumber: tempUser.mobilenumber
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
     });
 
-    await OtpUser.deleteOne({ email });
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP is ${otp}`
+    });
 
-    res.json({ message: "Registered successfully" });
+    res.json({ message: "OTP sent successfully" });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -81,7 +49,60 @@ exports.register = async (req, res) => {
 };
 
 
+// ================= VERIFY OTP =================
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
 
+    const record = await OtpUser.findOne({ email });
+
+    if (!record)
+      return res.status(400).json({ message: "Request OTP first" });
+
+    if (record.expiresAt < Date.now())
+      return res.status(400).json({ message: "OTP expired" });
+
+    if (record.otp !== otp)
+      return res.status(400).json({ message: "Invalid OTP" });
+
+    record.isVerified = true;
+    await record.save();
+
+    res.json({ message: "OTP verified successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// ================= REGISTER =================
+exports.register = async (req, res) => {
+  try {
+    const { name, email, password, mobilenumber } = req.body;
+
+    const otpRecord = await OtpUser.findOne({ email });
+
+    if (!otpRecord || !otpRecord.isVerified)
+      return res.status(400).json({ message: "Verify OTP first" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      mobilenumber
+    });
+
+    await OtpUser.deleteOne({ email });
+
+    res.status(201).json({ message: "User registered successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
 
