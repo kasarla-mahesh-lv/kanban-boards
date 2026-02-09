@@ -1,38 +1,127 @@
 const UserModel = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Otp=require("../models/OTPModel");
+const nodemailer = require("nodemailer");
 
-exports.register = async (req, res) => {
+exports.sendOtp = async (req, res) => {
   try {
-    const { name, email, password ,mobilenumber} = req.body;
+    const { email } = req.body;
 
-    if (!name || !email || !password || !mobilenumber) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-    const existingUser = await UserModel.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+    if (!email)
+      return res.status(400).json({ message: "Email required" });
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    //  Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const user = await UserModel.create({
-      name,
-      email,
-      password:hashedPassword,
-      mobilenumber
+    // Expiry 2 mins
+    const expiry = new Date(Date.now() + 2 * 60 * 1000);
+
+    // Save OTP in DB
+    await Otp.findOneAndUpdate(
+      { email },
+      { otp, expiresAt: expiry },
+      { upsert: true, new: true }
+    );
+
+    //  Create transporter HERE 
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
-    res.status(201).json({
-      message: "User registered successfully",
-      userId: user._id
+    //  Send Mail
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "OTP Verification",
+      text: `Your OTP is ${otp}`
     });
+
+    res.json({ message: "OTP sent successfully" });
+
+  } catch (error) {
+    console.log("MAIL ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const record = await Otp.findOne({ email });
+
+    if (!record)
+      return res.status(400).json({ message: "OTP not requested" });
+
+    if (record.expiresAt < Date.now())
+      return res.status(400).json({ message: "OTP expired" });
+
+    if (record.otp !== otp)
+      return res.status(400).json({ message: "Invalid OTP" });
+
+    // success → delete OTP
+    await Otp.deleteOne({ email });
+
+    res.json({ message: "OTP verified successfully" });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+exports.register = async (req, res) => {
+  try {
+    const { name, email, password, mobilenumber } = req.body;
+
+    if (!name || !email || !password || !mobilenumber)
+      return res.status(400).json({ message: "All fields required" });
+
+    // Check OTP verified or not
+    const otpRecord = await Otp.findOne({ email });
+
+    if (otpRecord)
+      return res.status(400).json({ message: "Please verify OTP first" });
+
+    // Check existing user
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "User already exists" });
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const user = await UserModel.create({
+      name,
+      email,
+      password: hashedPassword,
+      mobilenumber
+    });
+
+    res.status(201).json({
+      message: "Registered successfully",
+      userId: user._id
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
 
 exports.login = async (req, res) => {
   try {
