@@ -1,31 +1,30 @@
 const UserModel = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const OtpUser=require("../models/OTPModel");
+const Otp=require("../models/OTPModel");
 const nodemailer = require("nodemailer");
 
-// ================= SEND OTP =================
 exports.sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const existingUser = await UserModel.findOne({ email });
-    if (existingUser)
-      return res.status(400).json({ message: "User already registered" });
+    if (!email)
+      return res.status(400).json({ message: "Email required" });
 
+    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await OtpUser.findOneAndUpdate(
+    // Expiry 5 mins
+    const expiry = new Date(Date.now() + 5 * 60 * 1000);
+
+    // Save in DB (overwrite old OTP)
+    await Otp.findOneAndUpdate(
       { email },
-      {
-        email,
-        otp,
-        isVerified: false,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000)
-      },
-      { upsert: true }
+      { otp, expiresAt: expiry },
+      { upsert: true, new: true }
     );
 
+    // Mail
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -37,7 +36,7 @@ exports.sendOtp = async (req, res) => {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Your OTP Code",
+      subject: "OTP Verification",
       text: `Your OTP is ${otp}`
     });
 
@@ -48,16 +47,14 @@ exports.sendOtp = async (req, res) => {
   }
 };
 
-
-// ================= VERIFY OTP =================
 exports.verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
-    const record = await OtpUser.findOne({ email });
+    const record = await Otp.findOne({ email });
 
     if (!record)
-      return res.status(400).json({ message: "Request OTP first" });
+      return res.status(400).json({ message: "OTP not requested" });
 
     if (record.expiresAt < Date.now())
       return res.status(400).json({ message: "OTP expired" });
@@ -65,8 +62,8 @@ exports.verifyOtp = async (req, res) => {
     if (record.otp !== otp)
       return res.status(400).json({ message: "Invalid OTP" });
 
-    record.isVerified = true;
-    await record.save();
+    // success → delete OTP
+    await Otp.deleteOne({ email });
 
     res.json({ message: "OTP verified successfully" });
 
@@ -76,34 +73,44 @@ exports.verifyOtp = async (req, res) => {
 };
 
 
-// ================= REGISTER =================
 exports.register = async (req, res) => {
   try {
     const { name, email, password, mobilenumber } = req.body;
 
-    const otpRecord = await OtpUser.findOne({ email });
+    if (!name || !email || !password || !mobilenumber)
+      return res.status(400).json({ message: "All fields required" });
 
-    if (!otpRecord || !otpRecord.isVerified)
-      return res.status(400).json({ message: "Verify OTP first" });
+    // Check OTP verified or not
+    const otpRecord = await Otp.findOne({ email });
 
+    if (otpRecord)
+      return res.status(400).json({ message: "Please verify OTP first" });
+
+    // Check existing user
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "User already exists" });
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    // Create user
+    const user = await UserModel.create({
       name,
       email,
       password: hashedPassword,
       mobilenumber
     });
 
-    await OtpUser.deleteOne({ email });
-
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({
+      message: "Registered successfully",
+      userId: user._id
+    });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 
 

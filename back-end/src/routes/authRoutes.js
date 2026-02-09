@@ -36,15 +36,8 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
  *       200:
  *         description: OTP sent successfully
  *         content:
- *           application/json:
- *             example:
- *               message: OTP sent successfully
  *       400:
  *         description: User already registered
- *         content:
- *           application/json:
- *             example:
- *               message: User already registered
  */
 router.post("/send-otp", sendOtp);
 

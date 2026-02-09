@@ -9,14 +9,10 @@ const otpSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
   expiresAt: {
     type: Date,
     required: true
   }
-},{timestamps:true});
+}, { timestamps: true });
 
-module.exports = mongoose.model("OtpUser", otpSchema);
+module.exports = mongoose.model("Otp", otpSchema);
