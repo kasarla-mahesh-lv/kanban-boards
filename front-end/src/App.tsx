@@ -1,5 +1,5 @@
 import React from "react";
-import {  Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import Sidebar from "./components/layout/Sidebar";
 import { Topbar } from "./components/Topbar";
@@ -8,53 +8,60 @@ import { Taskbar } from "./components/Taskbar";
 import Dashboard from "./components/dashboard/Dashboard";
 import History from "./components/History";
 import Reports from "./Pages/Reports";
+import NotificationPage from "./components/notifications/NotificationPage";
+
+import Login from "./Pages/Login";
+import Logout from "./Pages/Logout";
+
+import Kanban from "./components/Projects/Kanban";
+import ProjectDetails from "./components/Projects/ProjectDetails";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Login from "./Pages/Login";
-
 import "./App.css";
-
-
-
-import ProjectDetails from "./components/Projects/ProjectDetails";
-
-import Logout from "./Pages/Logout";
-import NotificationPage from "./components/notifications/NotificationPage";
 
 /* ================= APP LAYOUT ================= */
 const AppLayout: React.FC = () => {
-
   const location = useLocation();
+
+  // Taskbar only on dashboard
   const showTaskbar = location.pathname === "/";
 
   return (
     <div className="app-layout">
+      {/* LEFT SIDEBAR */}
       <Sidebar />
 
+      {/* RIGHT CONTENT */}
       <div className="right-container">
-
-        {/* TOPBAR */}
+        {/* TOP BAR */}
         <Topbar />
 
         {showTaskbar && <Taskbar />}
 
-        {/* PAGE ROUTES */}
+        {/* MAIN CONTENT */}
         <div className="content-container">
           <Routes>
+            {/* DASHBOARD */}
             <Route path="/" element={<Dashboard />} />
+
+            {/* PROJECTS */}
+            <Route path="/projects" element={<Kanban />} />
+            <Route path="/projects/:projectId" element={<ProjectDetails />} />
+
+            {/* OTHER PAGES */}
             <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/notifications" element={<NotificationPage />} />
-             <Route path="/projects/:projectId" element={<ProjectDetails />} /> 
+
+            {/* AUTH */}
             <Route path="/login" element={<Login onClose={() => {}} />} />
-            <Route path="/logout" element={<Logout/>}/>
+            <Route path="/logout" element={<Logout />} />
           </Routes>
         </div>
-
       </div>
 
-      {/* ⭐ TOAST CONTAINER GLOBAL */}
+      {/* GLOBAL TOAST */}
       <ToastContainer
         position="top-right"
         autoClose={2000}
@@ -64,7 +71,6 @@ const AppLayout: React.FC = () => {
         draggable
         theme="colored"
       />
-
     </div>
   );
 };

@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, NavLink, useParams } from "react-router-dom";
 import "./Sidebar.css";
 import Login from "../../Pages/Login";
+import {
+  getProjectsApi,
+  createProjectApi,
+} from "../Api/ApiService";
 
 import {
   FaHome,
@@ -20,9 +24,9 @@ import {
 
 /* ---------- TYPES ---------- */
 type Project = {
-  id: number;
-  name: string;
-  color: string;
+  _id: string;
+  title: string;
+  description?: string;
 };
 
 type Member = {
@@ -37,21 +41,16 @@ type Team = {
   members: Member[];
 };
 
-/* ---------- STORAGE KEYS ---------- */
-const PROJECT_KEY = "hrm-projects";
-const TEAM_KEY = "hrm-teams";
-
-const Sidebar: React.FC = () => {
+const Sidebar = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
 
-  /* ---------- AUTH MODAL ---------- */
+  /* ---------- AUTH ---------- */
   const [showAuth, setShowAuth] = useState(false);
 
   /* ---------- STATE ---------- */
   const [projects, setProjects] = useState<Project[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
-  const [activeProjects, setActiveProjects] = useState<number | null []>([]);
 
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
@@ -62,42 +61,38 @@ const Sidebar: React.FC = () => {
   const [showProjectInput, setShowProjectInput] = useState(false);
   const [showTeamInput, setShowTeamInput] = useState(false);
 
-  /* ---------- LOAD STORAGE ---------- */
+  /* ---------- LOAD PROJECTS (BACKEND) ---------- */
+  const loadProjects = async () => {
+    try {
+      const data = await getProjectsApi();
+      setProjects(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Failed to load projects", error);
+    }
+  };
+
   useEffect(() => {
-    setProjects(JSON.parse(localStorage.getItem(PROJECT_KEY) || "[]"));
-    setTeams(JSON.parse(localStorage.getItem(TEAM_KEY) || "[]"));
+    loadProjects();
   }, []);
 
-  const saveProjects = (data: Project[]) => {
-    setProjects(data);
-    localStorage.setItem(PROJECT_KEY, JSON.stringify(data));
-  };
-
-  const saveTeams = (data: Team[]) => {
-    setTeams(data);
-    localStorage.setItem(TEAM_KEY, JSON.stringify(data));
-  };
-
-  /* ---------- PROJECT CRUD ---------- */
-  const addProject = () => {
+  /* ---------- ADD PROJECT (BACKEND) ---------- */
+  const addProject = async () => {
     if (!newProjectName.trim()) return;
 
-    const project: Project = {
-      id: Date.now(),
-      name: newProjectName,
-      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
-    };
+    try {
+      await createProjectApi({
+        title: newProjectName,
+      });
 
-    saveProjects([...projects, project]);
-    setNewProjectName("");
-    setShowProjectInput(false);
+      setNewProjectName("");
+      setShowProjectInput(false);
+      loadProjects(); // 🔁 refresh from backend
+    } catch (error) {
+      console.error("Create project failed", error);
+    }
   };
 
-  const deleteProject = (id: number) => {
-    saveProjects(projects.filter((p) => p.id !== id));
-  };
-
-  /* ---------- TEAM CRUD ---------- */
+  /* ---------- TEAM (LOCAL ONLY) ---------- */
   const addTeam = () => {
     if (!newTeamName.trim()) return;
 
@@ -108,13 +103,13 @@ const Sidebar: React.FC = () => {
       members: [],
     };
 
-    saveTeams([...teams, team]);
+    setTeams((prev) => [...prev, team]);
     setNewTeamName("");
     setShowTeamInput(false);
   };
 
   const deleteTeam = (id: number) => {
-    saveTeams(teams.filter((t) => t.id !== id));
+    setTeams((prev) => prev.filter((t) => t.id !== id));
   };
 
   return (
@@ -125,6 +120,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       <nav className="sidebar-menu">
+        {/* MAIN MENU */}
         <div className="menu-item" onClick={() => navigate("/")}>
           <FaHome /> Dashboard
         </div>
@@ -196,7 +192,7 @@ const Sidebar: React.FC = () => {
           </div>
         )}
 
-        {/* ---------- PROJECTS ---------- */}
+        {/* ---------- PROJECTS (BACKEND CONNECTED) ---------- */}
         <div className="projects-section">
           <div
             className="projects-header"
@@ -217,24 +213,13 @@ const Sidebar: React.FC = () => {
             <div className="projects-list">
               {projects.map((p) => (
                 <div
-                  key={p.id}
+                  key={p._id}
                   className={`project-item ${
-                    Number(projectId) === p.id ? "active" : ""
+                    projectId === p._id ? "active" : ""
                   }`}
-                  onClick={() => {
-                    setActiveProjects(p.id);
-                    navigate(`/projects/${p.id}`);
-                  }}
+                  onClick={() => navigate(`/projects/${p._id}`)}
                 >
-                  {p.name}
-                  <span
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteProject(p.id);
-                    }}
-                  >
-                    ❌
-                  </span>
+                  {p.title}
                 </div>
               ))}
 

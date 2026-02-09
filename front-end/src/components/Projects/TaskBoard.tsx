@@ -1,65 +1,44 @@
-import { useState } from "react";
-import type { Task, TaskStatus } from "./types";
-import KanbanColumn from "./KanbanColumn";
-import "./kanban.css";
+import { DragDropContext } from "@hello-pangea/dnd";
+import type { DropResult } from "@hello-pangea/dnd";
 
-const INITIAL_TASKS: Task[] = [
-  { id: "1", projectId: "1", code: "PRJ-12", title: "Something", status: "backlog" },
-  { id: "2", projectId: "1", code: "PRJ-16", title: "Header component", status: "todo" },
-  { id: "3", projectId: "1", code: "PRJ-17", title: "Layout component", status: "inprogress" },
-  { id: "4", projectId: "1", code: "PRJ-20", title: "Create APIs", status: "done" },
-  { id: "5", projectId: "2", code: "PRJ-30", title: "HR Dashboard", status: "todo" },
-];
+import KanbanColumn from "./KanbanColumn";
+import { updateTaskApi } from "../Api/ApiService";
+import type { Project, Task } from "./types";
 
 type Props = {
-  projectId: string;
+  project: Project;
+  tasks: Task[];
 };
 
-const TaskBoard = ({ projectId }: Props) => {
-  const [allTasks, setAllTasks] = useState<Task[]>(INITIAL_TASKS);
+const TaskBoard = ({ project, tasks }: Props) => {
+  const onDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
 
-  const moveTask = (taskId: string, newStatus: TaskStatus) => {
-    setAllTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId ? { ...t, status: newStatus } : t
-      )
-    );
+    const taskId = result.draggableId;
+    const newStatus = result.destination.droppableId as Task["status"];
+
+    try {
+      await updateTaskApi(project._id, taskId, {
+        status: newStatus,
+      });
+    } catch (error) {
+      console.error("Failed to update task status", error);
+    }
   };
 
-  const projectTasks = allTasks.filter(
-    (t) => t.projectId === projectId
-  );
-
   return (
-    <div className="board">
-      
-
-      <div className="columns">
-        <KanbanColumn
-          title="Backlog"
-          status="backlog"
-          tasks={projectTasks.filter((t) => t.status === "backlog")}
-          onDropTask={moveTask}
-        />
-        <KanbanColumn
-          title="Todo"
-          status="todo"
-          tasks={projectTasks.filter((t) => t.status === "todo")}
-          onDropTask={moveTask}
-        />
-        <KanbanColumn
-          title="In Progress"
-          status="inprogress"
-          tasks={projectTasks.filter((t) => t.status === "inprogress")}
-          onDropTask={moveTask}
-        />
-        <KanbanColumn
-          title="Done"
-          status="done"
-          tasks={projectTasks.filter((t) => t.status === "done")}
-          onDropTask={moveTask}
-        />
-      </div>
+    <div className="task-board">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="kanban-board">
+          <KanbanColumn title="Todo" status="todo" tasks={tasks} />
+          <KanbanColumn
+            title="In Progress"
+            status="inprogress"
+            tasks={tasks}
+          />
+          <KanbanColumn title="Done" status="done" tasks={tasks} />
+        </div>
+      </DragDropContext>
     </div>
   );
 };
