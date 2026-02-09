@@ -43,7 +43,7 @@ const Login = ({ onClose }: Props) => {
       // ✅ store token
       localStorage.setItem("token", res.token);
 
-      toast.success("Login Successful 🎉");
+      toast.success("login sucessfull");
 
       // ✅ close modal if exists
       if (onClose) onClose();
@@ -53,7 +53,7 @@ const Login = ({ onClose }: Props) => {
         nav("/", { replace: true });
       }, 600);
     } catch {
-      toast.error("Invalid email or password ❌");
+      toast.error("invalid details");
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ const Login = ({ onClose }: Props) => {
         mobilenumber,
       });
 
-      toast.success("Registration Successful 🎉");
+      toast.success("register sucessful");
 
       // ✅ After register -> switch to login
       setIsLogin(true);
@@ -85,7 +85,7 @@ const Login = ({ onClose }: Props) => {
       // Optional: clear fields
       setPassword("");
     } catch {
-      toast.error("Registration Failed ❌");
+      toast.error("invalid details");
     } finally {
       setLoading(false);
     }
