@@ -8,30 +8,134 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
 
 /**
  * @swagger
+ * tags:
+ *   name: Register
+ *   description: User Registration with OTP verification
+ */
+
+
+/**
+ * @swagger
  * /api/auth/send-otp:
  *   post:
  *     tags: [Register]
- *     summary: Send OTP to email
+ *     summary: Send OTP to user email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: sowmya@gmail.com
+ *     responses:
+ *       200:
+ *         description: OTP sent successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: OTP sent successfully
+ *       400:
+ *         description: User already registered
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: User already registered
  */
 router.post("/send-otp", sendOtp);
+
+
 
 /**
  * @swagger
  * /api/auth/verify-otp:
  *   post:
  *     tags: [Register]
- *     summary: Verify OTP
+ *     summary: Verify OTP entered by user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - otp
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: sowmya@gmail.com
+ *               otp:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: OTP verified successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: OTP verified successfully
+ *       400:
+ *         description: Invalid or expired OTP
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Invalid OTP
  */
 router.post("/verify-otp", verifyOtp);
+
+
 
 /**
  * @swagger
  * /api/auth/register:
  *   post:
  *     tags: [Register]
- *     summary: Register after OTP verification
+ *     summary: Create account after OTP verification
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *               - mobilenumber
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Sowmya
+ *               email:
+ *                 type: string
+ *                 example: sowmya@gmail.com
+ *               password:
+ *                 type: string
+ *                 example: sowmya@1234
+ *               mobilenumber:
+ *                 type: number
+ *                 example: 9347978117
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: User registered successfully
+ *       400:
+ *         description: OTP not verified
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Verify OTP first
  */
 router.post("/register", register);
+
 
 /**
  * @swagger
