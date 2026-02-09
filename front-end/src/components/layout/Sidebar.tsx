@@ -16,6 +16,7 @@ import {
   FaBell,
   FaHistory,
 } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 /* ---------- TYPES ---------- */
 type Project = {
@@ -116,9 +117,11 @@ const Sidebar: React.FC = () => {
   };
 
   /* ---------- LOGOUT ---------- */
+  /* ---------- LOGOUT ---------- */
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    // toast handled in Logout page
+    navigate("/logout");
   };
 
   return (
