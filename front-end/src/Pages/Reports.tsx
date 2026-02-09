@@ -1,4 +1,3 @@
-
 import "./Reports.css";
 
 const Reports: FC = () => {

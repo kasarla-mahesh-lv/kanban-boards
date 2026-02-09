@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getNotifications, markRead } from "./notificationApi";
+import { getNotifications, markRead } from "./notificationApi"
 import type { Notification } from "./types";
 import "./NotificationPage.css";
 
@@ -8,8 +8,15 @@ const NotificationPage: React.FC = () => {
   const userId = 1;
 
   const load = async () => {
-    const data = await getNotifications(userId);
-    setList(data);
+    try {
+      const data = await getNotifications(userId);
+
+      
+      setList(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load notifications:", err);
+      setList([]);
+    }
   };
 
   useEffect(() => {
@@ -17,8 +24,12 @@ const NotificationPage: React.FC = () => {
   }, []);
 
   const handleRead = async (id: number) => {
-    await markRead(id);
-    load();
+    try {
+      await markRead(id);
+      load();
+    } catch (err) {
+      console.error("Mark read failed:", err);
+    }
   };
 
   return (
@@ -36,7 +47,6 @@ const NotificationPage: React.FC = () => {
               onClick={() => handleRead(n.id)}
             >
               <span>{n.message}</span>
-
               <span className="notification-time">
                 {new Date(n.createdAt).toLocaleString()}
               </span>
@@ -45,7 +55,7 @@ const NotificationPage: React.FC = () => {
         )}
       </div>
     </div>
-  );    
+  );
 };
 
 export default NotificationPage;

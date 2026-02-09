@@ -81,3 +81,56 @@ exports.deleteCard = async(req,res) => {
   return res.status(400).json({message:"Invalid Card Id"});
  }
 };
+
+// ✅ MOVE CARD (Drag & Drop) - works with STRING columnId & boardId
+// PATCH /api/cards/:id/move
+exports.moveCard = async (req, res) => {
+  try {
+    const { id } = req.params; // card id (string)
+    const { toColumnId, sourceCards = [], destCards = [] } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ message: "Card id is required" });
+    }
+
+    if (!toColumnId) {
+      return res.status(400).json({ message: "toColumnId is required" });
+    }
+
+    // 1️⃣ move card to new column
+    const movedCard = await CardModel.findByIdAndUpdate(
+      id,
+      { columnId: toColumnId },
+      { new: true }
+    );
+
+    if (!movedCard) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    // helper function to update orders
+    const updateOrders = async (cards) => {
+      if (!Array.isArray(cards)) return;
+
+      for (const c of cards) {
+        await CardModel.findByIdAndUpdate(c._id, {
+          order: c.order
+        });
+      }
+    };
+
+    // 2️⃣ reorder cards in source column
+    await updateOrders(sourceCards);
+
+    // 3️⃣ reorder cards in destination column
+    await updateOrders(destCards);
+
+    res.status(200).json({
+      message: "Card moved successfully",
+      card: movedCard
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

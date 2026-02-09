@@ -13,6 +13,7 @@ const {
   updateCard,
   getAllCards,
   deleteCard,
+  moveCard,
 } = require("../controllers/cardController");
 const authMiddleware = require("../middlewares/authmiddlewares");
 
@@ -84,6 +85,55 @@ router.post("/columns/:columnId/cards",authMiddleware, createCard);
  *         description: Card not found
  */
 router.patch("/cards/:id",authMiddleware, updateCard);
+
+
+/**
+ * @openapi
+ * /api/cards/{id}/move:
+ *   patch:
+ *     tags: [Cards]
+ *     summary: Move card between columns (drag & drop)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Card ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [toColumnId]
+ *             properties:
+ *               toColumnId:
+ *                 type: string
+ *                 example: "TODO_COLUMN_ID"
+ *               sourceCards:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     order:
+ *                       type: number
+ *               destCards:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     order:
+ *                       type: number
+ *     responses:
+ *       200:
+ *         description: Card moved successfully
+ */
+router.patch("/:id/move", moveCard);
 
 /**
  * @openapi
