@@ -11,28 +11,34 @@ exports.sendOtp = async (req, res) => {
     if (!email)
       return res.status(400).json({ message: "Email required" });
 
-    // Generate OTP
+    //  Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Expiry 5 mins
-    const expiry = new Date(Date.now() + 5 * 60 * 1000);
+    // Expiry 2 mins
+    const expiry = new Date(Date.now() + 2 * 60 * 1000);
 
-    // Save in DB (overwrite old OTP)
+    // Save OTP in DB
     await Otp.findOneAndUpdate(
       { email },
       { otp, expiresAt: expiry },
       { upsert: true, new: true }
     );
 
-    // Mail
+    //  Create transporter HERE 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     });
 
+    //  Send Mail
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -43,9 +49,11 @@ exports.sendOtp = async (req, res) => {
     res.json({ message: "OTP sent successfully" });
 
   } catch (error) {
+    console.log("MAIL ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 exports.verifyOtp = async (req, res) => {
   try {

@@ -31,7 +31,6 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
  *             properties:
  *               email:
  *                 type: string
- *                 example: sowmya@gmail.com
  *     responses:
  *       200:
  *         description: OTP sent successfully
@@ -61,23 +60,13 @@ router.post("/send-otp", sendOtp);
  *             properties:
  *               email:
  *                 type: string
- *                 example: sowmya@gmail.com
  *               otp:
  *                 type: string
- *                 example: "123456"
  *     responses:
  *       200:
  *         description: OTP verified successfully
- *         content:
- *           application/json:
- *             example:
- *               message: OTP verified successfully
  *       400:
  *         description: Invalid or expired OTP
- *         content:
- *           application/json:
- *             example:
- *               message: Invalid OTP
  */
 router.post("/verify-otp", verifyOtp);
 
@@ -103,29 +92,17 @@ router.post("/verify-otp", verifyOtp);
  *             properties:
  *               name:
  *                 type: string
- *                 example: Sowmya
  *               email:
  *                 type: string
- *                 example: sowmya@gmail.com
  *               password:
  *                 type: string
- *                 example: sowmya@1234
  *               mobilenumber:
  *                 type: number
- *                 example: 9347978117
  *     responses:
  *       201:
  *         description: User registered successfully
- *         content:
- *           application/json:
- *             example:
- *               message: User registered successfully
  *       400:
  *         description: OTP not verified
- *         content:
- *           application/json:
- *             example:
- *               message: Verify OTP first
  */
 router.post("/register", register);
 
