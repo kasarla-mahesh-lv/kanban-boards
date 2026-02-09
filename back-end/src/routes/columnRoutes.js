@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { createColumn, updateColumn, deleteColumn,getColumnsByBoard } = require("../controllers/columnController");
+const authMiddleware = require("../middlewares/authmiddlewares");
 /**
  * @openapi
  * tags:
@@ -7,12 +8,12 @@ const { createColumn, updateColumn, deleteColumn,getColumnsByBoard } = require("
  *     description: Column related APIs
  */
 
-router.get("/boards/:boardId/columns", getColumnsByBoard); // ✅ ADD THIS
+router.get("/boards/:boardId/columns",authMiddleware, getColumnsByBoard); // ✅ ADD THIS
 
 
-router.post("/boards/:boardId/columns", createColumn);
-router.patch("/boards/:boardId/columns/:columnId", updateColumn);
-router.delete("/boards/:boardId/columns/:columnId", deleteColumn);
+router.post("/boards/:boardId/columns",authMiddleware, createColumn);
+router.patch("/boards/:boardId/columns/:columnId",authMiddleware, updateColumn);
+router.delete("/boards/:boardId/columns/:columnId",authMiddleware, deleteColumn);
 
 module.exports = router;
 
@@ -135,7 +136,3 @@ router.get("/api/columns", async (req, res) => {
  *       200:
  *         description: Column deleted
  */
-
-
-
-
