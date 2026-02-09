@@ -11,7 +11,8 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
  * /api/auth/register:
  *   post:
  *     tags: [Register]
- *     summary: Register a new user
+ *     summary: Register a new user (Send OTP / Verify OTP)
+ *     description: First call sends OTP, second call with OTP creates account
  *     requestBody:
  *       required: true
  *       content:
@@ -32,9 +33,12 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
  *                 type: string
  *               mobilenumber:
  *                 type: number
+ *               otp:
+ *                 type: string
+ *                 description: Required only for second request (verification)
  *     responses:
- *       201:
- *         description: User registered successfully
+ *       200:
+ *         description: OTP sent OR Registered successfully
  */
 router.post("/register", register);
 
@@ -62,6 +66,7 @@ router.post("/register", register);
  *       200:
  *         description: Login successful
  */
+
 router.post("/login", login);
 
 /**
