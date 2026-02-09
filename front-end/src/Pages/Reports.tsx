@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import "./Reports.css";
 
 const Reports: FC = () => {
