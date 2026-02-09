@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { register,login } = require("../controllers/authController");
+const { sendOtp, verifyOtp, register, login } = require("../controllers/authController");
 const authMiddleware=require("../middlewares/authmiddlewares");
 const {getAllProjects,createProject,getProjectById,getProjectTasks,
     addTaskToProject,getTaskByTaskIdInProject,updateTaskInProject,
@@ -8,10 +8,76 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
 
 /**
  * @swagger
+ * tags:
+ *   name: Register
+ *   description: User Registration with OTP verification
+ */
+
+
+/**
+ * @swagger
+ * /api/auth/send-otp:
+ *   post:
+ *     tags: [Register]
+ *     summary: Send OTP to user email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP sent successfully
+ *         content:
+ *       400:
+ *         description: User already registered
+ */
+router.post("/send-otp", sendOtp);
+
+
+
+/**
+ * @swagger
+ * /api/auth/verify-otp:
+ *   post:
+ *     tags: [Register]
+ *     summary: Verify OTP entered by user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - otp
+ *             properties:
+ *               email:
+ *                 type: string
+ *               otp:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP verified successfully
+ *       400:
+ *         description: Invalid or expired OTP
+ */
+router.post("/verify-otp", verifyOtp);
+
+
+
+/**
+ * @swagger
  * /api/auth/register:
  *   post:
  *     tags: [Register]
- *     summary: Register a new user
+ *     summary: Create account after OTP verification
  *     requestBody:
  *       required: true
  *       content:
@@ -35,8 +101,11 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
  *     responses:
  *       201:
  *         description: User registered successfully
+ *       400:
+ *         description: OTP not verified
  */
 router.post("/register", register);
+
 
 /**
  * @swagger
@@ -62,6 +131,7 @@ router.post("/register", register);
  *       200:
  *         description: Login successful
  */
+
 router.post("/login", login);
 
 /**
