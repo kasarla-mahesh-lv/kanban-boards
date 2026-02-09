@@ -13,13 +13,13 @@ import Reports from "./Pages/Reports";
 import NotificationPage from "./components/notifications/NotificationPage";
 
 import Login from "./Pages/Login";
+import Logout from "./Pages/Logout";
 import Register from "./components/Auth/Register";
 
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import "./App.css";
 
 /* ✅ Dashboard Layout only (NO login/register here) */
@@ -53,6 +53,31 @@ const DashboardLayout: React.FC = () => {
         </div>
       </div>
 
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <>
+      <Routes>
+        {/* ✅ PUBLIC (no dashboard layout) */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/logout" element={<Logout />} />
+
+        {/* ✅ PROTECTED (dashboard layout only) */}
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+
       <ToastContainer
         position="top-right"
         autoClose={2000}
@@ -62,27 +87,7 @@ const DashboardLayout: React.FC = () => {
         draggable
         theme="colored"
       />
-    </div>
-  );
-};
-
-const App: React.FC = () => {
-  return (
-    <Routes>
-      {/* ✅ PUBLIC (no dashboard layout) */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
-      {/* ✅ PROTECTED (dashboard layout only) */}
-      <Route
-        path="/*"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    </>
   );
 };
 

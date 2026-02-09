@@ -27,9 +27,10 @@ const Register: React.FC = () => {
 
       await registerApi({ name, email, password, mobilenumber });
 
-      toast.success("Registration Successful! Please verify your email or login.");
+      toast.success("register sucessful");
       nav("/login", { replace: true });
     } catch (error: any) {
+      toast.error("invalid details");
       setErr(error?.message || "Register failed");
     } finally {
       setLoading(false);
