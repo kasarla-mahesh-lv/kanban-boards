@@ -1,4 +1,4 @@
-const History = require("../models/history");
+const HistoryModel = require("../models/history");
 
 // GET history by boardId
 exports.getBoardHistory = async (req, res) => {
@@ -9,7 +9,7 @@ exports.getBoardHistory = async (req, res) => {
       return res.status(400).json({ message: "boardId is required" });
     }
 
-    const history = await History.find({ boardId })
+    const history = await HistoryModel.find({ boardId })
       .sort({ createdAt: -1 });
 
     res.status(200).json(history);
