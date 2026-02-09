@@ -20,6 +20,7 @@ const Register: React.FC = () => {
   const [err, setErr] = useState("");
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+   
     e.preventDefault();
     try {
       setLoading(true);

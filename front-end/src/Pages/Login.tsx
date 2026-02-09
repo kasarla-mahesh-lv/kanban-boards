@@ -30,6 +30,8 @@ const Login = ({ onClose }: Props) => {
 
   /* ---------------- LOGIN ---------------- */
   const handleLogin = async () => {
+    console.log("click");
+    
     if (!email || !password) {
       toast.error("All fields required ❌");
       return;
@@ -61,6 +63,7 @@ const Login = ({ onClose }: Props) => {
 
   /* ---------------- REGISTER ---------------- */
   const handleRegister = async () => {
+    console.log("handle---------")
     if (!name || !email || !password || !mobilenumber) {
       toast.error("All fields required ❌");
       return;

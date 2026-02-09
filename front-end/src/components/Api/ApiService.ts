@@ -36,7 +36,7 @@ export type RegisterResponse = {
 export const loginApi = async (
   payload: LoginPayload
 ): Promise<LoginResponse> => {
-  const res = await api.post("/auth/login", payload);
+  const res = await api.post("https://kanban-boards-backend.vercel.app/api/auth/login", payload);
   return res.data;
 };
 
@@ -45,7 +45,7 @@ export const loginApi = async (
 export const registerApi = async (
   payload: RegisterPayload
 ): Promise<RegisterResponse> => {
-  const res = await api.post("/auth/register", payload);
+  const res = await api.post("https://kanban-boards-backend.vercel.app/api/auth/register", payload);
   return res.data;
 };
 
