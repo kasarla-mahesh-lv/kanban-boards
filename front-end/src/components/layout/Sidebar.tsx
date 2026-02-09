@@ -1,18 +1,7 @@
 import React, { useState, useEffect } from "react";
-<<<<<<< HEAD
-import { useNavigate, NavLink, useParams } from "react-router-dom";
-import "./Sidebar.css";
-import Login from "../../Pages/Login";
-import {
-  getProjectsApi,
-  createProjectApi,
-} from "../Api/ApiService";
-
-=======
 import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../../components/Auth/AuthContext";
 import "./Sidebar.css";
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
 import {
   FaHome,
   FaTasks,
@@ -26,12 +15,13 @@ import {
   FaBell,
   FaHistory,
 } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 
 type Project = {
-  _id: string;
-  title: string;
-  description?: string;
+  id: number;
+  name: string;
+  color: string;
 };
 
 type Member = {
@@ -47,16 +37,6 @@ type Team = {
   members: Member[];
 };
 
-<<<<<<< HEAD
-const Sidebar = () => {
-  const navigate = useNavigate();
-  const { projectId } = useParams();
-
-  /* ---------- AUTH ---------- */
-  const [showAuth, setShowAuth] = useState(false);
-
-  /* ---------- STATE ---------- */
-=======
 
 
 const PROJECT_KEY = "hrm-projects";
@@ -67,9 +47,10 @@ const Sidebar: React.FC = () => {
   const { logout } = useAuth();
 
   
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
   const [projects, setProjects] = useState<Project[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+
+  const [activeProject, setActiveProject] = useState<number | null>(null);
 
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
@@ -80,28 +61,12 @@ const Sidebar: React.FC = () => {
   const [showProjectInput, setShowProjectInput] = useState(false);
   const [showTeamInput, setShowTeamInput] = useState(false);
 
-<<<<<<< HEAD
-  /* ---------- LOAD PROJECTS (BACKEND) ---------- */
-  const loadProjects = async () => {
-    try {
-      const data = await getProjectsApi();
-      setProjects(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Failed to load projects", error);
-    }
-  };
-
-=======
   
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
   useEffect(() => {
-    loadProjects();
+    setProjects(JSON.parse(localStorage.getItem(PROJECT_KEY) || "[]"));
+    setTeams(JSON.parse(localStorage.getItem(TEAM_KEY) || "[]"));
   }, []);
 
-<<<<<<< HEAD
-  /* ---------- ADD PROJECT (BACKEND) ---------- */
-  const addProject = async () => {
-=======
   const saveProjects = (data: Project[]) => {
     setProjects(data);
     localStorage.setItem(PROJECT_KEY, JSON.stringify(data));
@@ -114,31 +79,24 @@ const Sidebar: React.FC = () => {
 
   
   const addProject = () => {
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
     if (!newProjectName.trim()) return;
 
-    try {
-      await createProjectApi({
-        title: newProjectName,
-      });
+    const project: Project = {
+      id: Date.now(),
+      name: newProjectName,
+      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+    };
 
-      setNewProjectName("");
-      setShowProjectInput(false);
-      loadProjects(); // 🔁 refresh from backend
-    } catch (error) {
-      console.error("Create project failed", error);
-    }
+    saveProjects([...projects, project]);
+    setNewProjectName("");
+    setShowProjectInput(false);
   };
 
-<<<<<<< HEAD
-  /* ---------- TEAM (LOCAL ONLY) ---------- */
-=======
   const deleteProject = (id: number) => {
     saveProjects(projects.filter((p) => p.id !== id));
   };
 
   
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
   const addTeam = () => {
     if (!newTeamName.trim()) return;
 
@@ -149,19 +107,21 @@ const Sidebar: React.FC = () => {
       members: [],
     };
 
-    setTeams((prev) => [...prev, team]);
+    saveTeams([...teams, team]);
     setNewTeamName("");
     setShowTeamInput(false);
   };
 
   const deleteTeam = (id: number) => {
-    setTeams((prev) => prev.filter((t) => t.id !== id));
+    saveTeams(teams.filter((t) => t.id !== id));
   };
 
   /* ---------- LOGOUT ---------- */
+  /* ---------- LOGOUT ---------- */
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    // toast handled in Logout page
+    navigate("/logout");
   };
 
   return (
@@ -172,8 +132,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       <nav className="sidebar-menu">
-        {/* MAIN MENU */}
-        <div className="menu-item" onClick={() => navigate("/")}>
+        <div className="menu-item active" onClick={() => navigate("/")}>
           <FaHome /> Dashboard
         </div>
 
@@ -220,14 +179,7 @@ const Sidebar: React.FC = () => {
             {teams.map((team) => (
               <div key={team.id} className="team-item">
                 <span>{team.name}</span>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteTeam(team.id);
-                  }}
-                >
-                  ❌
-                </span>
+                <span onClick={() => deleteTeam(team.id)}>❌</span>
               </div>
             ))}
 
@@ -244,11 +196,7 @@ const Sidebar: React.FC = () => {
           </div>
         )}
 
-<<<<<<< HEAD
-        {/* ---------- PROJECTS (BACKEND CONNECTED) ---------- */}
-=======
         
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
         <div className="projects-section">
           <div
             className="projects-header"
@@ -269,13 +217,6 @@ const Sidebar: React.FC = () => {
             <div className="projects-list">
               {projects.map((p) => (
                 <div
-<<<<<<< HEAD
-                  key={p._id}
-                  className={`project-item ${
-                    projectId === p._id ? "active" : ""
-                  }`}
-                  onClick={() => navigate(`/projects/${p._id}`)}
-=======
                   key={p.id}
                   className={`project-item ${activeProject === p.id ? "active" : ""
                     }`}
@@ -283,9 +224,9 @@ const Sidebar: React.FC = () => {
                     setActiveProject(p.id);
                     navigate(`/projects/${p.id}`);
                   }}
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
                 >
-                  {p.title}
+                  {p.name}
+                  <span onClick={() => deleteProject(p.id)}>❌</span>
                 </div>
               ))}
 
