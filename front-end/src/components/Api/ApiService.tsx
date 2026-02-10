@@ -2,7 +2,7 @@ import axios from "axios";
 
 /* ======================= AXIOS INSTANCE ======================= */
 const api = axios.create({
-  baseURL: import.meta.env.ITE_API_BASE_URLV, // change if needed
+  baseURL: import.meta.env.VITE_API_BASE_URL, // change if needed
   headers: {
     "Content-Type": "application/json",
   },
@@ -172,7 +172,7 @@ export const deleteTaskApi = async (
 
 /* ======================= SEND OTP ======================= */
 export const sendOtpApi = async (payload: SendOtpPayload) => {
-  const res = await api.post("https://kanban-boards-backend.vercel.app/api/auth/send-otp", payload);
+  const res = await api.post("/auth/send-otp", payload);
   return res.data;
 };
 
