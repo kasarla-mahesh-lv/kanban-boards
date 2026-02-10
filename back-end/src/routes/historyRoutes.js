@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const historyController = require("../controllers/historyController");
+const authMiddleware = require("../middlewares/authmiddlewares");
 
 /**
  * @swagger
@@ -20,6 +21,6 @@ const historyController = require("../controllers/historyController");
  *         description: History fetched successfully
  */
 
-router.get("/:boardId", historyController.getBoardHistory);
+router.get("/:boardId",authMiddleware, historyController.getBoardHistory);
 
 module.exports = router;

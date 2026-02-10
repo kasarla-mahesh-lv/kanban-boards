@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { sendOtp, verifyOtp, register, login } = require("../controllers/authController");
+const { register,verifyOtp, login } = require("../controllers/authController");
 const authMiddleware=require("../middlewares/authmiddlewares");
 const {getAllProjects,createProject,getProjectById,getProjectTasks,
     addTaskToProject,getTaskByTaskIdInProject,updateTaskInProject,
@@ -8,76 +8,11 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
 
 /**
  * @swagger
- * tags:
- *   name: Register
- *   description: User Registration with OTP verification
- */
-
-
-/**
- * @swagger
- * /api/auth/send-otp:
- *   post:
- *     tags: [Register]
- *     summary: Send OTP to user email
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *     responses:
- *       200:
- *         description: OTP sent successfully
- *         content:
- *       400:
- *         description: User already registered
- */
-router.post("/send-otp", sendOtp);
-
-
-
-/**
- * @swagger
- * /api/auth/verify-otp:
- *   post:
- *     tags: [Register]
- *     summary: Verify OTP entered by user
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - otp
- *             properties:
- *               email:
- *                 type: string
- *               otp:
- *                 type: string
- *     responses:
- *       200:
- *         description: OTP verified successfully
- *       400:
- *         description: Invalid or expired OTP
- */
-router.post("/verify-otp", verifyOtp);
-
-
-
-/**
- * @swagger
  * /api/auth/register:
  *   post:
  *     tags: [Register]
- *     summary: Create account after OTP verification
+ *     summary: Send OTP to user email for registration
+ *     description: Sends a one-time password (OTP) to the provided email address. User must verify OTP using verify-otp API to complete registration.
  *     requestBody:
  *       required: true
  *       content:
@@ -94,17 +29,47 @@ router.post("/verify-otp", verifyOtp);
  *                 type: string
  *               email:
  *                 type: string
+ *                 example: youremail@gmail.com
  *               password:
  *                 type: string
  *               mobilenumber:
- *                 type: number
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP sent successfully
+ */
+router.post("/register", register);
+
+
+/**
+ * @swagger
+ * /api/auth/verify-otp:
+ *   post:
+ *     tags: [verifyOtp]
+ *     summary: Verify OTP and create user account
+ *     description: Verifies OTP entered by the user and creates the account if OTP is valid.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - otp
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: youremail@gmail.com
+ *               otp:
+ *                 type: string
  *     responses:
  *       201:
  *         description: User registered successfully
- *       400:
- *         description: OTP not verified
  */
-router.post("/register", register);
+router.post("/verify-otp", verifyOtp);
+
+
 
 
 /**
