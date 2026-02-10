@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const CardModel= require("../models/card");
-const ColumnModel = require("../models/column")
+const ColumnModel = require("../models/column");
 const logHistory = require("../utils/historyLogger");
 
 

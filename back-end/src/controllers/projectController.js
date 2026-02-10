@@ -238,7 +238,7 @@ exports.deleteTaskInProject = async (req, res) => {
   }
 };
 
-const Column = require("../models/Column");
+const Column = require("../models/column");
 
 exports.openProject = async (req, res) => {
   try {
