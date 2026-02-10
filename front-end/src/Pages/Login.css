@@ -97,3 +97,24 @@
   cursor: pointer;
   font-size: 18px;
 }
+.otp-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.otp-btn {
+  background: #ff4d6d;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.otp-success {
+  color: green;
+  text-align: center;
+  font-size: 13px;
+}

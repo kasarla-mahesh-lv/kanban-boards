@@ -13,6 +13,8 @@ const boardRoutes = require("./src/routes/boardRoutes");
 const columnRoutes = require("./src/routes/columnRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
 const projectRoutes = require("./src/routes/projectRoutes");
+const historyRoutes = require("./src/routes/historyRoutes");
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,8 +26,10 @@ app.use(
     origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders:["Authorization"],
   })
 );
+
 app.use(morgan("dev"));
 
 /* -------------------- Health -------------------- */
@@ -42,6 +46,8 @@ app.use("/api/boards", boardRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/history", historyRoutes);
+
 
 /* -------------------- Start App -------------------- */
 (async () => {

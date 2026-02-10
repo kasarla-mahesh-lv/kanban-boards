@@ -15,8 +15,6 @@ import {
   FaBell,
   FaHistory,
 } from "react-icons/fa";
-import { toast } from "react-toastify";
-
 
 type Project = {
   id: number;
