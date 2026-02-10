@@ -12,9 +12,9 @@ try{
         return res.status(400).json({message:"All fields required"});
 
     //  length check
-    if(password.length < 8){
+    if(password.length < 8 || password.length > 8 ){
        return res.status(400).json({
-        message:"Password must be at least 8 characters long"
+        message:"Password must be 8 characters long"
     });
     }
 
