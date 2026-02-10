@@ -237,3 +237,35 @@ exports.deleteTaskInProject = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
+
+const Column = require("../models/Column");
+
+exports.openProject = async (req, res) => {
+  try {
+    const { projectId } = req.params; // ✅ correct param
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+
+    // ✅ correct model
+    const project = await ProjectModel.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    // ✅ Column schema lo boardId undi
+    await Column.insertMany([
+      { name: "Backlog", boardId: projectId, order: 1, cards: [] },
+      { name: "Todo", boardId: projectId, order: 2, cards: [] },
+      { name: "In Progress", boardId: projectId, order: 3, cards: [] },
+      { name: "Done", boardId: projectId, order: 4, cards: [] },
+    ]);
+
+    const columns = await Column.find({ boardId: projectId }).sort({ order: 1 });
+
+    return res.json({ project, columns });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
