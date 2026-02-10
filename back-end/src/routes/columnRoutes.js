@@ -8,7 +8,7 @@ const authMiddleware = require("../middlewares/authmiddlewares");
  *     description: Column related APIs
  */
 
-router.get("/boards/:boardId/columns",authMiddleware, getColumnsByBoard); // ✅ ADD THIS
+router.get("/boards/:boardId/columns", getColumnsByBoard); // ✅ ADD THIS
 
 
 router.post("/boards/:boardId/columns",authMiddleware, createColumn);
