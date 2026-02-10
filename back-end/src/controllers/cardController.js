@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const CardModel= require("../models/card");
 const ColumnModel = require("../models/column")
+const logHistory = require("../utils/historyLogger");
 
 
 exports.createCard = async (req, res) => {
@@ -95,6 +96,8 @@ exports.moveCard = async (req, res) => {
     if (!toColumnId) {
       return res.status(400).json({ message: "toColumnId is required" });
     }
+    const existingCard=await CardModel.findById(id);
+    const oldColumn=existingCard?.columnId;
 
     // 1️⃣ move card to new column
     const movedCard = await CardModel.findByIdAndUpdate(
@@ -106,6 +109,16 @@ exports.moveCard = async (req, res) => {
     if (!movedCard) {
       return res.status(404).json({ message: "Card not found" });
     }
+    // ⭐ Save history after moving
+  await logHistory({
+    actionType: "moved task",
+    taskTitle: movedCard.title,
+    taskId: movedCard._id,
+    boardId: movedCard.boardId,
+    fromColumn: oldColumn,
+    toColumn: toColumnId
+  });
+
 
     // helper function to update orders
     const updateOrders = async (cards) => {
