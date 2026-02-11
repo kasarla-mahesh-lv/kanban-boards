@@ -62,7 +62,7 @@ const Login = ({ onClose }: Props) => {
 
     return () => clearInterval(interval);
   }, [otpTimer]);
-
+  console.log(loading);
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
