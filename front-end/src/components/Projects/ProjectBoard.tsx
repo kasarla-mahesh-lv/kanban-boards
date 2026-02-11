@@ -1,0 +1,101 @@
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import {
+  // getProjectColumnsApi,
+  getProjectsApi,
+  type Column,
+  type Project,
+} from "../Api/ApiService";
+import { getProjectColumnsApi } from "../Api/ApiCommon"
+import "./Project.css";
+
+
+
+const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
+
+const ProjectBoard: React.FC = () => {
+  const { projectId } = useParams();
+  const [project, setProject] = useState<Project | null>(null);
+
+  const [columns, setColumns] = useState<Column[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    console.log(projectId,"project");
+    
+    (async () => {
+      try {
+        setError("");
+        setLoading(true);
+
+        // const projects = await getProjectsApi();
+        // setProject(projects.find((p) => p._id === projectId) || null);
+
+        const cols = await getProjectColumnsApi(projectId);
+        console.log("Columns loaded:", cols);
+        setColumns(cols);
+      } catch (e: any) {
+        console.log("Load board failed:",e, e?.response?.status, e?.response?.data);
+        setError("Failed to load columns.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [projectId]);
+
+  const displayColumns = columns.length
+    ? columns
+    : DEFAULT_COLUMNS.map((t, idx) => ({
+        _id: `temp-${idx}`,
+        title: t,
+        key: t.toLowerCase().replace(/\s/g, ""),
+        tasks: [],
+      }));
+
+  return (
+    <div className="project-board">
+      <div className="project-board-header">
+        <div>
+          <h1>{project?.title || "Project Board"}</h1>
+          <p style={{ marginTop: 4, opacity: 0.7 }}>
+            {loading ? "Loading..." : "Project Board"}
+          </p>
+        </div>
+
+        <button className="add-col-btn">+ Add Column</button>
+      </div>
+
+      {error && <div className="board-error">{error}</div>}
+
+      <div className="columns-row">
+        {displayColumns.map((col) => (
+          <div key={col._id} className="column-card">
+            <div className="column-title">
+              <span>{col.title}</span>
+              <span className="count">{col.tasks?.length || 0}</span>
+            </div>
+
+            <div className="tasks-area">
+              {(col.tasks?.length || 0) === 0 ? (
+                <div className="no-tasks">No tasks</div>
+              ) : (
+                col.tasks.map((t: any) => (
+                  <div key={t._id || t.id} className="task-item">
+                    {t.title}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <button className="add-task-btn" >+ Add Task</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default ProjectBoard;
