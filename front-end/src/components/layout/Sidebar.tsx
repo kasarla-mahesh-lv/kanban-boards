@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../../components/Auth/AuthContext";
 import "./Sidebar.css";
@@ -15,42 +15,28 @@ import {
   FaBell,
   FaHistory,
 } from "react-icons/fa";
-import { toast } from "react-toastify";
 
+import {
+  // getProjectsApi,
+  createProjectApi,
+  type Project,
+} from "../Api/ApiService";
 
-type Project = {
-  id: number;
-  name: string;
-  color: string;
-};
+import { getProjectsApi } from "../Api/ApiCommon";
 
-type Member = {
-  id: number;
-  name: string;
-  color: string;
-};
+type Member = { id: number; name: string; color: string };
+type Team = { id: number; name: string; color: string; members: Member[] };
 
-type Team = {
-  id: number;
-  name: string;
-  color: string;
-  members: Member[];
-};
-
-
-
-const PROJECT_KEY = "hrm-projects";
 const TEAM_KEY = "hrm-teams";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  
   const [projects, setProjects] = useState<Project[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
 
-  const [activeProject, setActiveProject] = useState<number | null>(null);
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
   const [openProjects, setOpenProjects] = useState(true);
   const [openTeams, setOpenTeams] = useState(false);
@@ -61,42 +47,55 @@ const Sidebar: React.FC = () => {
   const [showProjectInput, setShowProjectInput] = useState(false);
   const [showTeamInput, setShowTeamInput] = useState(false);
 
-  
-  useEffect(() => {
-    setProjects(JSON.parse(localStorage.getItem(PROJECT_KEY) || "[]"));
-    setTeams(JSON.parse(localStorage.getItem(TEAM_KEY) || "[]"));
-  }, []);
+  const [loadingProjects, setLoadingProjects] = useState(false);
 
-  const saveProjects = (data: Project[]) => {
-    setProjects(data);
-    localStorage.setItem(PROJECT_KEY, JSON.stringify(data));
-  };
+  /* ---------- LOAD DATA ---------- */
+  useEffect(() => {
+    // Teams local
+    setTeams(JSON.parse(localStorage.getItem(TEAM_KEY) || "[]"));
+
+    // Projects API
+    (async () => {
+      try {
+        setLoadingProjects(true);
+        const data = await getProjectsApi();
+        console.log(data,"dataaaaaaaaaaaaa");
+        
+        setProjects(data);
+      } catch (e) {
+        console.log("Projects load failed:", e);
+      } finally {
+        setLoadingProjects(false);
+      }
+    })();
+  }, []);
 
   const saveTeams = (data: Team[]) => {
     setTeams(data);
     localStorage.setItem(TEAM_KEY, JSON.stringify(data));
   };
 
-  
-  const addProject = () => {
-    if (!newProjectName.trim()) return;
+  /* ---------- ADD PROJECT (API) ---------- */
+  const addProject = async () => {
+    const title = newProjectName.trim();
+    if (!title) return;
 
-    const project: Project = {
-      id: Date.now(),
-      name: newProjectName,
-      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
-    };
+    try {
+      const created = await createProjectApi({ title });
 
-    saveProjects([...projects, project]);
-    setNewProjectName("");
-    setShowProjectInput(false);
+      setProjects((prev) => [created, ...prev]);
+
+      setNewProjectName("");
+      setShowProjectInput(false);
+
+      setActiveProjectId(created._id);
+      navigate(`/projects/${created._id}`);
+    } catch (e) {
+      console.log("Create project failed:", e);
+    }
   };
 
-  const deleteProject = (id: number) => {
-    saveProjects(projects.filter((p) => p.id !== id));
-  };
-
-  
+  /* ---------- TEAMS (local) ---------- */
   const addTeam = () => {
     if (!newTeamName.trim()) return;
 
@@ -117,16 +116,13 @@ const Sidebar: React.FC = () => {
   };
 
   /* ---------- LOGOUT ---------- */
-  /* ---------- LOGOUT ---------- */
   const handleLogout = () => {
     logout();
-    // toast handled in Logout page
     navigate("/logout");
   };
 
   return (
     <aside className="sidebar">
-      
       <div className="sidebar-logo">
         ⚡ <h2>HRM</h2>
       </div>
@@ -139,10 +135,6 @@ const Sidebar: React.FC = () => {
         <div className="menu-item">
           <FaTasks /> Tasks
         </div>
-
-        {/* <div className="menu-item">
-          <FaCalendarCheck /> Attendance
-        </div> */}
 
         <NavLink
           to="/history"
@@ -161,7 +153,7 @@ const Sidebar: React.FC = () => {
           <FaBell /> Notifications
         </div>
 
-        
+        {/* ---------- TEAMS ---------- */}
         <div className="menu-item" onClick={() => setOpenTeams(!openTeams)}>
           <FaUsers /> Teams
           {openTeams ? <FaChevronDown /> : <FaChevronRight />}
@@ -196,7 +188,7 @@ const Sidebar: React.FC = () => {
           </div>
         )}
 
-        
+        {/* ---------- PROJECTS (API) ---------- */}
         <div className="projects-section">
           <div
             className="projects-header"
@@ -215,18 +207,24 @@ const Sidebar: React.FC = () => {
 
           {openProjects && (
             <div className="projects-list">
+              {loadingProjects && (
+                <div style={{ padding: "8px 10px", opacity: 0.7 }}>
+                  Loading projects...
+                </div>
+              )}
+
               {projects.map((p) => (
                 <div
-                  key={p.id}
-                  className={`project-item ${activeProject === p.id ? "active" : ""
-                    }`}
+                  key={p._id}
+                  className={`project-item ${
+                    activeProjectId === p._id ? "active" : ""
+                  }`}
                   onClick={() => {
-                    setActiveProject(p.id);
-                    navigate(`/projects/${p.id}`);
+                    setActiveProjectId(p._id);
+                    navigate(`/projects/${p._id}`);
                   }}
                 >
-                  {p.name}
-                  <span onClick={() => deleteProject(p.id)}>❌</span>
+                  {p.title}
                 </div>
               ))}
 
@@ -245,7 +243,6 @@ const Sidebar: React.FC = () => {
         </div>
       </nav>
 
-      
       <div className="sidebar-bottom">
         <div className="login" onClick={handleLogout}>
           <FaSignOutAlt />
@@ -256,7 +253,6 @@ const Sidebar: React.FC = () => {
           <FaCog /> Settings
         </div>
       </div>
-      {/* {showAuth && <Login onClose={() => setShowAuth(false)} />} */}
     </aside>
   );
 };

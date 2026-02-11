@@ -1,25 +1,16 @@
-const express = require("express");
-const router = express.Router();
+const router = require("express").Router();
 const historyController = require("../controllers/historyController");
 
 /**
  * @swagger
- * /api/history/{boardId}:
+ * /api/history:
  *   get:
- *     summary: Get board history
+ *     summary: Get full history
  *     tags: [History]
- *     parameters:
- *       - in: path
- *         name: boardId
- *         required: true
- *         schema:
- *           type: string
- *         description: Board ID
  *     responses:
  *       200:
- *         description: History fetched successfully
+ *         description: Full history fetched successfully
  */
-
-router.get("/:boardId", historyController.getBoardHistory);
+router.get("/",historyController.getAllHistory);
 
 module.exports = router;

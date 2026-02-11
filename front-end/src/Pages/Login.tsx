@@ -9,13 +9,13 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import {
-  loginApi,
   registerApi,
   sendOtpApi,
   verifyOtpApi,
   resetPasswordApi,
 } from "../components/Api/ApiService";
 import "./Login.css";
+import { loginApi } from "../components/Api/ApiCommon"
 
 type Props = {
   onClose?: () => void;
@@ -23,7 +23,7 @@ type Props = {
 
 type Mode = "login" | "register" | "forgot";
 
-const OTP_DURATION = 120; // ⏱ 2 minutes
+const OTP_DURATION = 120;
 
 const Login = ({ onClose }: Props) => {
   const nav = useNavigate();
@@ -36,13 +36,21 @@ const Login = ({ onClose }: Props) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [mobilenumber, setMobilenumber] = useState("");
 
-  // 🔐 OTP
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(0); // ⏱ seconds
+  const [otpTimer, setOtpTimer] = useState(0);
 
   const [loading, setLoading] = useState(false);
+
+  /* ================= VALIDATIONS ================= */
+  const isStrongPassword =
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /\d/.test(password) &&
+    /[@$!%*?&]/.test(password);
+
+  const isValidMobile = mobilenumber.length === 10;
 
   /* ================= OTP TIMER ================= */
   useEffect(() => {
@@ -54,14 +62,20 @@ const Login = ({ onClose }: Props) => {
 
     return () => clearInterval(interval);
   }, [otpTimer]);
-
+  console.log(loading);
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
-  /* ---------------- LOGIN ---------------- */
+  /* ================= MOBILE ================= */
+  const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "");
+    if (value.length <= 10) setMobilenumber(value);
+  };
+
+  /* ================= LOGIN ================= */
   const handleLogin = async () => {
     if (!email || !password) {
       toast.error("All fields required ❌");
@@ -71,38 +85,51 @@ const Login = ({ onClose }: Props) => {
     try {
       setLoading(true);
       const res = await loginApi({ email, password });
-      localStorage.setItem("token", res.token);
+      console.log(res,"res--------------------");
+      
+      // localStorage.setItem("token", res.token);
       toast.success("Login successful ✅");
       onClose?.();
       nav("/", { replace: true });
     } catch {
-      toast.error("Invalid details ❌");
+      toast.error("Invalid credentials ❌");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- SEND OTP ---------------- */
-  const handleSendOtp = async () => {
-    if (!email) {
-      toast.error("Enter email first ❌");
+  /* ================= REGISTER ================= */
+  const handleRegister = async () => {
+    if (!name || !email || !password || !mobilenumber) {
+      toast.error("All fields required ❌");
+      return;
+    }
+
+    if (!isStrongPassword) {
+      toast.error("Password is too weak ❌");
+      return;
+    }
+
+    if (!isValidMobile) {
+      toast.error("Mobile number must be 10 digits ❌");
       return;
     }
 
     try {
+      setLoading(true);
       await sendOtpApi({ email });
       setOtpSent(true);
-      setOtpVerified(false);
-      setOtp("");
-      setOtpTimer(OTP_DURATION); // ⏱ start timer
-      toast.success("OTP sent 📩");
+      setOtpTimer(OTP_DURATION);
+      toast.success("OTP sent to email 📩");
     } catch {
-      toast.error("Failed to send OTP ❌");
+      toast.error("User already exists ❌");
+    } finally {
+      setLoading(false);
     }
   };
 
-  /* ---------------- VERIFY OTP ---------------- */
-  const handleVerifyOtp = async () => {
+  /* ================= VERIFY OTP ================= */
+  const handleVerifyOtpAndRegister = async () => {
     if (!otp) {
       toast.error("Enter OTP ❌");
       return;
@@ -114,40 +141,36 @@ const Login = ({ onClose }: Props) => {
     }
 
     try {
-      await verifyOtpApi({ email, otp });
-      setOtpVerified(true);
-      toast.success("OTP verified ✅");
-    } catch {
-      toast.error("Invalid OTP ❌");
-    }
-  };
-
-  /* ---------------- REGISTER ---------------- */
-  const handleRegister = async () => {
-    if (!name || !email || !password || !mobilenumber) {
-      toast.error("All fields required ❌");
-      return;
-    }
-
-    if (!otpVerified) {
-      toast.error("Please verify OTP ❌");
-      return;
-    }
-
-    try {
       setLoading(true);
+      await verifyOtpApi({ email, otp });
       await registerApi({ name, email, password, mobilenumber });
-      toast.success("Register successful 🎉");
+      toast.success("Registration successful 🎉");
       resetAll();
       setMode("login");
     } catch {
-      toast.error("Registration failed ❌");
+      toast.error("user already exists ❌");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- RESET PASSWORD ---------------- */
+  /* ================= FORGOT PASSWORD ================= */
+  const handleSendForgotOtp = async () => {
+    if (!email) {
+      toast.error("Enter email ❌");
+      return;
+    }
+
+    try {
+      await sendOtpApi({ email });
+      setOtpSent(true);
+      setOtpTimer(OTP_DURATION);
+      toast.success("OTP sent 📩");
+    } catch {
+      toast.error("Email not registered ❌");
+    }
+  };
+
   const handleResetPassword = async () => {
     if (!password || !confirmPassword) {
       toast.error("All fields required ❌");
@@ -159,19 +182,20 @@ const Login = ({ onClose }: Props) => {
       return;
     }
 
-    if (!otpVerified) {
-      toast.error("Verify OTP first ❌");
+    if (!isStrongPassword) {
+      toast.error("Password is too weak ❌");
       return;
     }
 
     try {
       setLoading(true);
+      await verifyOtpApi({ email, otp });
       await resetPasswordApi({ email, password });
       toast.success("Password reset successful 🔐");
       resetAll();
       setMode("login");
     } catch {
-      toast.error("Reset failed ❌");
+      toast.error("Invalid OTP ❌");
     } finally {
       setLoading(false);
     }
@@ -185,7 +209,6 @@ const Login = ({ onClose }: Props) => {
     setMobilenumber("");
     setOtp("");
     setOtpSent(false);
-    setOtpVerified(false);
     setOtpTimer(0);
   };
 
@@ -200,139 +223,149 @@ const Login = ({ onClose }: Props) => {
           {mode === "forgot" && "Reset Password"}
         </h2>
 
-        {/* NAME */}
-        {mode === "register" && (
-          <div className="input-box">
-            <FaUser className="input-icon" />
-            <input
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-        )}
-
-        {/* EMAIL + OTP */}
-        <div className="input-box otp-box">
-          <FaEnvelope className="input-icon" />
-          <input
-            placeholder="Email"
-            value={email}
-            disabled={otpSent}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          {mode !== "login" && !otpSent && (
-            <button className="otp-btn" onClick={handleSendOtp}>
-              Send OTP
-            </button>
-          )}
-        </div>
-
-        {/* OTP INPUT */}
-        {mode !== "login" && otpSent && !otpVerified && (
+        {/* ================= REGISTER ================= */}
+        {mode === "register" && !otpSent && (
           <>
-            <div className="input-box otp-box">
-              <input
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-              />
-              <button className="otp-btn" onClick={handleVerifyOtp}>
-                Verify
-              </button>
+            <div className="input-box">
+              <FaUser className="input-icon" />
+              <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
 
-            <p className="otp-timer">
-              {otpTimer > 0
-                ? `⏱ OTP expires in ${formatTime(otpTimer)}`
-                : "OTP expired. Resend OTP"}
-            </p>
+            <div className="input-box">
+              <FaEnvelope className="input-icon" />
+              <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
 
-            {otpTimer <= 0 && (
-              <button className="resend-btn" onClick={handleSendOtp}>
-                Resend OTP
-              </button>
+            <div className="input-box">
+              <FaLock className="input-icon" />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            {password && !isStrongPassword && (
+              <p className="hint-text">
+                Use 8+ chars with Upper, Lower, Number & Special char
+              </p>
             )}
+
+            <div className="input-box">
+              <FaPhone className="input-icon" />
+              <input
+                placeholder="Mobile Number"
+                value={mobilenumber}
+                onChange={handleMobileChange}
+                maxLength={10}
+                inputMode="numeric"
+              />
+            </div>
+
+            {mobilenumber && !isValidMobile && (
+              <p className="hint-text">Enter valid 10-digit mobile number</p>
+            )}
+
+            <button className="login-btn" onClick={handleRegister}>
+              Register
+            </button>
+
+            {/* ✅ BACK TO LOGIN LINK */}
+            <p className="switch-text">
+              <span onClick={() => setMode("login")}>← Back to Login</span>
+            </p>
           </>
         )}
 
-        {otpVerified && <p className="otp-success">✅ OTP Verified</p>}
+        {/* ================= REGISTER OTP ================= */}
+        {mode === "register" && otpSent && (
+          <>
+            <div className="input-box">
+              <input placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value)} />
+            </div>
 
-        {/* PASSWORD */}
-        {(mode === "login" || mode === "register" || (mode === "forgot" && otpVerified)) && (
-          <div className="input-box">
-            <FaLock className="input-icon" />
-            <input
-              type="password"
-              placeholder={mode === "forgot" ? "New Password" : "Password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+            <p className="otp-timer">⏱ OTP expires in {formatTime(otpTimer)}</p>
+
+            <button className="login-btn" onClick={handleVerifyOtpAndRegister}>
+              Verify OTP & Register
+            </button>
+          </>
         )}
 
-        {/* CONFIRM PASSWORD */}
-        {mode === "forgot" && otpVerified && (
-          <div className="input-box">
-            <FaLock className="input-icon" />
-            <input
-              type="password"
-              placeholder="Re-enter Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
-        )}
+        {/* ================= LOGIN ================= */}
+        {mode === "login" && (
+          <>
+            <div className="input-box">
+              <FaEnvelope className="input-icon" />
+              <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
 
-        {/* MOBILE */}
-        {mode === "register" && (
-          <div className="input-box">
-            <FaPhone className="input-icon" />
-            <input
-              placeholder="Mobile Number"
-              value={mobilenumber}
-              onChange={(e) => setMobilenumber(e.target.value)}
-            />
-          </div>
-        )}
+            <div className="input-box">
+              <FaLock className="input-icon" />
+              <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            </div>
 
-        {/* BUTTON */}
-        <button
-          className="login-btn"
-          disabled={loading}
-          onClick={
-            mode === "login"
-              ? handleLogin
-              : mode === "register"
-              ? handleRegister
-              : handleResetPassword
-          }
-        >
-          <FaSignInAlt />
-          {loading
-            ? "Please wait..."
-            : mode === "login"
-            ? "Login"
-            : mode === "register"
-            ? "Register"
-            : "Reset Password"}
-        </button>
+            <button className="login-btn" onClick={handleLogin}>
+              <FaSignInAlt /> Login
+            </button>
 
-        {/* LINKS */}
-        <p className="switch-text">
-          {mode === "login" && (
-            <>
+            <p className="switch-text">
               Don’t have an account?
               <span onClick={() => setMode("register")}> Register</span>
               <br />
               <span onClick={() => setMode("forgot")}>Forgot Password?</span>
-            </>
-          )}
+            </p>
+          </>
+        )}
 
-          {mode !== "login" && (
-            <span onClick={() => setMode("login")}>Back to Login</span>
-          )}
-        </p>
+        {/* ================= FORGOT PASSWORD ================= */}
+        {mode === "forgot" && (
+          <>
+            <div className="input-box">
+              <FaEnvelope className="input-icon" />
+              <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+
+            {!otpSent && (
+              <button className="login-btn" onClick={handleSendForgotOtp}>
+                Send OTP
+              </button>
+            )}
+
+            {otpSent && (
+              <>
+                <div className="input-box">
+                  <input placeholder="OTP" value={otp} onChange={(e) => setOtp(e.target.value)} />
+                </div>
+
+                <div className="input-box">
+                  <FaLock className="input-icon" />
+                  <input type="password" placeholder="New Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </div>
+
+                {password && !isStrongPassword && (
+                  <p className="hint-text">
+                    Use 8+ chars with Upper, Lower, Number & Special char
+                  </p>
+                )}
+
+                <div className="input-box">
+                  <FaLock className="input-icon" />
+                  <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                </div>
+
+                <button className="login-btn" onClick={handleResetPassword}>
+                  Reset Password
+                </button>
+              </>
+            )}
+
+            <p className="switch-text">
+              <span onClick={() => setMode("login")}>Back to Login</span>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
