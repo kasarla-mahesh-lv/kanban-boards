@@ -1,6 +1,15 @@
-const router = require("express").Router();
-const { createColumn, updateColumn, deleteColumn,getColumnsByBoard } = require("../controllers/columnController");
+const express = require("express");
+const router = express.Router();
+
+const {
+  createColumn,
+  updateColumn,
+  deleteColumn,
+  getColumnsByBoard,
+} = require("../controllers/columnController");
+
 const authMiddleware = require("../middlewares/authmiddlewares");
+
 /**
  * @openapi
  * tags:
@@ -8,24 +17,33 @@ const authMiddleware = require("../middlewares/authmiddlewares");
  *     description: Column related APIs
  */
 
-router.get("/boards/:boardId/columns",authMiddleware, getColumnsByBoard); // ✅ ADD THIS
-
-
-router.post("/:projectId", createColumn);
-router.patch("/boards/:boardId/columns/:columnId",authMiddleware, updateColumn);
-router.delete("/boards/:boardId/columns/:columnId",authMiddleware, deleteColumn);
-
-module.exports = router;
+/**
+ * @openapi
+ * /api/columns/boards/{projectId}/columns:
+ *   get:
+ *     tags: [Columns]
+ *     summary: Get all columns in a board
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Columns list
+ */
+router.get("/boards/:projectId/columns", authMiddleware, getColumnsByBoard);
 
 /**
  * @openapi
- * /api/columns/boards/{boardId}/columns:
+ * /api/columns/boards/{projectId}/columns:
  *   post:
  *     tags: [Columns]
- *     summary: Create a column in a board
+ *     summary: Create a column in a board (Add group)
  *     parameters:
  *       - in: path
- *         name: boardId
+ *         name: projectId
  *         required: true
  *         schema:
  *           type: string
@@ -35,27 +53,26 @@ module.exports = router;
  *         application/json:
  *           schema:
  *             type: object
- *             required: [title]
+ *             required: [name]
  *             properties:
- *               title:
+ *               name:
  *                 type: string
- *                 example: "To Do"
+ *                 example: "Testing"
  *     responses:
  *       201:
  *         description: Column created
  */
+router.post("/boards/:projectId/columns",authMiddleware, createColumn);
 
-
-
- /**
+/**
  * @openapi
- * /api/columns/boards/{boardId}/columns/{columnId}:
+ * /api/columns/boards/{projectId}/columns/{columnId}:
  *   patch:
  *     tags: [Columns]
  *     summary: Update a column
  *     parameters:
  *       - in: path
- *         name: boardId
+ *         name: projectId
  *         required: true
  *         schema:
  *           type: string
@@ -70,60 +87,26 @@ module.exports = router;
  *         application/json:
  *           schema:
  *             type: object
- *             required: [title]
+ *             required: [name]
  *             properties:
- *               title:
+ *               name:
  *                 type: string
  *                 example: "In Progress"
  *     responses:
  *       200:
  *         description: Column updated
  */
-
-
-
+router.patch("/boards/:projectId/columns/:columnId", authMiddleware, updateColumn);
 
 /**
  * @openapi
- * /api/columns/boards/{boardId}/columns:
- *   get:
- *     tags: [Columns]
- *     summary: Get all columns in a board
- *     parameters:
- *       - in: path
- *         name: boardId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Columns list
- */
-
-
-router.get("/api/columns", async (req, res) => {
-  try {
-    const columns = await Column.find()
-      .sort({ order: 1 })
-      .populate({
-        path: "cards",
-        options: { sort: { order: 1 } }
-      });
-
-    res.status(200).json(columns);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-/**
- * @openapi
- * /api/columns/boards/{boardId}/columns/{columnId}:
+ * /api/columns/boards/{projectId}/columns/{columnId}:
  *   delete:
  *     tags: [Columns]
  *     summary: Delete a column
  *     parameters:
  *       - in: path
- *         name: boardId
+ *         name: projectId
  *         required: true
  *         schema:
  *           type: string
@@ -136,3 +119,10 @@ router.get("/api/columns", async (req, res) => {
  *       200:
  *         description: Column deleted
  */
+router.delete(
+  "/boards/:projectId/columns/:columnId",
+  authMiddleware,
+  deleteColumn
+);
+
+module.exports = router;

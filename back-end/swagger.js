@@ -49,6 +49,10 @@ const swaggerOptions = {
         description: "Card related APIs",
       },
        { name: "Projects", description: "Project related APIs" },
+       {
+        name: "History",
+        description: "History related APIS"
+       }
       
     
   

@@ -7,6 +7,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const connectDB = require("./src/config/mongo");
 
+
 // Routes
 const authRoutes = require("./src/routes/authRoutes");
 //const boardRoutes = require("./src/routes/boardRoutes");
@@ -26,8 +27,10 @@ app.use(
     origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders:["Authorization"],
   })
 );
+
 app.use(morgan("dev"));
 
 /* -------------------- Health -------------------- */
