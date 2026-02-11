@@ -250,6 +250,8 @@ router.get("/:projectId/tasks",authMiddleware, getProjectTasks);
  */
 router.post("/:projectId/tasks",authMiddleware, addTaskToProject);
 
+
+
 /**
  * @openapi
  * /api/projects/{projectId}/tasks/{taskId}:
