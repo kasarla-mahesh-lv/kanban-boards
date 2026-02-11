@@ -1,52 +1,25 @@
 const UserModel = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const sendMail = require("../utils/mail");
+const {
+  registerSchema,
+  verifyOtpSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema
+} = require("../validators/authValidator");
 
 exports.register = async (req,res)=>{
 try{
 
-    const {name,email,password,mobilenumber} = req.body;
+     const { error } = registerSchema.validate(req.body);
+     if (error)
+        return res.status(400).json({ message: error.details[0].message });
+     const { name, email, password, mobilenumber } = req.body;
 
-    if(!name || !email || !password || !mobilenumber)
-        return res.status(400).json({message:"All fields required"});
-
-    //  length check
-    if(password.length < 8 || password.length > 8 ){
-       return res.status(400).json({
-        message:"Password must be 8 characters long"
-    });
-    }
-
-    //  first letter capital check
-    const firstChar = password[0];
-    if(firstChar !== firstChar.toUpperCase()){
-        return res.status(400).json({
-        message:"Password must start with a capital letter"
-    });
-    }
-
-    //  special character check
-    const specialChars = "!@#$%^&*()_+-=[]{};':\"\\|,.<>/?";
-    let hasSpecialChar = false;
-
-    for(let i = 0; i < password.length; i++){
-    if(specialChars.includes(password[i])){
-        hasSpecialChar = true;
-        break;
-    }
-   }
-
-   if(!hasSpecialChar){
-        return res.status(400).json({
-        message:"Password must contain at least one special character"
-    });
-    }
-
-    if(String(mobilenumber).length !== 10)
-        return res.status(400).json({message:"Invalid mobile number📱, please enter 10 digit mobilenumber"});
-
-    let user = await UserModel.findOne({email});
+      // 🔥 FETCH USER FIRST
+     let user = await UserModel.findOne({ email });
 
     // already verified user
     if(user && user.isVerified)
@@ -73,23 +46,12 @@ try{
     );
 
     // send mail
-    const transporter = nodemailer.createTransport({
-        host:"smtp.gmail.com",
-        port:587,
-        secure:false,
-        auth:{
-            user:process.env.EMAIL_USER,
-            pass:process.env.EMAIL_PASS
-        },
-        tls:{rejectUnauthorized:false}
-    });
-
-    await transporter.sendMail({
-        from:process.env.EMAIL_USER,
-        to:email,
-        subject:"OTP Verification",
-        text:`Your OTP is ${otp}`
-    });
+    await sendMail(
+    email,
+    "OTP Verification",
+    `Welcome to Luvetha Tech Solutions
+    Your OTP is ${otp}`
+);
 
     res.status(200).json({message:"OTP sent to email"});
 
@@ -102,10 +64,11 @@ try{
  exports.verifyOtp = async (req,res)=>{
 try{
 
-    const {email,otp} = req.body;
 
-    if(!email || !otp)
-        return res.status(400).json({message:"Email and OTP required"});
+    const { error } = verifyOtpSchema.validate(req.body);
+    if (error)
+        return res.status(400).json({ message: error.details[0].message });
+    const { email, otp } = req.body;
 
     const user = await UserModel.findOne({email});
 
@@ -132,7 +95,7 @@ try{
         message:"User Registered Succesfully 🙏🤝",
         userId:user._id
     });
-    console.log(res,"User Registered Succesfully 🙏🤝")
+    console.log("User Registered Succesfully 🙏🤝")
 
 }catch(error){
     res.status(500).json({message:error.message});
@@ -140,20 +103,20 @@ try{
 };
 
 
+
 exports.login = async (req, res) => {
   try {
+    const { error } = loginSchema.validate(req.body);
+    if (error)
+        return res.status(400).json({ message: error.details[0].message });
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required 📩" });
-    }
 
     const user = await UserModel.findOne({ email });
     if (!user) {
-      console.log(res,"Invalid email");
+      console.log("Invalid email");
       return res.status(400).json({ message: "Invalid email 📩" });
     }
-
+ 
     if(!user.isVerified){
         return res.status(401).json({
             message:"Please verify OTP before login"
@@ -181,7 +144,82 @@ exports.login = async (req, res) => {
         email: user.email
       }
     });
-    console.log(res,"Login Successful 🤝👍");
+    console.log("Login Successful 🤝👍");
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { error } = forgotPasswordSchema.validate(req.body);
+    if (error)
+       return res.status(400).json({ message: error.details[0].message });
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    // generate otp
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 2 * 60 * 1000);
+
+    user.otp = otp;
+    user.expiresAt = expiry;
+    await user.save();
+
+    // send mail
+    await sendMail(
+    email,
+    "Password Reset OTP",
+    `Your password reset OTP is ${otp}`
+);
+
+    res.status(200).json({ message: "Reset OTP sent to email" });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { error } = resetPasswordSchema.validate(req.body);
+    if (error)
+       return res.status(400).json({ message: error.details[0].message });
+    const { email, otp, newPassword } = req.body;
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
+
+    if (!user.otp || !user.expiresAt)
+      return res.status(400).json({ message: "Please request OTP first" });
+
+    if (user.expiresAt < Date.now())
+      return res.status(400).json({ message: "OTP expired" });
+
+    if (user.otp !== otp)
+      return res.status(400).json({ message: "Invalid OTP" });
+
+    // hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    // clear otp
+    user.otp = null;
+    user.expiresAt = null;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful 🎉" });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
