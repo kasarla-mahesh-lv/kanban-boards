@@ -1,41 +1,42 @@
-const mongoose=require("mongoose");
-const userSchema=new mongoose.Schema(
-    {
-        name:{
-            type:String,
-            required:true,
-            trim:true
-        },
+const mongoose = require("mongoose");
 
-        email:{
-            type:String,
-            required:true,
-            unique:true,
-            lowercase:true,
-            trim:true
-        },
-
-        password:{
-            type:String,
-            required:true,
-            minlength:6
-        },
-
-        mobilenumber:{
-            type:Number,
-            required:true,
-            minlength:10
-        },
-        tokens: [{
-          token: {
-          type: String,
-          required: true
-        }
-    }
-]
+const userSchema = new mongoose.Schema(
+{
+    name:{
+        type:String,
+        required:true,
+        trim:true
     },
-    {timestamps:true}
-);
 
+    email:{
+        type:String,
+        required:true,
+        unique:true,
+        lowercase:true,
+        trim:true
+    },
 
-module.exports=mongoose.model("User",userSchema);
+    password:{
+        type:String,
+        required:true,
+        minlength:6
+    },
+
+    mobilenumber:{
+        type:String,
+        required:true,
+        minlength:10
+    },
+
+    // OTP fields
+    otp:{ type:String, default:null },
+    expiresAt:{ type:Date, default:null },
+
+    isVerified:{
+        type:Boolean,
+        default:false
+    }
+
+},{timestamps:true});
+
+module.exports = mongoose.model("User",userSchema);

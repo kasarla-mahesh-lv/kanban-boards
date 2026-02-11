@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { sendOtp, verifyOtp, register, login } = require("../controllers/authController");
+const { register,verifyOtp,login,forgotPassword,resetPassword } = require("../controllers/authController");
 const authMiddleware=require("../middlewares/authmiddlewares");
 const {getAllProjects,createProject,getProjectById,getProjectTasks,
     addTaskToProject,getTaskByTaskIdInProject,updateTaskInProject,
@@ -9,36 +9,40 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
 /**
  * @swagger
  * tags:
- *   name: Register
- *   description: User Registration with OTP verification
+ *   name: Auth
+ *   description: Authentication APIs
  */
 
 
 /**
  * @swagger
- * /api/auth/send-otp:
+ * /api/auth/register:
  *   post:
- *     tags: [Register]
- *     summary: Send OTP to user email
+ *     tags: [Auth]
+ *     summary: Send OTP to user email for registration
+ *     description: Sends OTP to email. User must verify OTP using verify-otp API to complete registration.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
+ *             required: [name, email, password, mobilenumber]
  *             properties:
+ *               name:
+ *                 type: string
  *               email:
+ *                 type: string
+ *                 example: youremail@gmail.com
+ *               password:
+ *                 type: string
+ *               mobilenumber:
  *                 type: string
  *     responses:
  *       200:
  *         description: OTP sent successfully
- *         content:
- *       400:
- *         description: User already registered
  */
-router.post("/send-otp", sendOtp);
+router.post("/register", register);
 
 
 
@@ -46,17 +50,15 @@ router.post("/send-otp", sendOtp);
  * @swagger
  * /api/auth/verify-otp:
  *   post:
- *     tags: [Register]
- *     summary: Verify OTP entered by user
+ *     tags: [Auth]
+ *     summary: Verify OTP and activate account
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - otp
+ *             required: [email, otp]
  *             properties:
  *               email:
  *                 type: string
@@ -64,9 +66,7 @@ router.post("/send-otp", sendOtp);
  *                 type: string
  *     responses:
  *       200:
- *         description: OTP verified successfully
- *       400:
- *         description: Invalid or expired OTP
+ *         description: Account verified successfully
  */
 router.post("/verify-otp", verifyOtp);
 
@@ -74,44 +74,9 @@ router.post("/verify-otp", verifyOtp);
 
 /**
  * @swagger
- * /api/auth/register:
- *   post:
- *     tags: [Register]
- *     summary: Create account after OTP verification
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *               - mobilenumber
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               mobilenumber:
- *                 type: number
- *     responses:
- *       201:
- *         description: User registered successfully
- *       400:
- *         description: OTP not verified
- */
-router.post("/register", register);
-
-
-/**
- * @swagger
  * /api/auth/login:
  *   post:
- *     tags: [Login]
+ *     tags: [Auth]
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -119,9 +84,7 @@ router.post("/register", register);
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
+ *             required: [email, password]
  *             properties:
  *               email:
  *                 type: string
@@ -131,8 +94,62 @@ router.post("/register", register);
  *       200:
  *         description: Login successful
  */
-
 router.post("/login", login);
+
+
+
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Send OTP for password reset
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Reset OTP sent to email
+ */
+router.post("/forgot-password", forgotPassword);
+
+
+
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Reset password using OTP
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, otp, newPassword, confirmPassword]
+ *             properties:
+ *               email:
+ *                 type: string
+ *               otp:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *               confirmPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ */
+router.post("/reset-password", resetPassword);
+
 
 /**
  * @openapi
