@@ -11,7 +11,7 @@ const authMiddleware = require("../middlewares/authmiddlewares");
 router.get("/boards/:boardId/columns",authMiddleware, getColumnsByBoard); // ✅ ADD THIS
 
 
-router.post("/boards/:boardId/columns",authMiddleware, createColumn);
+router.post("/:projectId", createColumn);
 router.patch("/boards/:boardId/columns/:columnId",authMiddleware, updateColumn);
 router.delete("/boards/:boardId/columns/:columnId",authMiddleware, deleteColumn);
 

@@ -1,23 +1,28 @@
 const ColumnModel = require("../models/column");
+const Column = require("../models/column");
 
 // ✅ Create Column
 exports.createColumn = async (req, res) => {
   try {
-    const { boardId } = req.params;
+    const { projectId } = req.params;
     const { name } = req.body;
 
-    if (!name) return res.status(400).json({ message: "name is required" });
+    if (!name) {
+      return res.status(400).json({ message: "Column name required" });
+    }
 
-    const last = await ColumnModel.findOne({ boardId }).sort({ order: -1 }).lean();
-    const nextOrder = last ? last.order + 1 : 1;
+    const column = await Column.create({
+      boardId: projectId,
+      name: name,
+      order: 1,
+      cards: []
+    });
 
-    const column = await ColumnModel.create({ boardId, name, order: nextOrder });
     res.status(201).json(column);
-  } catch (error) {
-    res.status(500).json({ message: "Create column failed", error: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
-
 // ✅ Update Column
 exports.updateColumn = async (req, res) => {
   try {
