@@ -17,7 +17,7 @@ import Logout from "./Pages/Logout";
 import Register from "./components/Auth/Register";
 
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
-
+import ProjectBoard from "./components/Projects/ProjectBoard";   
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
@@ -48,6 +48,7 @@ const DashboardLayout: React.FC = () => {
             <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/notifications" element={<NotificationPage />} />
+             <Route path="/projects/:projectId" element={<ProjectBoard />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

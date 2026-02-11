@@ -41,10 +41,6 @@ const swaggerOptions = {
         description:"Login related APIS"
       },
       {
-        name: "Boards",
-        description: "Board related APIs",
-      },
-      {
         name: "Columns",
         description: "Column related APIs",
       },
@@ -52,6 +48,10 @@ const swaggerOptions = {
         name: "Cards",
         description: "Card related APIs",
       },
+       { name: "Projects", description: "Project related APIs" },
+      
+    
+  
       
     ],
   },

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const Project = require("../models/project");
+const ProjectModel = require("../models/project");
+const Column = require("../models/column");
 
 // ✅ GET /api/projects -> all projects
 exports.getAllProjects = async (req, res) => {
@@ -20,13 +21,25 @@ exports.createProject = async (req, res) => {
       return res.status(400).json({ message: "Project name required" });
     }
 
-    const project = await Project.create({
+    await ProjectModel.create({
       title: title.trim(),
       description: description || "",
       tasks: [],
+    }).then(async (projectDoc) => {
+      if (!projectDoc) {
+        return res.status(500).json({ message: "Failed to create project" });
+      }
+      
+      await Column.insertMany([
+        { name: "Backlog", boardId: projectDoc._id, order: 1, cards: [] },
+        { name: "Todo", boardId: projectDoc._id, order: 2, cards: [] },
+        { name: "In Progress", boardId: projectDoc._id, order: 3, cards: [] },
+        { name: "Done", boardId: projectDoc._id, order: 4, cards: [] },
+      ]);
+  
+      console.log(projectDoc,"project")
+      return res.status(201).json(projectDoc);
     });
-
-    return res.status(201).json(project);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -213,6 +226,41 @@ exports.deleteTaskInProject = async (req, res) => {
     await project.save();
 
     return res.status(200).json({ message: "Task deleted" });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+exports.openProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+
+    const project = await ProjectModel.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    // ✅ 1) Check columns already exist or not
+    const existingCount = await Column.countDocuments({ boardId: projectId });
+
+    // ✅ 2) Create default columns ONLY ONCE (first time)
+    if (existingCount === 0) {
+      await Column.insertMany([
+        { name: "Backlog", boardId: projectId, order: 1, cards: [] },
+        { name: "Todo", boardId: projectId, order: 2, cards: [] },
+        { name: "In Progress", boardId: projectId, order: 3, cards: [] },
+        { name: "Done", boardId: projectId, order: 4, cards: [] },
+      ]);
+    }
+
+    // ✅ 3) Fetch columns
+    const columns = await Column.find({ boardId: projectId }).sort({ order: 1 });
+
+    return res.json({ project, columns });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }

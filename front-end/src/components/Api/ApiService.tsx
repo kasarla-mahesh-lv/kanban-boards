@@ -57,7 +57,12 @@ export type ResetPasswordPayload = {
 export const loginApi = async (
   payload: LoginPayload
 ): Promise<LoginResponse> => {
-  const res = await api.post("https://kanban-boards-backend.vercel.app/api/auth/login", payload);
+  const res = await api.post("/auth/login", payload);
+  if(res.status == 200){
+    sessionStorage.setItem("token", res.headers.authorization);
+  }
+  console.log(res,"=============");
+  
   return res.data;
 };
 
@@ -83,18 +88,7 @@ export type Project = {
 
 /* ================= PROJECT API ================= */
 
-export const getProjectsApi = async (): Promise<Project[]> => {
-  const res = await api.get("/projects");
-  return Array.isArray(res.data) ? res.data : [];
-};
 
-export const createProjectApi = async (payload: {
-  title: string;
-  description?: string;
-}): Promise<Project> => {
-  const res = await api.post("/projects", payload);
-  return res.data;
-};
 
 export const getProjectByIdApi = async (
   projectId: string
@@ -190,4 +184,38 @@ export const resetPasswordApi = async (
   return res.data;
 };
 
+
+
+export type Column = {
+  _id: string;
+  title: string;
+  key: string;
+  tasks: any[];
+};
+
 export default api;
+export const getProjectsApi = async (): Promise<Project[]> => {
+  const res = await api.get("/projects");
+  return res.data;
+};
+
+export const createProjectApi = async (payload: {
+  title: string;
+  description?: string;
+}): Promise<Project> => {
+  const res = await api.post("/projects", payload);
+  return res.data;
+};
+
+// export const deleteProjectApi = async (projectId: string): Promise<void> => {
+//   await api.delete(`/projects/${projectId}`);
+// };
+
+/* ======================= COLUMNS APIs ======================= */
+// Example: /api/columns/boards/:projectId/columns (mee backend batti adjust)
+export const getProjectColumnsApi = async (
+  projectId: string
+): Promise<Column[]> => {
+  const res = await api.get(`/columns/boards/${projectId}/columns`);
+  return res.data; // if backend returns {columns: []} -> return res.data.columns;
+};
