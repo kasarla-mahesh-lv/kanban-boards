@@ -10,4 +10,6 @@ const columnSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Column", columnSchema);
+// 🔥 FIX: prevent OverwriteModelError
+module.exports =
+  mongoose.models.Column || mongoose.model("Column", columnSchema);

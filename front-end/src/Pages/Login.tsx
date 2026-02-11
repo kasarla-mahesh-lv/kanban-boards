@@ -9,13 +9,13 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import {
-  loginApi,
   registerApi,
   sendOtpApi,
   verifyOtpApi,
   resetPasswordApi,
 } from "../components/Api/ApiService";
 import "./Login.css";
+import { loginApi } from "../components/Api/ApiCommon"
 
 type Props = {
   onClose?: () => void;
@@ -71,6 +71,8 @@ const Login = ({ onClose }: Props) => {
     try {
       setLoading(true);
       const res = await loginApi({ email, password });
+      console.log(res,"res--------------------");
+      
       localStorage.setItem("token", res.token);
       toast.success("Login successful ✅");
       onClose?.();
