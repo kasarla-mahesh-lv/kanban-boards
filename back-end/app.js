@@ -14,6 +14,7 @@ const columnRoutes = require("./src/routes/columnRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
 const projectRoutes = require("./src/routes/projectRoutes");
 const historyRoutes = require("./src/routes/historyRoutes");
+const multiFactorAuthRoutes = require("./src/routes/multiFactorAuthRoutes");
 
 
 const app = express();
@@ -41,12 +42,16 @@ app.get("/", (req, res) => {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /* -------------------- Routes -------------------- */
-app.use("/api/auth", authRoutes);
+// app.use("/api/auth", authRoutes);
 // app.use("/api/boards", boardRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/history", historyRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/mfa", multiFactorAuthRoutes);
+
+
 
 
 /* -------------------- Start App -------------------- */

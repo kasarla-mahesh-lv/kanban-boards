@@ -38,7 +38,11 @@ const swaggerOptions = {
       },
       {
         name:"Login",
-        description:"Login related APIS"
+        description:"Login related APIS",
+      },
+        {
+        name: "MFA",
+        description: "Multi-Factor Authentication (Login OTP) APIs",
       },
       {
         name: "Columns",
@@ -61,6 +65,7 @@ const swaggerOptions = {
   },
   
   apis: ["./src/routes/*.js"], // routes folder
+  
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
