@@ -1,15 +1,9 @@
 const HistoryModel = require("../models/history");
 
-// GET history by boardId
-exports.getBoardHistory = async (req, res) => {
+exports.getAllHistory = async (req, res) => {
   try {
-    const { boardId } = req.params;
 
-    if (!boardId) {
-      return res.status(400).json({ message: "boardId is required" });
-    }
-
-    const history = await HistoryModel.find({ boardId })
+    const history = await HistoryModel.find()
       .sort({ createdAt: -1 });
 
     res.status(200).json(history);

@@ -62,7 +62,7 @@ const Login = ({ onClose }: Props) => {
 
     return () => clearInterval(interval);
   }, [otpTimer]);
-
+  console.log(loading);
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -87,7 +87,7 @@ const Login = ({ onClose }: Props) => {
       const res = await loginApi({ email, password });
       console.log(res,"res--------------------");
       
-      localStorage.setItem("token", res.token);
+      // localStorage.setItem("token", res.token);
       toast.success("Login successful ✅");
       onClose?.();
       nav("/", { replace: true });

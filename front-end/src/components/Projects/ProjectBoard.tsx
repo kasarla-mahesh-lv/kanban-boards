@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   // getProjectColumnsApi,
-  getProjectsApi,
+  // getProjectsApi,
   type Column,
   type Project,
 } from "../Api/ApiService";
@@ -15,7 +15,7 @@ const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 
 const ProjectBoard: React.FC = () => {
   const { projectId } = useParams();
-  const [project, setProject] = useState<Project | null>(null);
+  const [project] = useState<Project | null>(null);
 
   const [columns, setColumns] = useState<Column[]>([]);
   const [loading, setLoading] = useState(false);
