@@ -40,10 +40,6 @@ const swaggerOptions = {
         name:"Login",
         description:"Login related APIS",
       },
-        {
-        name: "MFA",
-        description: "Multi-Factor Authentication (Login OTP) APIs",
-      },
       {
         name: "Columns",
         description: "Column related APIs",

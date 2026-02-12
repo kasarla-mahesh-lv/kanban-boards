@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { sendOtp, verifyOtp, register, login } = require("../controllers/authController");
+const { sendOtp, verifyOtp,login, register,forgotPassword, resetPassword } = require("../controllers/authController");
 const authMiddleware=require("../middlewares/authmiddlewares");
 const {getAllProjects,createProject,getProjectById,getProjectTasks,
     addTaskToProject,getTaskByTaskIdInProject,updateTaskInProject,
@@ -45,13 +45,13 @@ const {getAllProjects,createProject,getProjectById,getProjectTasks,
 router.post("/register", register);
 
 
-
 /**
  * @swagger
  * /api/auth/verify-otp:
  *   post:
  *     tags: [Auth]
- *     summary: Verify OTP and activate account
+ *     summary: Verify OTP (Register/Login)
+ *     description: Use type=register for registration OTP, type=login for login OTP
  *     requestBody:
  *       required: true
  *       content:
@@ -64,12 +64,16 @@ router.post("/register", register);
  *                 type: string
  *               otp:
  *                 type: string
+ *                 example: "123456"
+ *               type:
+ *                 type: string
+ *                 enum: [register, login]
+ *                 example: "login"
  *     responses:
  *       200:
- *         description: Account verified successfully
+ *         description: OTP verified successfully
  */
 router.post("/verify-otp", verifyOtp);
-
 
 
 /**
@@ -77,7 +81,8 @@ router.post("/verify-otp", verifyOtp);
  * /api/auth/login:
  *   post:
  *     tags: [Auth]
- *     summary: Login user
+ *     summary: Login Step-1 (Password check + Send OTP)
+ *     description: If password is correct, sends OTP to email. Then call verify-otp with type=login to get token.
  *     requestBody:
  *       required: true
  *       content:
@@ -92,7 +97,7 @@ router.post("/verify-otp", verifyOtp);
  *                 type: string
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: OTP sent to email
  */
 router.post("/login", login);
 
