@@ -4,7 +4,7 @@ import "../../Pages/Login.css";
 
 
 import { toast } from "react-toastify";
-import { registerApi } from "../Api/ApiService";
+import { registerApi } from "../Api/ApiCommon";
 
 
 const Register: React.FC = () => {
@@ -25,6 +25,8 @@ const Register: React.FC = () => {
       setLoading(true);
       setErr("");
 
+      console.log("register");
+      return true;
       await registerApi({ name, email, password, mobilenumber });
 
       toast.success("register sucessful");
