@@ -504,4 +504,43 @@
   font-weight: 600;
   cursor: pointer;
 }
+.add-group-wrapper {
+  min-width: 260px;
+}
 
+.add-group-column {
+  background: #f1f3f5;
+  padding: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 500;
+}
+
+.add-group-input-container {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.add-group-input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.add-group-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.add-group-btn,
+.cancel-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}

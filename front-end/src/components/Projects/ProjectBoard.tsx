@@ -24,7 +24,7 @@ const ProjectBoard: React.FC = () => {
   const [error, setError] = useState("");
    const [showAddGroup, setShowAddGroup] = useState(false);
   const [groupName, setGroupName] = useState("");
-  const [creating, setCreating] = useState(false);
+  const [creating, ] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
