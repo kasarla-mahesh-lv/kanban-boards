@@ -12,26 +12,29 @@ const {
   updateTaskInProject,
   deleteTaskInProject,
   openProject,
+  createTaskInProject
 } = require("../controllers/projectController");
+const authMiddleware = require("../middlewares/authmiddlewares");
 
 // ✅ all projects
-router.get("/", getAllProjects);
+router.get("/",authMiddleware, getAllProjects);
 
 // ✅ create project
-router.post("/", createProject);
+router.post("/", authMiddleware,createProject);
 
 // ✅ open project (must be before /:projectId)
-router.get("/:projectId/open", openProject);
+router.get("/:projectId/open",authMiddleware, openProject);
 
 // ✅ tasks
-router.get("/:projectId/tasks/:taskId", getTaskByTaskIdInProject);
-router.get("/:projectId/tasks", getProjectTasks);
-router.post("/:projectId/tasks", addTaskToProject);
-router.patch("/:projectId/tasks/:taskId", updateTaskInProject);
-router.delete("/:projectId/tasks/:taskId", deleteTaskInProject);
+router.get("/:projectId/tasks/:taskId",authMiddleware, getTaskByTaskIdInProject);
+router.get("/:projectId/tasks",authMiddleware, getProjectTasks);
+router.post("/:projectId/tasks",authMiddleware, addTaskToProject);
+router.patch("/:projectId/tasks/:taskId",authMiddleware, updateTaskInProject);
+router.delete("/:projectId/tasks/:taskId",authMiddleware, deleteTaskInProject);
+router.post("/create-task", createTaskInProject);
 
 // ✅ project details
-router.get("/:projectId", getProjectById);
+router.get("/:projectId",authMiddleware, getProjectById);
 
 /**
  * @openapi
