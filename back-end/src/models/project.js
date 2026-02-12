@@ -13,9 +13,8 @@ const taskSchema = new mongoose.Schema(
 
     // Todo / In Progress / Done
     status: {
-      type: String,
-      enum: ["backlog", "todo", "in_progress", "done"],
-      default: "todo"
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Column",
     },
 
     // Due date
@@ -59,4 +58,4 @@ const projectSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Project", projectSchema);
+module.exports = mongoose.model("Projects", projectSchema);
