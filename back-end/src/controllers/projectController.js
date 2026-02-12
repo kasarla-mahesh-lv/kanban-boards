@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const ProjectModel = require("../models/project");
 const Column = require("../models/column");
+const Task = require("../models/task");
 
 // ✅ GET /api/projects -> all projects
 exports.getAllProjects = async (req, res) => {
@@ -261,6 +262,57 @@ exports.openProject = async (req, res) => {
     const columns = await Column.find({ boardId: projectId }).sort({ order: 1 });
 
     return res.json({ project, columns });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+exports.createTaskInProject = async (req, res) => {
+  try {
+    const { projectId, columnId, title, description, priority } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(columnId)) {
+      return res.status(400).json({ message: "Invalid columnId" });
+    }
+    
+    const projectDoc = await ProjectModel.findById({_id: projectId});
+    console.log(projectDoc, projectId,"--------------");
+    if (!projectDoc) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+    const columnDoc = await Column.findById(columnId);
+    if (!columnDoc) {
+      return res.status(404).json({ message: "Column not found" });
+    }
+    const newTask = await Task.create({
+      title,
+      description,
+      projectId,
+      columnId,
+      createdBy: req.user?._id || "698c4edf58378c386afd1445",
+    });
+    await columnDoc.save();
+    return res.status(201).json({ message: "Task created", task: newTask });
+  }
+    catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+    
+exports.getColumnsTasks = async (req, res) => {
+  try {
+    const { projectId } = req.query;
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+    const columns = await Column.find({ boardId: projectId }).sort({ order: 1 });
+    const columnsWithTasks = await Promise.all(columns.map(async (col) => {
+      const tasks = await Task.find({ columnId: col._id });
+      return { ...col.toObject(), tasks };
+    }));
+    return res.status(200).json(columnsWithTasks);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
