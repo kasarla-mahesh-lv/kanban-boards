@@ -1,11 +1,5 @@
-<<<<<<< HEAD
 import { DragDropContext } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
-=======
-import { useState } from "react";
-import type { Task, TaskStatus } from "./types";
-import KanbanColumn from "./KanbanColumn";
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
 
 import KanbanColumn from "./KanbanColumn";
 import { updateTaskApi } from "../Api/ApiService";
@@ -16,7 +10,6 @@ type Props = {
   tasks: Task[];
 };
 
-<<<<<<< HEAD
 const TaskBoard = ({ project, tasks }: Props) => {
   const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
@@ -33,25 +26,6 @@ const TaskBoard = ({ project, tasks }: Props) => {
     }
   };
 
-=======
-const TaskBoard = ({ projectId }: Props) => {
-
-  const [allTasks, setAllTasks] = useState<Task[]>(INITIAL_TASKS);
-
-  const moveTask = (taskId: string, newStatus: TaskStatus) => {
-    setAllTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId ? { ...t, status: newStatus } : t
-      )
-    );
-  };
-
-    
-  const projectTasks = allTasks.filter(
-    (t) => t.projectId === projectId
-  );
-
->>>>>>> 99575ae03d26fc639088e691c819e7fddbe46f8f
   return (
     <div className="task-board">
       <DragDropContext onDragEnd={onDragEnd}>

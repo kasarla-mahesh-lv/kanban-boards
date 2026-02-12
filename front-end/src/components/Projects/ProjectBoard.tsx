@@ -16,10 +16,15 @@ const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 const ProjectBoard: React.FC = () => {
   const { projectId } = useParams();
   const [project] = useState<Project | null>(null);
+  
+
 
   const [columns, setColumns] = useState<Column[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+   const [showAddGroup, setShowAddGroup] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
@@ -65,7 +70,7 @@ const ProjectBoard: React.FC = () => {
           </p>
         </div>
 
-        <button className="add-col-btn">+ Add Column</button>
+        
       </div>
 
       {error && <div className="board-error">{error}</div>}
@@ -90,9 +95,55 @@ const ProjectBoard: React.FC = () => {
               )}
             </div>
 
-            <button className="add-task-btn" >+ Add Task</button>
+            {/* <button className="add-task-btn" >+ Add Task</button> */}
           </div>
         ))}
+        <div className="add-group-wrapper">
+  {!showAddGroup ? (
+    <div
+      className="add-group-column"
+      onClick={() => setShowAddGroup(true)}
+    >
+      Add group
+    </div>
+  ) : (
+    <div className="add-group-input-container">
+      <input
+        type="text"
+        placeholder="Enter group name..."
+        value={groupName}
+        onChange={(e) => setGroupName(e.target.value)}
+        className="add-group-input"
+        autoFocus
+      />
+
+      <div className="add-group-actions">
+        <button
+          className="add-group-btn"
+          onClick={() => {
+            console.log("Create group:", groupName);
+            setShowAddGroup(false);
+            setGroupName("");
+          }}
+          disabled={creating}
+        >
+          Add group
+        </button>
+
+        <button
+          className="cancel-btn"
+          onClick={() => {
+            setShowAddGroup(false);
+            setGroupName("");
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )}
+</div>
+
       </div>
     </div>
   );
