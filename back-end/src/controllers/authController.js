@@ -134,6 +134,9 @@ exports.login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
+    const userData = await UserModel.findById(user._id);
+    userData.tokens.push({ token });
+    await userData.save();
     res.setHeader("Authorization", `Bearer ${token}`);
 
     res.status(200).json({
@@ -147,6 +150,8 @@ exports.login = async (req, res) => {
     console.log("Login Successful 🤝👍");
 
   } catch (error) {
+    console.log(error,"----------------");
+    
     res.status(500).json({ message: error.message });
   }
 };
