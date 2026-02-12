@@ -61,100 +61,127 @@ try{
 };
 
 
- exports.verifyOtp = async (req,res)=>{
-try{
-
-
+ exports.verifyOtp = async (req, res) => {
+  try {
     const { error } = verifyOtpSchema.validate(req.body);
-    if (error)
-        return res.status(400).json({ message: error.details[0].message });
-    const { email, otp } = req.body;
+    if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const user = await UserModel.findOne({email});
+    const { email, otp, type = "register" } = req.body; // ✅ type added
 
-    if(!user)
-        return res.status(400).json({message:"User not found"});
+    const user = await UserModel.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found" });
 
-    if(!user.otp || !user.expiresAt)
-        return res.status(400).json({message:"Please request OTP first"});
+    // ✅ REGISTER OTP verify
+    if (type === "register") {
+      if (!user.otp || !user.expiresAt)
+        return res.status(400).json({ message: "Please request OTP first" });
 
-    if(user.expiresAt < Date.now())
-        return res.status(400).json({message:"OTP expired"});
+      if (user.expiresAt < Date.now())
+        return res.status(400).json({ message: "OTP expired" });
 
-    if(user.otp !== otp)
-        return res.status(400).json({message:"Invalid OTP"});
+      if (user.otp !== otp)
+        return res.status(400).json({ message: "Invalid OTP" });
 
-    // SUCCESS → ACTIVATE ACCOUNT
-    user.isVerified = true;
-    user.otp = null;
-    user.expiresAt = null;
+      user.isVerified = true;
+      user.otp = null;
+      user.expiresAt = null;
+      await user.save();
 
-    await user.save();
+      return res.status(200).json({
+        message: "User Registered Successfully 🙏🤝",
+        userId: user._id
+      });
+    }
 
-    res.status(200).json({
-        message:"User Registered Succesfully 🙏🤝",
-        userId:user._id
-    });
-    console.log("User Registered Succesfully 🙏🤝")
+    // ✅ LOGIN OTP verify → return token here only
+    if (type === "login") {
+      if (!user.loginOtp || !user.loginOtpExpiresAt)
+        return res.status(400).json({ message: "Please login first to get OTP" });
 
-}catch(error){
-    res.status(500).json({message:error.message});
-}
+      if (user.loginOtpExpiresAt < Date.now())
+        return res.status(400).json({ message: "OTP expired" });
+
+      if (user.loginOtp !== otp)
+        return res.status(400).json({ message: "Invalid OTP" });
+
+      const token = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      // clear login otp
+      user.loginOtp = null;
+      user.loginOtpExpiresAt = null;
+      await user.save();
+
+      const userData = await UserModel.findById(user._id);
+      userData.tokens.push({ token });
+      await userData.save();
+
+      res.setHeader("Authorization", `Bearer ${token}`);
+
+      return res.status(200).json({
+        message: "Login OTP verified ✅",
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email
+        }
+      });
+    }
+
+    // safety
+    return res.status(400).json({ message: "Invalid type" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
-
 
 
 exports.login = async (req, res) => {
   try {
     const { error } = loginSchema.validate(req.body);
-    if (error)
-        return res.status(400).json({ message: error.details[0].message });
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     const { email, password } = req.body;
 
     const user = await UserModel.findOne({ email });
-    if (!user) {
-      console.log("Invalid email");
-      return res.status(400).json({ message: "Invalid email 📩" });
-    }
- 
-    if(!user.isVerified){
-        return res.status(401).json({
-            message:"Please verify OTP before login"
-        });
+    if (!user) return res.status(400).json({ message: "Invalid email 📩" });
+
+    if (!user.isVerified) {
+      return res.status(401).json({ message: "Please verify OTP before login" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
-    }
+    if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+    // ✅ Generate login OTP only
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 2 * 60 * 1000);
+
+    user.loginOtp = otp;
+    user.loginOtpExpiresAt = expiry;
+    await user.save();
+
+    await sendMail(
+      email,
+      "Login OTP",
+      `Your login OTP is ${otp}. It is valid for 2 minutes.`
     );
 
-    const userData = await UserModel.findById(user._id);
-    userData.tokens.push({ token });
-    await userData.save();
-    res.setHeader("Authorization", `Bearer ${token}`);
-
-    res.status(200).json({
-      message: "Login Successful 🤝👍",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email
-      }
+    return res.status(200).json({
+      message: "OTP sent to email. Please verify OTP using /verify-otp with type=login"
     });
-    console.log("Login Successful 🤝👍");
 
   } catch (error) {
-    console.log(error,"----------------");
+    console.log(error,"error");
     
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 exports.forgotPassword = async (req, res) => {
