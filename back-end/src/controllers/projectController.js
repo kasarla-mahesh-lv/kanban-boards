@@ -321,3 +321,19 @@ exports.createTaskInProject = async (req, res) => {
   }
 };
     
+exports.getColumnsTasks = async (req, res) => {
+  try {
+    const { projectId } = req.query;
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
+    }
+    const columns = await Column.find({ boardId: projectId }).sort({ order: 1 });
+    const columnsWithTasks = await Promise.all(columns.map(async (col) => {
+      const tasks = await Task.find({ columnId: col._id });
+      return { ...col.toObject(), tasks };
+    }));
+    return res.status(200).json(columnsWithTasks);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
