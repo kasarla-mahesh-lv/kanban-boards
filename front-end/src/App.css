@@ -37,10 +37,10 @@
 
 /* 🔥 SINGLE SOURCE OF TRUTH */
 .content-container {
-  /* width: 100%; */
-  max-width: 1200px;
-  padding: 34px;              /* 👈 SAME PADDING FOR ALL */
+  width: 100%;
+  
 }
+
 
 
 /* Centered wrapper */
