@@ -87,7 +87,7 @@ const Login = ({ onClose }: Props) => {
       const res = await loginApi({ email, password });
       console.log(res,"res--------------------");
       
-      // localStorage.setItem("token", res.token);
+      localStorage.setItem("token", res.token);
       toast.success("Login successful ✅");
       onClose?.();
       nav("/", { replace: true });

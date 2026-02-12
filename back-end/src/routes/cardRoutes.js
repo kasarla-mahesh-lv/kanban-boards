@@ -133,7 +133,7 @@ router.patch("/cards/:id",authMiddleware, updateCard);
  *       200:
  *         description: Card moved successfully
  */
-router.patch("/:id/move", moveCard);
+router.patch("/:id/move",authMiddleware, moveCard);
 
 /**
  * @openapi

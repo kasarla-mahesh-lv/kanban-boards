@@ -7,7 +7,8 @@ import {
   type Project,
 } from "../Api/ApiService";
 import { getProjectColumnsApi } from "../Api/ApiCommon"
-import "./Project.css";
+import "./Project.css"; 
+
 
 
 
@@ -46,6 +47,9 @@ const ProjectBoard: React.FC = () => {
     })();
   }, [projectId]);
 
+  const [showFilters, setShowFilters] = useState(false);
+
+
   const displayColumns = columns.length
     ? columns
     : DEFAULT_COLUMNS.map((t, idx) => ({
@@ -55,21 +59,33 @@ const ProjectBoard: React.FC = () => {
         tasks: [],
       }));
 
-  return (
-    <div className="project-board">
-      <div className="project-board-header">
-        <div>
-          <h1>{project?.title || "Project Board"}</h1>
-          <p style={{ marginTop: 4, opacity: 0.7 }}>
-            {loading ? "Loading..." : "Project Board"}
-          </p>
-        </div>
-
-        <button className="add-col-btn">+ Add Column</button>
+ 
+    return (
+  <div className="project-board">
+    <div className="project-board-header">
+      <div>
+        <h1>{project?.title || "Project Board"}</h1>
+        <p style={{ marginTop: 4, opacity: 0.7 }}>
+          {loading ? "Loading..." : "Project Board"}
+        </p>
       </div>
 
-      {error && <div className="board-error">{error}</div>}
+      <div className="board-actions">
+        <button className="add-col-btn">+ Add Column</button>
+        <button
+          className="filter-btn"
+          onClick={() => setShowFilters(true)}
+        >
+          ☰ Filters
+        </button>
 
+        
+      </div>
+    </div>
+
+    {error && <div className="board-error">{error}</div>}
+
+    <div className="board-body">
       <div className="columns-row">
         {displayColumns.map((col) => (
           <div key={col._id} className="column-card">
@@ -90,12 +106,48 @@ const ProjectBoard: React.FC = () => {
               )}
             </div>
 
-            <button className="add-task-btn" >+ Add Task</button>
+            <button className="add-task-btn">+ Add Task</button>
           </div>
         ))}
       </div>
+
+      {/* 🔥 FILTER SIDEBAR */}
+      <div className={`filter-panel ${showFilters ? "open" : ""}`}>
+        <div className="filter-header">
+          <h3>Filter</h3>
+          <button onClick={() => setShowFilters(false)}>→</button>
+        </div>
+
+        <div className="filter-content">
+          <input type="text" placeholder="Search" className="filter-search" />
+
+          <div className="filter-section">
+            <h4>Due date</h4>
+            <label><input type="checkbox" /> No dates</label>
+            <label><input type="checkbox" /> Overdue</label>
+            <label><input type="checkbox" /> Due tomorrow</label>
+            <label><input type="checkbox" /> Due next week</label>
+          </div>
+
+          <div className="filter-section">
+            <h4>Priority</h4>
+            <label><input type="checkbox" /> Low priority</label>
+            <label><input type="checkbox" /> Medium priority</label>
+            <label><input type="checkbox" /> High priority</label>
+          </div>
+
+          <div className="filter-section">
+            <h4>Misc</h4>
+            <label><input type="checkbox" /> Marked as complete</label>
+            <label><input type="checkbox" /> Not marked as complete</label>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  </div>
+);
+
+  
 };
 
 export default ProjectBoard;
