@@ -5,6 +5,8 @@ const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
+    console.log(authHeader,"auth");
+    
     if (!authHeader)
       return res.status(401).json({ message: "Token missing" });
 
@@ -13,11 +15,17 @@ const authMiddleware = async (req, res, next) => {
     // verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    console.log(decoded,"dec");
+    
     // check token exists in DB
     const user = await UserModel.findOne({
       _id: decoded.userId,
       "tokens.token": token
     });
+    
+
+    // $2b$10$vek.350rDyxxHHAz2Mm98.RcKyqN4ZvwerfIlF1YITau9fG.M0L9W
+    console.log(user,"user");
     
     if (!user)
       return res.status(401).json({ message: "Unauthorized" });

@@ -100,7 +100,7 @@ module.exports = router;
  */
 
 
-router.get("/api/columns", async (req, res) => {
+router.get("/api/columns",authMiddleware, async (req, res) => {
   try {
     const columns = await Column.find()
       .sort({ order: 1 })
