@@ -12,6 +12,8 @@ const {
   updateTaskInProject,
   deleteTaskInProject,
   openProject,
+  createTaskInProject,
+  getColumnsTasks
 } = require("../controllers/projectController");
 const authMiddleware = require("../middlewares/authmiddlewares");
 
@@ -30,6 +32,8 @@ router.get("/:projectId/tasks",authMiddleware, getProjectTasks);
 router.post("/:projectId/tasks",authMiddleware, addTaskToProject);
 router.patch("/:projectId/tasks/:taskId",authMiddleware, updateTaskInProject);
 router.delete("/:projectId/tasks/:taskId",authMiddleware, deleteTaskInProject);
+router.post("/create-task", createTaskInProject);
+router.get("/get-columns-tasks", getColumnsTasks);
 
 // ✅ project details
 router.get("/:projectId",authMiddleware, getProjectById);

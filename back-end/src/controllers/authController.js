@@ -116,10 +116,11 @@ try{
       await user.save();
 
       const userData = await UserModel.findById(user._id);
-    userData.tokens.push({ token });
-    await userData.save();
+      userData.tokens.push({ token });
+      await userData.save();
 
       res.setHeader("Authorization", `Bearer ${token}`);
+
       return res.status(200).json({
         message: "Login OTP verified ✅",
         token,
@@ -156,7 +157,7 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
-    // ✅ Generate login OTP
+    // ✅ Generate login OTP only
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 2 * 60 * 1000);
 
@@ -171,13 +172,14 @@ exports.login = async (req, res) => {
     );
 
     return res.status(200).json({
-      message: "OTP sent to email. Please verify OTP to login.",
-      type: "login"
+      message: "OTP sent to email. Please verify OTP using /verify-otp with type=login"
     });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 exports.forgotPassword = async (req, res) => {
