@@ -48,6 +48,13 @@ export type ResetPasswordPayload = {
   email: string;
   password: string;
 };
+export type Task = {
+  _id: string;
+  title: string;
+  description?: string;
+  priority?: string;
+};
+
 
 /* ======================= LOGIN ======================= */
 export const loginApi = async (
@@ -129,3 +136,15 @@ export const getProjectColumnsApi = async (
   const res = await api.get(`/columns/boards/${projectId}/columns`);
   return res.data; // if backend returns {columns: []} -> return res.data.columns;
 };
+
+/* ======================= TASK APIs ======================= */
+export const createTaskApi = async (
+  columnId: string,
+  payload: { title: string; description?: string; priority?: string }
+): Promise<Task> => {
+  console.log(columnId,"--------------");
+  
+  const res = await api.post(`/tasks/columns/${columnId}`, payload);
+  return res.data;
+};
+

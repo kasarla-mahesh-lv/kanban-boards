@@ -115,10 +115,11 @@ export type ResetPasswordPayload = { email: string; password: string };
 export type Project = { _id: string; title: string; description?: string };
 
 export type Task = {
-  _id: string;
   title: string;
   description?: string;
   priority?: string;
+  projectId: string;
+  columnId: string;
 };
 
 export type Column = {
@@ -135,6 +136,8 @@ export const loginApi = async (
   // login ki interceptor token avasaram ledu
   const res = await api.post<LoginResponse>("/auth/login", payload);
 
+  console.log(res,"======+++");
+  
   // token header nundi vasthe
   const authHeader =
     res.headers["authorization"] || res.headers["Authorization"];
@@ -178,5 +181,12 @@ export const getProjectColumnsApi = (projectId: string) =>
 export const createColumnApi = (projectId: string, payload: { title: string }) =>
   apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
 
+export const createTaskApi = (payload: any) =>{
+  console.log("--------------",payload);
+  return apiPost<any, any>(`/projects/create-task`, payload);
+}
 /* ======================= EXPORT AXIOS INSTANCE (optional) ======================= */
 export default api;
+
+
+

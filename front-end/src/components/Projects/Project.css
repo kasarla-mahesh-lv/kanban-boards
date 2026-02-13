@@ -1,14 +1,3 @@
-/* =========================
-   Project Board - Professional UI
-   Works with your classNames:
-   .project-board, .project-board-header, .add-col-btn,
-   .board-error, .columns-row, .column-card, .column-title,
-   .count, .tasks-area, .no-tasks, .task-item, .add-task-btn
-   + Modal (AddTaskModal):
-   .modal-overlay, .modal-box, .modal-head, .modal-title,
-   .modal-sub, .form-group, .label, .input, .textarea,
-   .modal-actions, .btn-ghost, .btn-primary
-========================= */
 
 /* ---- Page wrapper ---- */
 .project-board {

@@ -77,6 +77,8 @@ const Login = ({ onClose }: Props) => {
 
   /* ================= LOGIN ================= */
   const handleLogin = async () => {
+    console.log("email");
+    
     if (!email || !password) {
       toast.error("All fields required ❌");
       return;
@@ -87,7 +89,7 @@ const Login = ({ onClose }: Props) => {
       const res = await loginApi({ email, password });
       console.log(res,"res--------------------");
       
-      localStorage.setItem("token", res.token);
+      //  localStorage.setItem("token", res.token);
       toast.success("Login successful ✅");
       onClose?.();
       nav("/", { replace: true });
@@ -131,7 +133,7 @@ const Login = ({ onClose }: Props) => {
   /* ================= VERIFY OTP ================= */
   const handleVerifyOtpAndRegister = async () => {
     if (!otp) {
-      toast.error("Enter OTP ❌");
+    toast.error("Enter OTP ❌");
       return;
     }
 

@@ -1,45 +1,42 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  // getProjectColumnsApi,
-  // getProjectsApi,
-  type Column,
-  type Project,
-} from "../Api/ApiService";
-import { getProjectColumnsApi } from "../Api/ApiCommon"
-import "./Project.css"; 
-
-
-
+// import {
+//   type Column,
+//   type Project,
+//   type Task,
+//   getProjectColumnsApi,
+//   createTaskApi,
+// } from "../Api/ApiService";
+import { type Column, type Project, type Task, createTaskApi, getProjectColumnsApi } from "../Api/ApiCommon";
+// import { getProjectColumnsApi, createTaskApi } from "../Api/ApiService";
+import AddTaskModal from "./AddTaskModal";
+import "./Project.css";
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 
 const ProjectBoard: React.FC = () => {
   const { projectId } = useParams();
-  const [project] = useState<Project | null>(null);
 
+  const [project] = useState<Project | null>(null);
   const [columns, setColumns] = useState<Column[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+
+  /* ================= LOAD COLUMNS ================= */
   useEffect(() => {
     if (!projectId) return;
 
-    console.log(projectId,"project");
-    
     (async () => {
       try {
-        setError("");
         setLoading(true);
-
-        // const projects = await getProjectsApi();
-        // setProject(projects.find((p) => p._id === projectId) || null);
+        setError("");
 
         const cols = await getProjectColumnsApi(projectId);
-        console.log("Columns loaded:", cols);
         setColumns(cols);
-      } catch (e: any) {
-        console.log("Load board failed:",e, e?.response?.status, e?.response?.data);
+      } catch (e) {
         setError("Failed to load columns.");
       } finally {
         setLoading(false);
@@ -49,6 +46,56 @@ const ProjectBoard: React.FC = () => {
 
   const [showFilters, setShowFilters] = useState(false);
 
+
+  /* ================= ADD TASK ================= */
+  const handleAddTask = async (
+    columnId: string,
+    payload: { title: string; description?: string; priority?: string }
+  ) => {
+    try {
+      // 🔥 1. Optimistic UI Update
+      const tempTask: Task = {
+        title: payload.title,
+        description: payload.description,
+        projectId: projectId!,
+        columnId: columnId,
+      };
+
+      setColumns((prev) =>
+        prev.map((col) =>
+          col._id === columnId
+            ? { ...col, tasks: [...(col.tasks || []), tempTask] }
+            : col
+        )
+      );
+
+      console.log(payload,"payload in project board");
+      return true;
+      
+      // 🔥 2. Real API Call
+      const createdTask = await createTaskApi(payload);
+
+
+      console.log(createdTask,"cretedtask");
+      
+      // 🔥 3. Replace temp with real task
+      // setColumns((prev) =>
+      //   prev.map((col) =>
+      //     col._id === columnId
+      //       ? {
+      //           ...col,
+      //           tasks: col.tasks?.map((t) =>
+      //             t._id === tempTask._id ? createdTask : t
+      //           ) || [],
+      //         }
+      //       : col
+      //   )
+      // );
+    } catch (err) {
+      console.error("Error creating task:", err);
+      alert("Task creation failed");
+    }
+  };
 
   const displayColumns = columns.length
     ? columns
@@ -98,15 +145,22 @@ const ProjectBoard: React.FC = () => {
               {(col.tasks?.length || 0) === 0 ? (
                 <div className="no-tasks">No tasks</div>
               ) : (
-                col.tasks.map((t: any) => (
-                  <div key={t._id || t.id} className="task-item">
-                    {t.title}
+                col.tasks.map((t) => (
+                  <div key={t?._id} className="task-item">
+                    <strong>{t.title}</strong>
+                    {t.description && <p>{t.description}</p>}
                   </div>
                 ))
               )}
             </div>
 
             <button className="add-task-btn">+ Add Task</button>
+            <button
+              className="add-task-btn"
+              onClick={() => setActiveColumn(col)}
+            >
+              + Add Task
+            </button>
           </div>
         ))}
       </div>
@@ -143,6 +197,16 @@ const ProjectBoard: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* 🔥 Modal */}
+      {/* {activeColumn && (
+        <AddTaskModal
+          columnTitle={activeColumn.title}
+          onClose={() => setActiveColumn(null)}
+          onAdd={(payload) =>
+            handleAddTask(activeColumn._id, payload)
+           }
+        />
+      )} */}
     </div>
   </div>
 );
@@ -151,3 +215,15 @@ const ProjectBoard: React.FC = () => {
 };
 
 export default ProjectBoard;
+
+
+
+
+
+
+
+
+
+
+
+
