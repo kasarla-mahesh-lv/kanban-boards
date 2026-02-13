@@ -1,0 +1,343 @@
+/* Night Mode Global Styles */
+.night-mode {
+  --bg-primary: #0a1929;
+  --bg-secondary: #1e2f47;
+  --bg-tertiary: #2a3f5e;
+  --text-primary: #ffffff;
+  --text-secondary: #b0c4ce;
+  --text-muted: #8fa3b3;
+  --border-color: #334e68;
+  --hover-color: #2a3f5e;
+  --accent-color: #64b5f6;
+  --card-bg: #1e2f47;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Apply to all pages */
+.night-mode body,
+.night-mode html,
+.night-mode .dashboard,
+.night-mode .project-board,
+.night-mode .sidebar,
+.night-mode .topbar,
+.night-mode .stat-card,
+.night-mode .column-card,
+.night-mode .task-item,
+.night-mode .filter-panel {
+  transition: all 0.3s ease;
+}
+
+/* Dashboard Page */
+.night-mode .dashboard-title {
+  color: var(--text-primary);
+}
+
+.night-mode .dashboard-grid {
+  background-color: var(--bg-primary);
+}
+
+/* Stat Cards */
+.night-mode .stat-card {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.night-mode .stat-card-title {
+  color: var(--text-secondary) !important;
+}
+
+.night-mode .stat-card-value {
+  color: var(--text-primary) !important;
+}
+
+.night-mode .stat-card-icon {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--accent-color) !important;
+}
+
+/* Sidebar */
+.night-mode .sidebar {
+  background: var(--bg-secondary) !important;
+  border-right: 1px solid var(--border-color) !important;
+}
+
+.night-mode .sidebar-logo h2,
+.night-mode .menu-item,
+.night-mode .projects-header,
+.night-mode .project-item,
+.night-mode .team-item {
+  color: var(--text-primary) !important;
+}
+
+.night-mode .menu-item:hover,
+.night-mode .project-item:hover,
+.night-mode .team-item:hover {
+  background-color: var(--hover-color) !important;
+}
+
+.night-mode .menu-item.active,
+.night-mode .project-item.active {
+  background-color: var(--bg-tertiary) !important;
+  border-left: 3px solid var(--accent-color) !important;
+}
+
+.night-mode .sidebar-input {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.night-mode .sidebar-input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+.night-mode .sidebar-bottom {
+  border-top: 1px solid var(--border-color) !important;
+}
+
+/* Topbar */
+.night-mode .topbar {
+  background: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.night-mode .topbar-search {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.night-mode .topbar-search::placeholder {
+  color: var(--text-muted) !important;
+}
+
+.night-mode .topbar-icon {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.night-mode .topbar-icon:hover {
+  background: var(--hover-color) !important;
+}
+
+.night-mode .theme-toggle.active {
+  background: var(--accent-color) !important;
+  color: var(--bg-primary) !important;
+}
+
+/* Project Board */
+.night-mode .project-board {
+  background: var(--bg-primary) !important;
+}
+
+.night-mode .project-board-header h1 {
+  color: var(--text-primary) !important;
+}
+
+.night-mode .board-actions button {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.night-mode .board-actions button:hover {
+  background: var(--bg-tertiary) !important;
+}
+
+/* Column Cards */
+.night-mode .column-card {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.night-mode .column-title {
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.night-mode .count {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Task Items */
+.night-mode .task-item {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.night-mode .task-item:hover {
+  background: var(--hover-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+.night-mode .task-title {
+  color: var(--text-primary) !important;
+}
+
+.night-mode .priority-badge {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.night-mode .priority-badge.high {
+  background: #d32f2f !important;
+  color: white !important;
+}
+
+.night-mode .priority-badge.medium {
+  background: #ed6c02 !important;
+  color: white !important;
+}
+
+.night-mode .priority-badge.low {
+  background: #2e7d32 !important;
+  color: white !important;
+}
+
+.night-mode .add-task-btn,
+.night-mode .add-col-btn {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px dashed var(--border-color) !important;
+}
+
+.night-mode .add-task-btn:hover,
+.night-mode .add-col-btn:hover {
+  background: var(--hover-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+/* Filter Panel */
+.night-mode .filter-panel {
+  background: var(--bg-secondary) !important;
+  border-left: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.night-mode .filter-header {
+  background: var(--bg-tertiary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.night-mode .filter-section {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.night-mode .filter-label {
+  color: var(--text-secondary) !important;
+}
+
+.night-mode .filter-input {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.night-mode .filter-option {
+  color: var(--text-primary) !important;
+}
+
+.night-mode .filter-option:hover {
+  background: var(--hover-color) !important;
+}
+
+.night-mode .filter-footer {
+  background: var(--bg-tertiary) !important;
+  border-top: 1px solid var(--border-color) !important;
+}
+
+/* Active Filters Bar */
+.night-mode .active-filters-bar {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.night-mode .active-filters-label {
+  color: var(--text-secondary) !important;
+}
+
+.night-mode .filter-tag {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.night-mode .filter-tag button {
+  color: var(--text-secondary) !important;
+}
+
+.night-mode .clear-all-filters {
+  color: var(--accent-color) !important;
+}
+
+/* Notifications Page */
+.night-mode .notifications-container {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.night-mode .notification-item {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Settings Page */
+.night-mode .settings-container {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Reports Page */
+.night-mode .reports-container {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* History Page */
+.night-mode .history-container {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Links */
+.night-mode a {
+  color: var(--accent-color) !important;
+}
+
+/* Scrollbar for night mode */
+.night-mode ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.night-mode ::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+.night-mode ::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 5px;
+}
+
+.night-mode ::-webkit-scrollbar-thumb:hover {
+  background: var(--hover-color);
+}
+
+/* Animations */
+.night-mode .theme-toggle {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.night-mode .theme-toggle i {
+  transition: transform 0.5s ease;
+}
+
+.night-mode .theme-toggle:hover i {
+  transform: rotate(15deg);
+}

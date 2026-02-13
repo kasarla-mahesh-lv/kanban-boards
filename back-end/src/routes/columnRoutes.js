@@ -17,7 +17,7 @@ const authMiddleware = require("../middlewares/authmiddlewares");
  *     description: Column related APIs
  */
 
-<<<<<<< HEAD
+
 router.get("/boards/:boardId/columns", getColumnsByBoard); // ✅ ADD THIS
 
 
@@ -26,7 +26,7 @@ router.patch("/boards/:boardId/columns/:columnId",authMiddleware, updateColumn);
 router.delete("/boards/:boardId/columns/:columnId",authMiddleware, deleteColumn);
 
 module.exports = router;
-=======
+
 /**
  * @openapi
  * /api/projects/{projectId}/columns:
