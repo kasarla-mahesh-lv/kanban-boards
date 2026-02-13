@@ -142,6 +142,8 @@ export const verifyOtpApi = async (payload: VerifyOtpPayload): Promise<any> => {
   // If this is login verification and token is returned, store it
   if (payload.type === "login" && res.data.token) {
     localStorage.setItem("token", res.data.token);
+
+    sessionStorage.setItem("token", res.data.token);
     localStorage.setItem("user", JSON.stringify(res.data.user));
   }
   
