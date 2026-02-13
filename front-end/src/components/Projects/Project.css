@@ -8,6 +8,8 @@
    .modal-overlay, .modal-box, .modal-head, .modal-title,
    .modal-sub, .form-group, .label, .input, .textarea,
    .modal-actions, .btn-ghost, .btn-primary
+   
+   ⚠️ FILTER STYLES REMOVED COMPLETELY
 ========================= */
 
 /* ---- Page wrapper ---- */
@@ -83,6 +85,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ---- Board body layout ---- */
+.board-body {
+  display: flex;
+  position: relative;
+}
+
 /* ---- Columns grid ---- */
 .columns-row {
   display: flex;
@@ -116,7 +124,6 @@
   background: #e2e8f0;
   color: #334155;
 }
-
 
 
 
@@ -156,7 +163,6 @@
 
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
-
 
 @keyframes popIn {
   from { opacity: 0; transform: translateY(10px) scale(0.99); }
@@ -252,7 +258,7 @@
   font-weight: 600;
 }
 
-/* Task item (basic) */
+/* ---- Task item (basic) ---- */
 .task-item {
   background: #ffffff;
   border: 1px solid rgba(226, 232, 240, 0.95);
@@ -359,7 +365,9 @@
 }
 
 /* form */
-.form-group { margin-top: 12px; }
+.form-group { 
+  margin-top: 12px; 
+}
 
 .label {
   display: block;
@@ -546,4 +554,10 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
+}
+/* ---- Board actions (only Add Column button remains) ---- */
+.board-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
