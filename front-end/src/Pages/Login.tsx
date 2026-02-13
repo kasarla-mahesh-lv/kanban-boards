@@ -230,7 +230,6 @@ const Login = ({ onClose }: Props) => {
       toast.error("OTP expired ❌");
       return;
     }
-
     try {
       setLoading(true);
       // Directly call reset password API - it verifies OTP internally

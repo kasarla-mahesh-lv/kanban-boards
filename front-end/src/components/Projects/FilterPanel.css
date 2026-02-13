@@ -3,7 +3,6 @@
    Complete filter sidebar with all dropdowns, icons, date picker
    Matching Screenshot 2026-02-12 104659.png, 104712.png, etc.
 ========================= */
-
 .filter-panel {
   position: fixed;
   right: -420px;

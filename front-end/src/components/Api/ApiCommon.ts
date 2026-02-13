@@ -116,13 +116,7 @@ export type ResetPasswordPayload = {
   otp?: string; // Some implementations send OTP in body
 };
 
-/* ======================= AUTH API CALLS ======================= */
 
-/**
- * LOGIN - Step 1: Verify password and send OTP
- * Backend: POST /auth/login
- * Response: { message: "OTP sent to email..." }
- */
 export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> => {
   const res = await api.post("/auth/login", payload);
   // Login API doesn't return token, only sends OTP

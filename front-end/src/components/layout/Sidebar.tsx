@@ -17,12 +17,10 @@ import {
 } from "react-icons/fa";
 
 import {
-  // getProjectsApi,
+   getProjectsApi,
   createProjectApi,
   type Project,
 } from "../Api/ApiCommon";
-
-import { getProjectsApi } from "../Api/ApiCommon";
 
 type Member = { id: number; name: string; color: string };
 type Team = { id: number; name: string; color: string; members: Member[] };

@@ -16,7 +16,6 @@ import {
   type FilterPreset
 } from "../Api/ApiCommon";
 import "./FilterPanel.css";
-
 interface Filters {
   search: string;
   assignedToMe: boolean;

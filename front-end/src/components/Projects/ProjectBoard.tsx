@@ -3,8 +3,9 @@ import { useParams } from "react-router-dom";
 import {
   type Column,
   type Project,
+  getProjectColumnsApi
 } from "../Api/ApiCommon";
-import { getProjectColumnsApi } from "../Api/ApiCommon"
+
 import FilterPanel from "./FilterPanel";
 import "./Project.css"; 
 

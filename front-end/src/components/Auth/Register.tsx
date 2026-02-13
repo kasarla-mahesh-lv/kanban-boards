@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../Pages/Login.css";
-
-
 import { toast } from "react-toastify";
 import { registerApi } from "../Api/ApiCommon";
-
-
 const Register: React.FC = () => {
   const nav = useNavigate();
 
