@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
 import Sidebar from "./components/layout/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { Taskbar } from "./components/Taskbar";
@@ -56,7 +55,6 @@ const App: React.FC = () => {
       <Routes>
         {/* ✅ PUBLIC (no dashboard layout) */}
         <Route path="/login" element={<Login />} />
-       
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<Logout />} />
 
