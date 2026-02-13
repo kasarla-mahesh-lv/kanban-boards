@@ -36,12 +36,17 @@ const userSchema = new mongoose.Schema(
         type:Boolean,
         default:false
     },
+    loginOtp: { type: String, default: null },
+    loginOtpExpiresAt: { type: Date, default: null },
+
     tokens:[
         {
             token:{ type:String, required:true }
         }
     ]
 
+
+    
 },{timestamps:true});
 
 module.exports = mongoose.model("User",userSchema);

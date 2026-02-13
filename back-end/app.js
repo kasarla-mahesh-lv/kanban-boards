@@ -7,9 +7,10 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const connectDB = require("./src/config/mongo");
 
+
 // Routes
 const authRoutes = require("./src/routes/authRoutes");
-const boardRoutes = require("./src/routes/boardRoutes");
+//const boardRoutes = require("./src/routes/boardRoutes");
 const columnRoutes = require("./src/routes/columnRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
 const projectRoutes = require("./src/routes/projectRoutes");
@@ -47,6 +48,8 @@ app.use("/api/columns", columnRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/history", historyRoutes);
+
+
 
 
 /* -------------------- Start App -------------------- */

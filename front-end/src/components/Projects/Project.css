@@ -33,7 +33,7 @@
   font-size: 40px;
   font-weight: 900;
   letter-spacing: -0.5px;
-  color: #0f172a;
+  /* color: #0f172a; */
 }
 
 .project-board-header p {
@@ -90,7 +90,8 @@
   align-items: flex-start;
   width: 100%;
   overflow-x: auto;
-  padding-bottom: 10px;
+  padding-bottom: 350px;
+  
 }
 
 
@@ -116,7 +117,7 @@
 .column-card {
   flex: 0 0 320px;   /* 👈 fixed width like Jira/Trello */
   max-width: 360px;
-  min-height: 600px;
+  min-height: 100px;
 
   background: #ffffff;
   border-radius: 20px;
