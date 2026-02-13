@@ -291,7 +291,7 @@ exports.createTaskInProject = async (req, res) => {
       description,
       projectId,
       columnId,
-      createdBy: req.user?._id || "698c4edf58378c386afd1445",
+      createdBy: req.user?._id 
     });
     await columnDoc.save();
     return res.status(201).json({ message: "Task created", task: newTask });
@@ -300,7 +300,8 @@ exports.createTaskInProject = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-    
+   
+// ✅ GET /api/projects/get-columns-tasks?projectId= -> get all columns with tasks for a project
 exports.getColumnsTasks = async (req, res) => {
   try {
     const { projectId } = req.query;
