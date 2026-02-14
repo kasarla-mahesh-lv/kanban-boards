@@ -1,10 +1,13 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
+
+
 import { useParams } from "react-router-dom";
 import {
   type Column,
   type Project,
   getProjectColumnsApi,
+  createProjectColumnApi,
 } from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
@@ -66,10 +69,39 @@ const ProjectBoard: React.FC = () => {
 
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [showFilters, setShowFilters] = useState(false);
+  const [showAddInput, setShowAddInput] = useState(false);
+const [newColumnName, setNewColumnName] = useState("");
+
+  
 
   const currentUserId = "ajay"; // Later replace with auth user
 
   //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+  const handleAddColumn = async () => {
+  if (!projectId || !newColumnName.trim()) return;
+
+  try {
+    const newCol = await createProjectColumnApi(projectId, 
+      newColumnName
+      
+    );
+
+    const formatted = {
+      _id: newCol._id,
+      title: newCol.name,
+      key: newCol.name.toLowerCase().replace(/\s/g, ""),
+      tasks: newCol.tasks || [],
+    };
+
+    setColumns((prev) => [...prev, formatted]);
+
+    setNewColumnName("");
+    setShowAddInput(false);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 
   /* ================= LOAD COLUMNS ================= */
   useEffect(() => {
@@ -206,7 +238,41 @@ const ProjectBoard: React.FC = () => {
         </div>
 
         <div className="board-actions">
-          <button className="add-col-btn">+ Add Column</button>
+    
+        {!showAddInput ? (
+  <button
+    className="add-col-btn"
+    onClick={() => setShowAddInput(true)}
+  >
+    + Add Column
+  </button>
+) : (
+  <div className="add-group-box-header">
+    <input
+      type="text"
+      placeholder="Enter group name..."
+      value={newColumnName}
+      onChange={(e) => setNewColumnName(e.target.value)}
+      autoFocus
+    />
+
+    <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+      <button onClick={handleAddColumn}>
+        Add group
+      </button>
+
+      <button
+        onClick={() => {
+          setShowAddInput(false);
+          setNewColumnName("");
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
 
           <button
             className="filter-btn"
@@ -266,6 +332,8 @@ const ProjectBoard: React.FC = () => {
             </div>
           ))}
         </div>
+    
+
       </div>
 
       {projectId && (

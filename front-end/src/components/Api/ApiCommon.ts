@@ -239,10 +239,29 @@ export const deleteProjectApi = (id: string) =>
 
 /* ======================= COLUMNS API CALLS ======================= */
 export const getProjectColumnsApi = (projectId: string) =>
-  apiGet<Column[]>(`/projects/get-columns-tasks?projectId=${projectId}`);
+  apiGet<Column[]>(
+    `/columns/${projectId}/columns`
+  );
 
-export const createColumnApi = (projectId: string, payload: { title: string }) =>
-  apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
+
+export const createProjectColumnApi = (
+  projectId: string,
+  name: string
+) =>
+  apiPost<Column, { name: string }>(
+    `/columns/${projectId}/columns`,
+    { name }
+  );
+
+
+
+
+
+
+
+
+
+
 
 /* ======================= MEMBERS API CALLS ======================= */
 export const getProjectMembersApi = (projectId: string): Promise<Member[]> =>
