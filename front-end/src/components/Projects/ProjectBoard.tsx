@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   type Column,
@@ -68,23 +69,41 @@ const ProjectBoard: React.FC = () => {
 
   const currentUserId = "ajay"; // Later replace with auth user
 
-  useEffect(() => {
-    if (!projectId) return;
+  //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
-    (async () => {
-      try {
-        setError("");
-        setLoading(true);
-        const cols = await getProjectColumnsApi(projectId);
-        setColumns(cols || []);
-      } catch (e: any) {
-        console.error("Load board failed:", e);
-        setError("Failed to load columns.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [projectId]);
+  /* ================= LOAD COLUMNS ================= */
+  useEffect(() => {
+  if (!projectId) return;
+
+  (async () => {
+    try {
+      setLoading(true);
+      const cols = await getProjectColumnsApi(projectId);
+
+      console.log(cols, "----------------");
+
+      // 🔥 Transform API response to match UI structure
+      const formattedColumns = cols.map((col: any) => ({
+        _id: col._id,
+        title: col.name,          // map name -> title
+        key: col.name.toLowerCase().replace(/\s/g, ""),
+        order: col.order,
+        tasks: col.tasks || [],   // ensure tasks array exists
+      }));
+
+      // Optional: sort by order
+      formattedColumns.sort((a, b) => a.order - b.order);
+
+      setColumns(formattedColumns);
+    } catch (e) {
+      console.log(e, "===============");
+      setError("Failed to load columns.");
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [projectId]);
+
 
   // ✅ Active filter check (safe)
   const hasActiveFilters = useMemo(() => {
