@@ -239,7 +239,8 @@ export const deleteProjectApi = (id: string) =>
 
 /* ======================= COLUMNS API CALLS ======================= */
 export const getProjectColumnsApi = (projectId: string) =>
-  apiGet<Column[]>(`/columns/boards/${projectId}/columns`);
+  apiGet<Column[]>(`/projects/get-columns-tasks?projectId=${projectId}`);
+
 export const createColumnApi = (projectId: string, payload: { title: string }) =>
   apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
 
