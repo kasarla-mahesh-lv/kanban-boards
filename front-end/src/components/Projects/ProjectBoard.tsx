@@ -7,6 +7,7 @@ import {
 } from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
+import ProjectSettings from "./Projectsettings"; // Import the new Settings component
 import "./Project.css"; 
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
@@ -62,44 +63,39 @@ const ProjectBoard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [showSettings, setShowSettings] = useState(false); // New state for settings
+  const [showSettings, setShowSettings] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
-
-  //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
   /* ================= LOAD COLUMNS ================= */
   useEffect(() => {
-  if (!projectId) return;
+    if (!projectId) return;
 
-  (async () => {
-    try {
-      setLoading(true);
-      const cols = await getProjectColumnsApi(projectId);
+    (async () => {
+      try {
+        setLoading(true);
+        const cols = await getProjectColumnsApi(projectId);
 
-      console.log(cols, "----------------");
+        // Transform API response to match UI structure
+        const formattedColumns = cols.map((col: any) => ({
+          _id: col._id,
+          title: col.name,
+          key: col.name.toLowerCase().replace(/\s/g, ""),
+          order: col.order,
+          tasks: col.tasks || [],
+        }));
 
-      // 🔥 Transform API response to match UI structure
-      const formattedColumns = cols.map((col: any) => ({
-        _id: col._id,
-        title: col.name,          // map name -> title
-        key: col.name.toLowerCase().replace(/\s/g, ""),
-        order: col.order,
-        tasks: col.tasks || [],   // ensure tasks array exists
-      }));
+        // Sort by order
+        formattedColumns.sort((a, b) => a.order - b.order);
 
-      // Optional: sort by order
-      formattedColumns.sort((a, b) => a.order - b.order);
-
-      setColumns(formattedColumns);
-    } catch (e) {
-      console.log(e, "===============");
-      setError("Failed to load columns.");
-    } finally {
-      setLoading(false);
-    }
-  })();
-}, [projectId]);
-
+        setColumns(formattedColumns);
+      } catch (e) {
+        console.error(e);
+        setError("Failed to load columns.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [projectId]);
 
   // Filter tasks based on current filters
   const filteredColumns = React.useMemo(() => {
@@ -165,8 +161,10 @@ const ProjectBoard: React.FC = () => {
 
   const handleSettingsClick = () => {
     setShowSettings(true);
-    // You can implement settings panel/modal here
-    console.log("Settings clicked for project:", projectId);
+  };
+
+  const handleCloseSettings = () => {
+    setShowSettings(false);
   };
 
   return (
@@ -182,7 +180,7 @@ const ProjectBoard: React.FC = () => {
         <div className="board-actions">
           <button className="add-col-btn">+ Add Column</button>
           
-          {/* Settings Button - New */}
+          {/* Settings Button */}
           <button
             className="settings-btn"
             onClick={handleSettingsClick}
@@ -288,38 +286,12 @@ const ProjectBoard: React.FC = () => {
         />
       )}
 
-      {/* Settings Panel - You can create a separate component for this */}
-      {showSettings && (
-        <div className="settings-overlay">
-          <div className="settings-panel">
-            <div className="settings-header">
-              <h2>Project Settings</h2>
-              <button 
-                className="close-settings-btn"
-                onClick={() => setShowSettings(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="settings-content">
-              <p>Project ID: {projectId}</p>
-              {/* Add your settings options here */}
-              <div className="settings-section">
-                <h3>General</h3>
-                <p>Project settings options will go here...</p>
-              </div>
-              <div className="settings-section">
-                <h3>Columns</h3>
-                <p>Configure columns, add/edit/delete columns</p>
-              </div>
-              <div className="settings-section">
-                <h3>Permissions</h3>
-                <p>Manage project access and permissions</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Settings Panel Component - Separate file */}
+      <ProjectSettings
+        projectId={projectId}
+        isOpen={showSettings}
+        onClose={handleCloseSettings}
+      />
     </div>
   );
 };
