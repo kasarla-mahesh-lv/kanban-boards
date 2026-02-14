@@ -234,7 +234,41 @@ router.patch("/:projectId/tasks/:taskId",authMiddleware, updateTaskInProject);
  */
 router.delete("/:projectId/tasks/:taskId", authMiddleware,deleteTaskInProject);
 
-module.exports = router;
+/**
+ * @openapi
+ * /api/projects:
+ *   get:
+ *     summary: Get all projects
+ *     description: Returns list of all projects
+ *     tags:
+ *       - Projects
+ *     responses:
+ *       200:
+ *         description: List of projects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: "6979cea052cdbca326ae2b16"
+ *                   title:
+ *                     type: string
+ *                     example: "Kanban Board"
+ *                   description:
+ *                     type: string
+ *                     example: "Project management board"
+ *                   createdAt:
+ *                     type: string
+ *                     example: "2026-02-13T06:28:00.000Z"
+ *                   updatedAt:
+ *                     type: string
+ *                     example: "2026-02-13T06:28:00.000Z"
+ */
+
 
 
 module.exports = router;
