@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -64,26 +65,41 @@ const ProjectBoard: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
 
-  useEffect(() => {
-    if (!projectId) return;
+  //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
-    console.log(projectId,"project");
-    
-    (async () => {
-      try {
-        setError("");
-        setLoading(true);
-        const cols = await getProjectColumnsApi(projectId);
-        console.log("Columns loaded:", cols);
-        setColumns(cols);
-      } catch (e: any) {
-        console.log("Load board failed:",e, e?.response?.status, e?.response?.data);
-        setError("Failed to load columns.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [projectId]);
+  /* ================= LOAD COLUMNS ================= */
+  useEffect(() => {
+  if (!projectId) return;
+
+  (async () => {
+    try {
+      setLoading(true);
+      const cols = await getProjectColumnsApi(projectId);
+
+      console.log(cols, "----------------");
+
+      // 🔥 Transform API response to match UI structure
+      const formattedColumns = cols.map((col: any) => ({
+        _id: col._id,
+        title: col.name,          // map name -> title
+        key: col.name.toLowerCase().replace(/\s/g, ""),
+        order: col.order,
+        tasks: col.tasks || [],   // ensure tasks array exists
+      }));
+
+      // Optional: sort by order
+      formattedColumns.sort((a, b) => a.order - b.order);
+
+      setColumns(formattedColumns);
+    } catch (e) {
+      console.log(e, "===============");
+      setError("Failed to load columns.");
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [projectId]);
+
 
   // Filter tasks based on current filters
   const filteredColumns = React.useMemo(() => {
