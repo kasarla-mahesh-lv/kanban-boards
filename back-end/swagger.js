@@ -52,8 +52,11 @@ const swaggerOptions = {
        {
         name: "History",
         description: "History related APIS"
-       }
-      
+       },
+      {
+       name: "Team",
+       description: "Team member related APIs"
+    }
     
   
       
