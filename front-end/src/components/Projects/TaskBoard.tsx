@@ -2,7 +2,7 @@ import { DragDropContext } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
 
 import KanbanColumn from "./KanbanColumn";
-import { updateTaskApi } from "../Api/ApiService";
+
 import type { Project, Task } from "./types";
 
 type Props = {
