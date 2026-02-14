@@ -32,7 +32,7 @@ router.get("/:projectId/tasks",authMiddleware, getProjectTasks);
 router.post("/:projectId/tasks",authMiddleware, addTaskToProject);
 router.patch("/:projectId/tasks/:taskId",authMiddleware, updateTaskInProject);
 router.delete("/:projectId/tasks/:taskId",authMiddleware, deleteTaskInProject);
-router.post("/create-task", createTaskInProject);
+router.post("/create-task", authMiddleware, createTaskInProject);
 router.get("/get-columns-tasks", getColumnsTasks);
 
 // ✅ project details

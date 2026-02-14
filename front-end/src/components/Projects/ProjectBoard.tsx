@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -64,20 +65,18 @@ const ProjectBoard: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
 
+  //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+
+  /* ================= LOAD COLUMNS ================= */
   useEffect(() => {
     if (!projectId) return;
 
-    console.log(projectId,"project");
-    
     (async () => {
       try {
-        setError("");
         setLoading(true);
         const cols = await getProjectColumnsApi(projectId);
-        console.log("Columns loaded:", cols);
         setColumns(cols);
-      } catch (e: any) {
-        console.log("Load board failed:",e, e?.response?.status, e?.response?.data);
+      } catch (e) {
         setError("Failed to load columns.");
       } finally {
         setLoading(false);

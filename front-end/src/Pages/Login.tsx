@@ -77,6 +77,8 @@ const Login = ({ onClose }: Props) => {
 
   /* ================= LOGIN WITH OTP ================= */
   const handleLogin = async () => {
+    console.log("email");
+    
     if (!email || !password) {
       toast.error("All fields required ❌");
       return;
@@ -159,7 +161,7 @@ const Login = ({ onClose }: Props) => {
   /* ================= VERIFY REGISTER OTP ================= */
   const handleVerifyOtpAndRegister = async () => {
     if (!otp) {
-      toast.error("Enter OTP ❌");
+    toast.error("Enter OTP ❌");
       return;
     }
 
@@ -236,7 +238,7 @@ const Login = ({ onClose }: Props) => {
       await resetPasswordApi({ 
         email, 
         otp,
-        newPassword: password 
+        password 
       });
       toast.success("Password reset successful 🔐");
       resetAll();
