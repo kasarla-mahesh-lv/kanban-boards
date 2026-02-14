@@ -69,20 +69,37 @@ const ProjectBoard: React.FC = () => {
 
   /* ================= LOAD COLUMNS ================= */
   useEffect(() => {
-    if (!projectId) return;
+  if (!projectId) return;
 
-    (async () => {
-      try {
-        setLoading(true);
-        const cols = await getProjectColumnsApi(projectId);
-        setColumns(cols);
-      } catch (e) {
-        setError("Failed to load columns.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [projectId]);
+  (async () => {
+    try {
+      setLoading(true);
+      const cols = await getProjectColumnsApi(projectId);
+
+      console.log(cols, "----------------");
+
+      // 🔥 Transform API response to match UI structure
+      const formattedColumns = cols.map((col: any) => ({
+        _id: col._id,
+        title: col.name,          // map name -> title
+        key: col.name.toLowerCase().replace(/\s/g, ""),
+        order: col.order,
+        tasks: col.tasks || [],   // ensure tasks array exists
+      }));
+
+      // Optional: sort by order
+      formattedColumns.sort((a, b) => a.order - b.order);
+
+      setColumns(formattedColumns);
+    } catch (e) {
+      console.log(e, "===============");
+      setError("Failed to load columns.");
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [projectId]);
+
 
   // Filter tasks based on current filters
   const filteredColumns = React.useMemo(() => {
