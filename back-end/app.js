@@ -15,6 +15,7 @@ const columnRoutes = require("./src/routes/columnRoutes");
 const cardRoutes = require("./src/routes/cardRoutes");
 const projectRoutes = require("./src/routes/projectRoutes");
 const historyRoutes = require("./src/routes/historyRoutes");
+const teamRoutes = require("./src/routes/teamRoutes");
 
 
 const app = express();
@@ -48,6 +49,7 @@ app.use("/api/columns", columnRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/history", historyRoutes);
+app.use("/api/team", teamRoutes);
 
 
 
