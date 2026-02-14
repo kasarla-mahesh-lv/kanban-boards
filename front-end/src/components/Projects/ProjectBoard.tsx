@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -63,6 +62,7 @@ const ProjectBoard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [showSettings, setShowSettings] = useState(false); // New state for settings
   const [filters, setFilters] = useState<Filters>(defaultFilters);
 
   //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
@@ -163,6 +163,12 @@ const ProjectBoard: React.FC = () => {
     setFilters(defaultFilters);
   };
 
+  const handleSettingsClick = () => {
+    setShowSettings(true);
+    // You can implement settings panel/modal here
+    console.log("Settings clicked for project:", projectId);
+  };
+
   return (
     <div className="project-board">
       <div className="project-board-header">
@@ -175,6 +181,17 @@ const ProjectBoard: React.FC = () => {
 
         <div className="board-actions">
           <button className="add-col-btn">+ Add Column</button>
+          
+          {/* Settings Button - New */}
+          <button
+            className="settings-btn"
+            onClick={handleSettingsClick}
+            title="Project Settings"
+          >
+            <span className="icon">⚙️</span> Settings
+          </button>
+
+          {/* Filter Button */}
           <button
             className="filter-btn"
             onClick={() => setShowFilters(true)}
@@ -269,6 +286,39 @@ const ProjectBoard: React.FC = () => {
           onApply={handleApplyFilters}
           currentFilters={filters}
         />
+      )}
+
+      {/* Settings Panel - You can create a separate component for this */}
+      {showSettings && (
+        <div className="settings-overlay">
+          <div className="settings-panel">
+            <div className="settings-header">
+              <h2>Project Settings</h2>
+              <button 
+                className="close-settings-btn"
+                onClick={() => setShowSettings(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="settings-content">
+              <p>Project ID: {projectId}</p>
+              {/* Add your settings options here */}
+              <div className="settings-section">
+                <h3>General</h3>
+                <p>Project settings options will go here...</p>
+              </div>
+              <div className="settings-section">
+                <h3>Columns</h3>
+                <p>Configure columns, add/edit/delete columns</p>
+              </div>
+              <div className="settings-section">
+                <h3>Permissions</h3>
+                <p>Manage project access and permissions</p>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
