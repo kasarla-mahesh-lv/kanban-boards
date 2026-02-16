@@ -38,7 +38,10 @@ const userSchema = new mongoose.Schema(
     },
     loginOtp: { type: String, default: null },
     loginOtpExpiresAt: { type: Date, default: null },
-
+        // ✅ MFA Settings (Project settings checkbox)
+    mfaEnabled: { type: Boolean, default: false },
+    mfaOtp: { type: String, default: null },
+    mfaOtpExpiresAt: { type: Date, default: null },
     tokens:[
         {
             token:{ type:String, required:true }
