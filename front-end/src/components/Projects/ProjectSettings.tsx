@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import "./ProjectSettings.css";
-
 interface ProjectSettingsProps {
+
   projectId: string | undefined;
   isOpen: boolean;
   onClose: () => void;
@@ -12,6 +12,9 @@ const ProjectSettings: React.FC<ProjectSettingsProps> = ({
   isOpen,
   onClose,
 }) => {
+const [enableMFA,setEnableMFA]=useState(false);
+const [mfaCode,setMfaCode]=useState("");
+
   if (!isOpen) return null;
 
   const handleSaveSettings = () => {
@@ -19,7 +22,7 @@ const ProjectSettings: React.FC<ProjectSettingsProps> = ({
     console.log("Save settings for project:", projectId);
     onClose();
   };
-
+ 
   const handleCancel = () => {
     onClose();
   };
@@ -42,46 +45,34 @@ const ProjectSettings: React.FC<ProjectSettingsProps> = ({
           </div>
 
           {/* Settings sections - to be implemented by the settings team */}
-          <div className="settings-section">
-            <h3>General Settings</h3>
-            <div className="settings-placeholder">
-              <p>General project settings will be here</p>
-              <div className="placeholder-shimmer"></div>
-            </div>
-          </div>
+{/* MFA SECTION SEPARATE */}
+<div className="settings-section">
+  <h3>Security (MFA)</h3>
+  <label>
+    <input
+      type="checkbox"
+      checked={enableMFA}
+      onChange={(e)=>setEnableMFA(e.target.checked)}
+    />
+    Enable MFA
+  </label>
 
-          <div className="settings-section">
-            <h3>Columns Configuration</h3>
-            <div className="settings-placeholder">
-              <p>Column management will be here</p>
-              <div className="placeholder-shimmer"></div>
-            </div>
-          </div>
+  {enableMFA && (
+    <div style={{marginTop:"10px"}}>
 
-          <div className="settings-section">
-            <h3>Permissions & Access</h3>
-            <div className="settings-placeholder">
-              <p>Permission settings will be here</p>
-              <div className="placeholder-shimmer"></div>
-            </div>
-          </div>
+      <input
+        type="text"
+        placeholder="Enter OTP"
+        value={mfaCode}
+        onChange={(e)=>setMfaCode(e.target.value)}
+      />
+    </div>
+  )}
+</div>
 
-          <div className="settings-section">
-            <h3>Notifications</h3>
-            <div className="settings-placeholder">
-              <p>Notification preferences will be here</p>
-              <div className="placeholder-shimmer"></div>
-            </div>
+           
           </div>
-
-          <div className="settings-section">
-            <h3>Integrations</h3>
-            <div className="settings-placeholder">
-              <p>Integration settings will be here</p>
-              <div className="placeholder-shimmer"></div>
-            </div>
-          </div>
-        </div>
+        
 
         <div className="settings-footer">
           <button className="settings-cancel-btn" onClick={handleCancel}>
