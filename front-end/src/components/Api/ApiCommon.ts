@@ -115,6 +115,13 @@ export type ResetPasswordPayload = {
   password: string;
   otp?: string; // Some implementations send OTP in body
 };
+export type CreateTaskPayload = {
+  title: string;
+  description?: string;
+  priority?: string;
+  projectId: string;
+  columnId: string;
+};
 
 
 export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> => {
@@ -211,6 +218,14 @@ export const logoutApi = (): void => {
   sessionStorage.removeItem("token");
 };
 
+export type CreateTaskResponse = {
+  message?: string;
+  task: Task; 
+};
+
+
+
+
 /* ======================= PROJECT TYPES ======================= */
 export type Project = { _id: string; title: string; description?: string };
 export type Task = { _id: string; title: string; description?: string; priority?: string };
@@ -243,6 +258,9 @@ export const getProjectColumnsApi = (projectId: string) =>
 
 export const createColumnApi = (projectId: string, payload: { title: string }) =>
   apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
+
+ export const createTaskApi = (payload: CreateTaskPayload) =>
+  apiPost<CreateTaskResponse, CreateTaskPayload>("/projects/create-task", payload);
 
 /* ======================= MEMBERS API CALLS ======================= */
 export const getProjectMembersApi = (projectId: string): Promise<Member[]> =>

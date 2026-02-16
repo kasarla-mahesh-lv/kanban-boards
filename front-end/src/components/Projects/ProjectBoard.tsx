@@ -1,14 +1,15 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  type Column,
-  type Project,
-  getProjectColumnsApi
-} from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
-import "./Project.css"; 
+import AddTaskModal from "./AddTaskModal";
+import "./Project.css";
+
+import {
+  getProjectColumnsApi,
+  createTaskApi, // ✅ add this in ApiCommon.ts
+} from "../Api/ApiCommon";
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 
@@ -56,82 +57,101 @@ const defaultFilters: Filters = {
   exactMatch: false,
 };
 
+// UI column type
+type UIColumn = {
+  _id: string;
+  title: string;
+  key: string;
+  order?: number;
+  tasks: any[];
+};
+
+const makeDefaultColumns = (): UIColumn[] =>
+  DEFAULT_COLUMNS.map((t, idx) => ({
+    _id: `temp-${idx}`,
+    title: t,
+    key: t.toLowerCase().replace(/\s/g, ""),
+    order: idx,
+    tasks: [],
+  }));
+
 const ProjectBoard: React.FC = () => {
   const { projectId } = useParams();
-  const [project] = useState<Project | null>(null);
-  const [columns, setColumns] = useState<Column[]>([]);
+
+  const [project] = useState<any>({ title: "Project Board" });
+
+  const [columns, setColumns] = useState<UIColumn[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
 
-  //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
 
-  /* ================= LOAD COLUMNS ================= */
-  useEffect(() => {
-  if (!projectId) return;
+  /* ================= LOAD COLUMNS FROM API ================= */
+  const loadColumns = async () => {
+    if (!projectId) return;
 
-  (async () => {
     try {
+      setError("");
       setLoading(true);
-      const cols = await getProjectColumnsApi(projectId);
 
-      console.log(cols, "----------------");
+      const cols: any[] = await getProjectColumnsApi(projectId);
 
-      // 🔥 Transform API response to match UI structure
-      const formattedColumns = cols.map((col: any) => ({
+      // ✅ backend response shape convert -> UIColumn
+      const formatted: UIColumn[] = (cols || []).map((col: any) => ({
         _id: col._id,
-        title: col.name,          // map name -> title
-        key: col.name.toLowerCase().replace(/\s/g, ""),
-        order: col.order,
-        tasks: col.tasks || [],   // ensure tasks array exists
+        title: col.name || col.title || "Untitled",
+        key: (col.name || col.title || "")
+          .toLowerCase()
+          .replace(/\s/g, ""),
+        order: col.order ?? 0,
+        tasks: col.tasks || [],
       }));
 
-      // Optional: sort by order
-      formattedColumns.sort((a, b) => a.order - b.order);
-
-      setColumns(formattedColumns);
-    } catch (e) {
-      console.log(e, "===============");
-      setError("Failed to load columns.");
+      formatted.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      setColumns(formatted.length ? formatted : makeDefaultColumns());
+    } catch (e: any) {
+      console.log(e);
+      setError(e?.message || "Failed to load columns.");
+      setColumns(makeDefaultColumns());
     } finally {
       setLoading(false);
     }
-  })();
-}, [projectId]);
+  };
 
+  useEffect(() => {
+    loadColumns();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
 
-  // Filter tasks based on current filters
-  const filteredColumns = React.useMemo(() => {
+  /* ================= FILTER TASKS ================= */
+  const filteredColumns = useMemo(() => {
     if (!columns.length) return columns;
-    
-    return columns.map((col) => {
+
+    return columns.map((col: any) => {
       const filteredTasks = (col.tasks || []).filter((task: any) => {
-        // Search filter
+        // Search
         if (filters.search) {
+          const t = (task.title || "").toString();
           const match = filters.exactMatch
-            ? task.title === filters.search
-            : task.title.toLowerCase().includes(filters.search.toLowerCase());
+            ? t === filters.search
+            : t.toLowerCase().includes(filters.search.toLowerCase());
           if (!match) return false;
         }
 
-        // Assigned to me
-        if (filters.assignedToMe && task.assignee?.id !== "ajay") return false;
-
-        // Assignees
-        if (filters.assignees.length > 0 && 
-            !filters.assignees.includes(task.assignee?.id)) return false;
-
         // Priority
-        if (filters.priority.length > 0 && 
-            !filters.priority.includes(task.priority)) return false;
+        if (
+          filters.priority.length > 0 &&
+          !filters.priority.includes(task.priority)
+        )
+          return false;
 
         // Completed
-        if (filters.completed !== null && 
-            task.completed !== filters.completed) return false;
-
-        // Created by me
-        if (filters.createdByMe && task.createdBy?.id !== "ajay") return false;
+        if (filters.completed !== null && task.completed !== filters.completed)
+          return false;
 
         // Favorites
         if (filters.favorites && !task.isFavorite) return false;
@@ -146,21 +166,53 @@ const ProjectBoard: React.FC = () => {
     });
   }, [columns, filters]);
 
-  const displayColumns = filteredColumns.length
-    ? filteredColumns
-    : DEFAULT_COLUMNS.map((t, idx) => ({
-        _id: `temp-${idx}`,
-        title: t,
-        key: t.toLowerCase().replace(/\s/g, ""),
-        tasks: [],
-      }));
+  const displayColumns = filteredColumns.length ? filteredColumns : columns;
 
-  const handleApplyFilters = (newFilters: Filters) => {
-    setFilters(newFilters);
-  };
+  const handleApplyFilters = (newFilters: Filters) => setFilters(newFilters);
+  const clearAllFilters = () => setFilters(defaultFilters);
 
-  const clearAllFilters = () => {
-    setFilters(defaultFilters);
+  const hasActiveFilters = useMemo(() => {
+    if (filters.search.trim()) return true;
+    if (filters.assignedToMe) return true;
+    if (filters.assignees.length) return true;
+    if (filters.priority.length) return true;
+    if (filters.completed !== null) return true;
+    if (filters.createdByMe) return true;
+    if (filters.favorites) return true;
+    if (filters.followed) return true;
+    if (filters.exactMatch) return true;
+    if (filters.dueDateOptions.length) return true;
+    if (filters.types.length) return true;
+    if (filters.milestones.length) return true;
+    if (filters.noBlockers) return true;
+    if (filters.selectedBlockers.length) return true;
+    if (filters.noBlocking) return true;
+    if (filters.selectedBlocking.length) return true;
+    if (filters.selectCreators.length) return true;
+    return false;
+  }, [filters]);
+
+  /* ================= ✅ ADD TASK (API HIT) ================= */
+  const handleAddTask = async (payload: {
+    title: string;
+    description?: string;
+    priority?: string;
+    projectId: string;
+    columnId: string;
+  }) => {
+    if (!projectId) return;
+
+    // ✅ API HIT
+    await createTaskApi({
+      title: payload.title,
+      description: payload.description,
+      priority: payload.priority || "Medium",
+      projectId: payload.projectId,
+      columnId: payload.columnId,
+    });
+
+    // ✅ reload board from backend (so it will always show saved task)
+    await loadColumns();
   };
 
   return (
@@ -175,17 +227,10 @@ const ProjectBoard: React.FC = () => {
 
         <div className="board-actions">
           <button className="add-col-btn">+ Add Column</button>
-          <button
-            className="filter-btn"
-            onClick={() => setShowFilters(true)}
-          >
+
+          <button className="filter-btn" onClick={() => setShowFilters(true)}>
             <span className="icon">☰</span> Filters
-            {Object.keys(filters).some(key => 
-              key !== 'search' && 
-              Array.isArray(filters[key as keyof Filters]) 
-                ? (filters[key as keyof Filters] as any[]).length > 0
-                : filters[key as keyof Filters] && key !== 'dueDateRange' && key !== 'creationDate'
-            ) && (
+            {hasActiveFilters && (
               <span className="filter-active-indicator">●</span>
             )}
           </button>
@@ -194,43 +239,9 @@ const ProjectBoard: React.FC = () => {
 
       {error && <div className="board-error">{error}</div>}
 
-      {/* Active filters summary */}
-      {filters !== defaultFilters && (
-        <div className="active-filters-bar">
-          <span className="active-filters-label">Active filters:</span>
-          {filters.priority.length > 0 && (
-            <span className="filter-tag">
-              Priority: {filters.priority.join(', ')}
-              <button onClick={() => setFilters({...filters, priority: []})}>✕</button>
-            </span>
-          )}
-          {filters.assignedToMe && (
-            <span className="filter-tag">
-              Assigned to me
-              <button onClick={() => setFilters({...filters, assignedToMe: false})}>✕</button>
-            </span>
-          )}
-          {filters.completed === true && (
-            <span className="filter-tag">
-              Completed
-              <button onClick={() => setFilters({...filters, completed: null})}>✕</button>
-            </span>
-          )}
-          {filters.completed === false && (
-            <span className="filter-tag">
-              Not completed
-              <button onClick={() => setFilters({...filters, completed: null})}>✕</button>
-            </span>
-          )}
-          <button className="clear-all-filters" onClick={clearAllFilters}>
-            Clear all
-          </button>
-        </div>
-      )}
-
       <div className="board-body">
         <div className="columns-row">
-          {displayColumns.map((col) => (
+          {displayColumns.map((col: any) => (
             <div key={col._id} className="column-card">
               <div className="column-title">
                 <span>{col.title}</span>
@@ -244,8 +255,25 @@ const ProjectBoard: React.FC = () => {
                   col.tasks.map((t: any) => (
                     <div key={t._id || t.id} className="task-item">
                       <div className="task-title">{t.title}</div>
+
+                      {t.description && (
+                        <div
+                          style={{
+                            marginTop: 6,
+                            fontSize: 12,
+                            color: "#64748b",
+                          }}
+                        >
+                          {t.description}
+                        </div>
+                      )}
+
                       {t.priority && (
-                        <span className={`priority-badge ${t.priority.toLowerCase()}`}>
+                        <span
+                          className={`priority-badge ${String(
+                            t.priority
+                          ).toLowerCase()}`}
+                        >
                           {t.priority}
                         </span>
                       )}
@@ -254,13 +282,20 @@ const ProjectBoard: React.FC = () => {
                 )}
               </div>
 
-              <button className="add-task-btn">+ Add Task</button>
+              <button
+                className="add-task-btn"
+                onClick={() => {
+                  setActiveColumnId(col._id);
+                  setShowAddTask(true);
+                }}
+              >
+                + Add Task
+              </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Filter Panel Component */}
       {projectId && (
         <FilterPanel
           projectId={projectId}
@@ -270,8 +305,24 @@ const ProjectBoard: React.FC = () => {
           currentFilters={filters}
         />
       )}
+
+      {showAddTask && activeColumnId && projectId && (
+        <AddTaskModal
+          columnTitle={
+            columns.find((c: any) => c._id === activeColumnId)?.title || ""
+          }
+          projectId={projectId}
+          columnId={activeColumnId}
+          onClose={() => {
+            setShowAddTask(false);
+            setActiveColumnId(null);
+          }}
+          onAdd={handleAddTask}
+        />
+      )}
     </div>
   );
 };
 
 export default ProjectBoard;
+
