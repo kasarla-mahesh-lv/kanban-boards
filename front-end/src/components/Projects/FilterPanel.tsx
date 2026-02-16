@@ -1,7 +1,9 @@
-import React, { useEffect, useState,  useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   getProjectMembersApi,
   searchProjectMembersApi,
+  createTeamMemberApi,
+  deleteTeamMemberApi,
   getProjectTypesApi,
   getProjectMilestonesApi,
   getBlockersApi,
@@ -16,6 +18,7 @@ import {
   type FilterPreset
 } from "../Api/ApiCommon";
 import "./FilterPanel.css";
+
 interface Filters {
   search: string;
   assignedToMe: boolean;
@@ -79,6 +82,15 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   const [typeSearchQuery, setTypeSearchQuery] = useState("");
   const [milestoneSearchQuery, setMilestoneSearchQuery] = useState("");
 
+  // New state for member management
+  const [showAddMemberForm, setShowAddMemberForm] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberEmail, setNewMemberEmail] = useState("");
+  const [memberError, setMemberError] = useState("");
+  const [addingMember, setAddingMember] = useState(false);
+  const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   // Fetch all filter data when panel opens
   useEffect(() => {
     if (!projectId || !isOpen) return;
@@ -88,6 +100,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         // Fetch members
         setLoading(prev => ({ ...prev, members: true }));
         const membersData = await getProjectMembersApi(projectId);
+        console.log("Fetched members:", membersData);
         setMembers(membersData);
         setFilteredMembers(membersData);
         setLoading(prev => ({ ...prev, members: false }));
@@ -172,6 +185,88 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   useEffect(() => {
     setFilters(currentFilters);
   }, [currentFilters]);
+
+  // FIXED: Add new member with proper error handling
+  const handleAddMember = async () => {
+    // Validation
+    if (!newMemberName.trim()) {
+      setMemberError("Name is required");
+      return;
+    }
+    if (!newMemberEmail.trim()) {
+      setMemberError("Email is required");
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(newMemberEmail)) {
+      setMemberError("Invalid email format");
+      return;
+    }
+
+    setAddingMember(true);
+    setMemberError("");
+
+    try {
+      console.log("Adding new member:", { name: newMemberName, email: newMemberEmail });
+      
+      const newMember = await createTeamMemberApi(projectId, {
+        name: newMemberName.trim(),
+        email: newMemberEmail.trim()
+      });
+
+      console.log("Member added successfully:", newMember);
+
+      // Add the new member to the list
+      setMembers(prev => [...prev, newMember]);
+      setFilteredMembers(prev => [...prev, newMember]);
+      
+      // Reset form
+      setNewMemberName("");
+      setNewMemberEmail("");
+      setShowAddMemberForm(false);
+      setMemberError("");
+    } catch (error: any) {
+      console.error("Failed to add member:", error);
+      setMemberError(error.message || "Failed to add member");
+    } finally {
+      setAddingMember(false);
+    }
+  };
+
+  // FIXED: Delete member with proper error handling and ID usage
+  const handleDeleteMember = async (memberId: string, memberName: string) => {
+    if (!window.confirm(`Are you sure you want to remove ${memberName} from the project?`)) {
+      return;
+    }
+
+    setDeletingMemberId(memberId);
+    setDeleteError(null);
+
+    try {
+      console.log("Deleting member with ID:", memberId);
+      
+      await deleteTeamMemberApi(memberId);
+
+      console.log("Member deleted successfully");
+
+      // Remove member from state
+      setMembers(prev => prev.filter(m => m._id !== memberId));
+      setFilteredMembers(prev => prev.filter(m => m._id !== memberId));
+      
+      // Also remove them from selected assignees if they were selected
+      if (filters.assignees.includes(memberId)) {
+        setFilters(prev => ({
+          ...prev,
+          assignees: prev.assignees.filter(id => id !== memberId)
+        }));
+      }
+    } catch (error: any) {
+      console.error("Failed to delete member:", error);
+      setDeleteError(error.message || "Failed to delete member");
+      alert(error.message || "Failed to delete member");
+    } finally {
+      setDeletingMemberId(null);
+    }
+  };
 
   const handleCheckboxGroup = (key: keyof Filters, value: string, checked: boolean) => {
     setFilters((prev) => {
@@ -307,7 +402,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
             />
           </div>
 
-          {/* ASSIGNEE */}
+          {/* ASSIGNEE - Updated with member management */}
           <div className="filter-section">
             <h4>Assignee</h4>
             <label className="checkbox-label">
@@ -326,7 +421,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
               </div>
               
               {openDropdown === "members" && (
-                <div className="dropdown-content">
+                <div className="dropdown-content members-dropdown">
                   <div className="dropdown-search">
                     <span className="icon">🔍</span>
                     <input 
@@ -336,7 +431,71 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                       onChange={(e) => setMemberSearchQuery(e.target.value)}
                     />
                   </div>
-                  <div className="dropdown-option">
+
+                  {/* Add Member Toggle Button */}
+                  <div className="add-member-toggle">
+                    <button 
+                      className="add-member-btn"
+                      onClick={() => setShowAddMemberForm(!showAddMemberForm)}
+                    >
+                      <span className="icon">➕</span> 
+                      {showAddMemberForm ? 'Cancel' : 'Add new member'}
+                    </button>
+                  </div>
+
+                  {/* Add Member Form */}
+                  {showAddMemberForm && (
+                    <div className="add-member-form">
+                      <h5>Add New Member</h5>
+                      <div className="form-group">
+                        <input
+                          type="text"
+                          placeholder="Name"
+                          value={newMemberName}
+                          onChange={(e) => setNewMemberName(e.target.value)}
+                          className="member-input"
+                          disabled={addingMember}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <input
+                          type="email"
+                          placeholder="Email"
+                          value={newMemberEmail}
+                          onChange={(e) => setNewMemberEmail(e.target.value)}
+                          className="member-input"
+                          disabled={addingMember}
+                        />
+                      </div>
+                      {memberError && (
+                        <div className="error-message">{memberError}</div>
+                      )}
+                      <div className="form-actions">
+                        <button 
+                          className="cancel-btn"
+                          onClick={() => {
+                            setShowAddMemberForm(false);
+                            setMemberError("");
+                            setNewMemberName("");
+                            setNewMemberEmail("");
+                          }}
+                          disabled={addingMember}
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          className="save-member-btn"
+                          onClick={handleAddMember}
+                          disabled={addingMember}
+                        >
+                          {addingMember ? 'Adding...' : 'Add Member'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Unassigned Option */}
+                  <div className="dropdown-option unassigned-option">
                     <label className="checkbox-label">
                       <input 
                         type="checkbox" 
@@ -346,17 +505,19 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                       Unassigned
                     </label>
                   </div>
+
+                  {/* Members List with Delete Option - FIXED: Using _id instead of id */}
                   {loading.members ? (
                     <div className="dropdown-loading">Loading members...</div>
                   ) : (
                     filteredMembers.map((member) => (
-                      <div key={member.id} className="dropdown-option">
-                        <label className="checkbox-label">
+                      <div key={member._id} className="dropdown-option member-item">
+                        <label className="checkbox-label member-checkbox">
                           <input
                             type="checkbox"
-                            checked={filters.assignees.includes(member.id)}
+                            checked={filters.assignees.includes(member._id)}
                             onChange={(e) => 
-                              handleCheckboxGroup("assignees", member.id, e.target.checked)
+                              handleCheckboxGroup("assignees", member._id, e.target.checked)
                             }
                           />
                           <span className="member-avatar">
@@ -371,8 +532,26 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                             <span className="member-email">{member.email}</span>
                           )}
                         </label>
+                        <button 
+                          className="delete-member-btn"
+                          onClick={() => handleDeleteMember(member._id, member.name)}
+                          disabled={deletingMemberId === member._id}
+                          title="Remove member from project"
+                        >
+                          {deletingMemberId === member._id ? '...' : '✕'}
+                        </button>
                       </div>
                     ))
+                  )}
+
+                  {!loading.members && filteredMembers.length === 0 && memberSearchQuery && (
+                    <div className="no-members-found">
+                      No members found. Click "Add new member" to create one.
+                    </div>
+                  )}
+                  
+                  {deleteError && (
+                    <div className="error-message">{deleteError}</div>
                   )}
                 </div>
               )}
@@ -820,13 +999,13 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                     <div className="dropdown-loading">Loading creators...</div>
                   ) : (
                     members.map((member) => (
-                      <div key={member.id} className="dropdown-option">
+                      <div key={member._id} className="dropdown-option">
                         <label className="checkbox-label">
                           <input
                             type="checkbox"
-                            checked={filters.selectCreators.includes(member.id)}
+                            checked={filters.selectCreators.includes(member._id)}
                             onChange={(e) => 
-                              handleCheckboxGroup("selectCreators", member.id, e.target.checked)
+                              handleCheckboxGroup("selectCreators", member._id, e.target.checked)
                             }
                           />
                           <span className="member-avatar">👤</span> {member.name}
