@@ -7,7 +7,7 @@ import {
 } from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
-import ProjectSettings from "./Projectsettings"; // Import the new Settings component
+import ProjectSettings from "./ProjectSettings"; // Import the new Settings component
 import "./Project.css"; 
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
