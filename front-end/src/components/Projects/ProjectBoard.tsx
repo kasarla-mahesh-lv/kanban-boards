@@ -257,11 +257,11 @@ const [newColumnName, setNewColumnName] = useState("");
     />
 
     <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-      <button onClick={handleAddColumn}>
+      <button onClick={handleAddColumn} className="btn btn-primary">
         Add group
       </button>
 
-      <button
+      <button className="btn btn-danger"
         onClick={() => {
           setShowAddInput(false);
           setNewColumnName("");
