@@ -207,6 +207,7 @@ const Login = ({ onClose }: Props) => {
     }
   };
 
+  // FIXED: Added confirmPassword validation and send both password and confirmPassword
   const handleResetPassword = async () => {
     if (!otp) {
       toast.error("Enter OTP ❌");
@@ -232,18 +233,21 @@ const Login = ({ onClose }: Props) => {
       toast.error("OTP expired ❌");
       return;
     }
+
     try {
       setLoading(true);
-      // Directly call reset password API - it verifies OTP internally
+      // Send both newPassword and confirmPassword to match backend validation
       await resetPasswordApi({ 
         email, 
         otp,
-        password 
+        newPassword: password,
+        confirmPassword: confirmPassword  // Added confirmPassword
       });
       toast.success("Password reset successful 🔐");
       resetAll();
       setMode("login");
     } catch (error: any) {
+      console.error("Reset password error:", error);
       toast.error(error?.response?.data?.message || error?.message || "Password reset failed ❌");
     } finally {
       setLoading(false);
