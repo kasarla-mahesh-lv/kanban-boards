@@ -2,6 +2,8 @@ const UserModel = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/mail");
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+
 const {
   registerSchema,
   verifyOtpSchema,
@@ -123,7 +125,6 @@ try{
 
       return res.status(200).json({
         message: "Login OTP verified ✅",
-        token,
         user: {
           id: user._id,
           name: user.name,
@@ -157,6 +158,28 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
+        // ✅ ✅ MAIN CHANGE: If MFA is OFF => direct token => dashboard
+    if (!user.mfaEnabled) {
+      const token = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      // optional: save token in DB like you are doing in verifyOtp
+      user.tokens.push({ token });
+      await user.save();
+
+      res.setHeader("Authorization", `Bearer ${token}`);
+
+      return res.status(200).json({
+        message: "Login success ✅",
+        mfaRequired: false,
+        token,
+        user: { id: user._id, name: user.name, email: user.email }
+      });
+    }
+
     // ✅ Generate login OTP only
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 2 * 60 * 1000);
@@ -165,11 +188,14 @@ exports.login = async (req, res) => {
     user.loginOtpExpiresAt = expiry;
     await user.save();
 
+
+
     await sendMail(
       email,
       "Login OTP",
       `Your login OTP is ${otp}. It is valid for 2 minutes.`
     );
+
 
     return res.status(200).json({
       message: "OTP sent to email. Please verify OTP using /verify-otp with type=login"
@@ -257,3 +283,90 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// 1) Checkbox ON -> Send MFA OTP
+exports.requestMfaOtp = async (req, res) => {
+  try {
+    const userId = req.userId || req.user?.userId || req.user?.id; // depends on your middleware
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const user = await UserModel.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const otp = generateOtp();
+    const expiry = new Date(Date.now() + 2 * 60 * 1000); // 2 mins
+
+    user.mfaOtp = otp;
+    user.mfaOtpExpiresAt = expiry;
+    await user.save();
+
+
+    await sendMail(
+      user.email,
+      "MFA Enable OTP",
+      `Your MFA enable OTP is ${otp}. It is valid for 2 minutes.`
+    );
+    res.setHeader("Authorization", `Bearer ${req.token}`);
+
+    return res.status(200).json({ message: "MFA OTP sent to email" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// 2) Verify MFA OTP -> MFA true
+exports.verifyMfaOtp = async (req, res) => {
+  try {
+    const userId = req.userId || req.user?.userId || req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { otp } = req.body;
+    if (!otp) return res.status(400).json({ message: "OTP required" });
+
+    const user = await UserModel.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.mfaOtp || !user.mfaOtpExpiresAt)
+      return res.status(400).json({ message: "Please request MFA OTP first" });
+
+    if (user.mfaOtpExpiresAt < Date.now())
+      return res.status(400).json({ message: "OTP expired" });
+
+    if (user.mfaOtp !== otp)
+      return res.status(400).json({ message: "Invalid OTP" });
+
+    user.mfaEnabled = true;
+    user.mfaOtp = null;
+    user.mfaOtpExpiresAt = null;
+    await user.save();
+
+    res.setHeader("Authorization", `Bearer ${req.token}`);
+
+
+    return res.status(200).json({ message: "MFA enabled ✅", mfaEnabled: true });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+// ✅ Disable MFA
+exports.disableMfa = async (req, res) => {
+  try {
+    const userId = req.userId || req.user?.id || req.user?._id;
+
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const user = await UserModel.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.mfaEnabled = false;
+    user.mfaOtp = null;
+    user.mfaOtpExpiresAt = null;
+
+    await user.save();
+
+    return res.status(200).json({ message: "MFA disabled", mfaEnabled: false });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
