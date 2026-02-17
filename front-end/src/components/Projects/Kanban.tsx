@@ -1,9 +1,10 @@
  console.log("KANBAN COMPONENT RENDERED");
 
 import { useEffect, useState } from "react";
-import { getProjectsApi } from "../Api/ApiService";
+import { getProjectsApi } from "../Api/ApiCommon";
 import TaskBoard from "./TaskBoard";
-import type { Project } from "./types";
+import type { Project } from "../Api/ApiCommon";
+
 import "./Kanban.css";
 
 const Kanban = () => {
@@ -33,7 +34,7 @@ const Kanban = () => {
   return (
     <div className="kanban-page">
       {projects.map((project) => (
-        <TaskBoard key={project._id} project={project} tasks={[]} />
+        <TaskBoard key={project._id} project={project} tasks={[]} columns={[]} refreshColumns={()=>{}}/>
       ))}
     </div>
   );
