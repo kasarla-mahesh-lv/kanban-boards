@@ -1,7 +1,4 @@
-
 import React, { useEffect, useState,useMemo } from "react";
-
-
 import { useParams } from "react-router-dom";
 import {
   type Column,
@@ -11,7 +8,8 @@ import {
 } from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
-import "./Project.css";
+import ProjectSettings from "./ProjectSettings"; // Import the new Settings component
+import "./Project.css"; 
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 
@@ -67,8 +65,10 @@ const ProjectBoard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [showFilters, setShowFilters] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [filters, setFilters] = useState<Filters>(defaultFilters);
+  
   const [showAddInput, setShowAddInput] = useState(false);
 const [newColumnName, setNewColumnName] = useState("");
 
@@ -105,37 +105,34 @@ const [newColumnName, setNewColumnName] = useState("");
 
   /* ================= LOAD COLUMNS ================= */
   useEffect(() => {
-  if (!projectId) return;
+    if (!projectId) return;
 
-  (async () => {
-    try {
-      setLoading(true);
-      const cols = await getProjectColumnsApi(projectId);
+    (async () => {
+      try {
+        setLoading(true);
+        const cols = await getProjectColumnsApi(projectId);
 
-      console.log(cols, "----------------");
+        // Transform API response to match UI structure
+        const formattedColumns = cols.map((col: any) => ({
+          _id: col._id,
+          title: col.name,
+          key: col.name.toLowerCase().replace(/\s/g, ""),
+          order: col.order,
+          tasks: col.tasks || [],
+        }));
 
-      // 🔥 Transform API response to match UI structure
-      const formattedColumns = cols.map((col: any) => ({
-        _id: col._id,
-        title: col.name,          // map name -> title
-        key: col.name.toLowerCase().replace(/\s/g, ""),
-        order: col.order,
-        tasks: col.tasks || [],   // ensure tasks array exists
-      }));
+        // Sort by order
+        formattedColumns.sort((a, b) => a.order - b.order);
 
-      // Optional: sort by order
-      formattedColumns.sort((a, b) => a.order - b.order);
-
-      setColumns(formattedColumns);
-    } catch (e) {
-      console.log(e, "===============");
-      setError("Failed to load columns.");
-    } finally {
-      setLoading(false);
-    }
-  })();
-}, [projectId]);
-
+        setColumns(formattedColumns);
+      } catch (e) {
+        console.error(e);
+        setError("Failed to load columns.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [projectId]);
 
   // ✅ Active filter check (safe)
   const hasActiveFilters = useMemo(() => {
@@ -227,6 +224,14 @@ const [newColumnName, setNewColumnName] = useState("");
     setFilters(defaultFilters);
   };
 
+  const handleSettingsClick = () => {
+    setShowSettings(true);
+  };
+
+  const handleCloseSettings = () => {
+    setShowSettings(false);
+  };
+
   return (
     <div className="project-board">
       <div className="project-board-header">
@@ -274,6 +279,18 @@ const [newColumnName, setNewColumnName] = useState("");
 )}
 
 
+          <button className="add-col-btn">+ Add Column</button>
+          
+          {/* Settings Button */}
+          <button
+            className="settings-btn"
+            onClick={handleSettingsClick}
+            title="Project Settings"
+          >
+            <span className="icon">⚙️</span> Settings
+          </button>
+
+          {/* Filter Button */}
           <button
             className="filter-btn"
             onClick={() => setShowFilters(true)}
@@ -345,6 +362,13 @@ const [newColumnName, setNewColumnName] = useState("");
           currentFilters={filters}
         />
       )}
+
+      {/* Settings Panel Component - Separate file */}
+      <ProjectSettings
+        projectId={projectId}
+        isOpen={showSettings}
+        onClose={handleCloseSettings}
+      />
     </div>
   );
 };

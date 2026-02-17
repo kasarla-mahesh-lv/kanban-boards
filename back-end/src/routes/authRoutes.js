@@ -1,5 +1,7 @@
 const router = require("express").Router();
 const { sendOtp, verifyOtp,login, register,forgotPassword, resetPassword } = require("../controllers/authController");
+const { requestMfaOtp, verifyMfaOtp,disableMfa } = require("../controllers/authController");
+const authMiddleware = require("../middlewares/authmiddlewares");
 
 
 /**
@@ -98,6 +100,64 @@ router.post("/verify-otp", verifyOtp);
 router.post("/login", login);
 
 
+/**
+ * @openapi
+ * /api/auth/mfa/request:
+ *   patch:
+ *     tags: [MFA]
+ *     summary: Request OTP to enable MFA (Project Settings checkbox ON)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: MFA OTP sent to email
+ *       401:
+ *         description: Unauthorized
+ */
+router.patch("/mfa/request", authMiddleware, requestMfaOtp);
+/**
+ * @openapi
+ * /api/auth/mfa/verify:
+ *   patch:
+ *     tags: [MFA]
+ *     summary: Verify OTP and enable MFA
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [otp]
+ *             properties:
+ *               otp:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: MFA enabled
+ *       400:
+ *         description: Invalid or expired OTP
+ *       401:
+ *         description: Unauthorized
+ */
+router.patch("/mfa/verify", authMiddleware, verifyMfaOtp);
+/**
+ * @openapi
+ * /api/auth/mfa/disable:
+ *   patch:
+ *     tags: [MFA]
+ *     summary: Disable MFA (Project Settings checkbox OFF)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: MFA disabled
+ *       401:
+ *         description: Unauthorized
+ */
+router.patch("/mfa/disable", authMiddleware, disableMfa);
 
 /**
  * @swagger
@@ -150,5 +210,7 @@ router.post("/forgot-password", forgotPassword);
  *         description: Password reset successful
  */
 router.post("/reset-password", resetPassword);
+
+
 
 module.exports = router;

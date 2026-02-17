@@ -16,7 +16,6 @@ import {
   forgotPasswordApi,
 } from "../components/Api/ApiCommon";
 import "./Login.css";
-
 type Props = {
   onClose?: () => void;
 };
@@ -78,7 +77,7 @@ const Login = ({ onClose }: Props) => {
   /* ================= LOGIN WITH OTP ================= */
   const handleLogin = async () => {
     console.log("email");
-    
+
     if (!email || !password) {
       toast.error("All fields required ❌");
       return;
@@ -86,15 +85,20 @@ const Login = ({ onClose }: Props) => {
 
     try {
       setLoading(true);
-      const res = await loginApi({ email, password });
-      console.log(res,"res--------------------");
-      
-     //  localStorage.setItem("token", res.token);
-      await loginApi({ email, password });
+      const loginData = await loginApi({ email, password });
+      console.log(loginData, "loginData");
+      if (loginData?.mfaRequired == false) {
+        toast.success("Login successful ✅");
+        resetAll();
+        onClose?.();
+        nav("/", { replace: true });
+      }
+
       setMode("loginOtp");
       setOtpSent(true);
       setOtpTimer(OTP_DURATION);
       toast.success("OTP sent to your email 📩");
+      return true;
     } catch (error: any) {
       toast.error(error?.message || "Invalid credentials ❌");
     } finally {
@@ -116,10 +120,10 @@ const Login = ({ onClose }: Props) => {
 
     try {
       setLoading(true);
-      await verifyOtpApi({ 
-        email, 
-        otp, 
-        type: "login" 
+      await verifyOtpApi({
+        email,
+        otp,
+        type: "login"
       });
       toast.success("Login successful ✅");
       resetAll();
@@ -165,7 +169,7 @@ const Login = ({ onClose }: Props) => {
   /* ================= VERIFY REGISTER OTP ================= */
   const handleVerifyOtpAndRegister = async () => {
     if (!otp) {
-    toast.error("Enter OTP ❌");
+      toast.error("Enter OTP ❌");
       return;
     }
 
@@ -176,10 +180,10 @@ const Login = ({ onClose }: Props) => {
 
     try {
       setLoading(true);
-      await verifyOtpApi({ 
-        email, 
-        otp, 
-        type: "register" 
+      await verifyOtpApi({
+        email,
+        otp,
+        type: "register"
       });
       toast.success("Registration successful 🎉");
       resetAll();
@@ -211,6 +215,7 @@ const Login = ({ onClose }: Props) => {
     }
   };
 
+  // FIXED: Added confirmPassword validation and send both password and confirmPassword
   const handleResetPassword = async () => {
     if (!otp) {
       toast.error("Enter OTP ❌");
@@ -236,18 +241,21 @@ const Login = ({ onClose }: Props) => {
       toast.error("OTP expired ❌");
       return;
     }
+
     try {
       setLoading(true);
-      // Directly call reset password API - it verifies OTP internally
-      await resetPasswordApi({ 
-        email, 
+      // Send both newPassword and confirmPassword to match backend validation
+      await resetPasswordApi({
+        email,
         otp,
-        password 
+        newPassword: password,
+        confirmPassword: confirmPassword  // Added confirmPassword
       });
       toast.success("Password reset successful 🔐");
       resetAll();
       setMode("login");
     } catch (error: any) {
+      console.error("Reset password error:", error);
       toast.error(error?.response?.data?.message || error?.message || "Password reset failed ❌");
     } finally {
       setLoading(false);
@@ -268,7 +276,7 @@ const Login = ({ onClose }: Props) => {
   const resendOtp = async () => {
     try {
       setLoading(true);
-      
+
       if (mode === "loginOtp") {
         await loginApi({ email, password });
       } else if (mode === "forgot") {
@@ -276,7 +284,7 @@ const Login = ({ onClose }: Props) => {
       } else {
         await registerApi({ name, email, password, mobilenumber });
       }
-      
+
       setOtpTimer(OTP_DURATION);
       toast.success("OTP resent successfully 📩");
     } catch (error: any) {
@@ -303,20 +311,20 @@ const Login = ({ onClose }: Props) => {
           <>
             <div className="input-box">
               <FaUser className="input-icon" />
-              <input 
-                placeholder="Full Name" 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
+              <input
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 
             <div className="input-box">
               <FaEnvelope className="input-icon" />
-              <input 
+              <input
                 type="email"
-                placeholder="Email Address" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -372,24 +380,24 @@ const Login = ({ onClose }: Props) => {
             </div>
 
             <div className="input-box">
-              <input 
-                placeholder="Enter 6-digit OTP" 
-                value={otp} 
-                onChange={(e) => setOtp(e.target.value)} 
+              <input
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
                 maxLength={6}
               />
             </div>
 
             <p className="otp-timer">⏱ OTP expires in {formatTime(otpTimer)}</p>
-            
+
             {otpTimer === 0 && (
               <button className="resend-btn" onClick={resendOtp} disabled={loading}>
                 {loading ? "Sending..." : "Resend OTP"}
               </button>
             )}
 
-            <button 
-              className="login-btn" 
+            <button
+              className="login-btn"
               onClick={handleVerifyOtpAndRegister}
               disabled={loading || otpTimer <= 0 || !otp}
             >
@@ -410,21 +418,21 @@ const Login = ({ onClose }: Props) => {
           <>
             <div className="input-box">
               <FaEnvelope className="input-icon" />
-              <input 
+              <input
                 type="email"
-                placeholder="Email Address" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
             <div className="input-box">
               <FaLock className="input-icon" />
-              <input 
-                type="password" 
-                placeholder="Password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
@@ -455,24 +463,24 @@ const Login = ({ onClose }: Props) => {
             </div>
 
             <div className="input-box">
-              <input 
-                placeholder="Enter 6-digit OTP" 
-                value={otp} 
-                onChange={(e) => setOtp(e.target.value)} 
+              <input
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
                 maxLength={6}
               />
             </div>
 
             <p className="otp-timer">⏱ OTP expires in {formatTime(otpTimer)}</p>
-            
+
             {otpTimer === 0 && (
               <button className="resend-btn" onClick={resendOtp} disabled={loading}>
                 {loading ? "Sending..." : "Resend OTP"}
               </button>
             )}
 
-            <button 
-              className="login-btn" 
+            <button
+              className="login-btn"
               onClick={handleVerifyLoginOtp}
               disabled={loading || otpTimer <= 0 || !otp}
             >
@@ -493,11 +501,11 @@ const Login = ({ onClose }: Props) => {
           <>
             <div className="input-box">
               <FaEnvelope className="input-icon" />
-              <input 
+              <input
                 type="email"
-                placeholder="Email Address" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -512,21 +520,21 @@ const Login = ({ onClose }: Props) => {
                 </div>
 
                 <div className="input-box">
-                  <input 
-                    placeholder="Enter 6-digit OTP" 
-                    value={otp} 
-                    onChange={(e) => setOtp(e.target.value)} 
+                  <input
+                    placeholder="Enter 6-digit OTP"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
                     maxLength={6}
                   />
                 </div>
 
                 <div className="input-box">
                   <FaLock className="input-icon" />
-                  <input 
-                    type="password" 
-                    placeholder="New Password" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
+                  <input
+                    type="password"
+                    placeholder="New Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
 
@@ -538,11 +546,11 @@ const Login = ({ onClose }: Props) => {
 
                 <div className="input-box">
                   <FaLock className="input-icon" />
-                  <input 
-                    type="password" 
-                    placeholder="Confirm Password" 
-                    value={confirmPassword} 
-                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                  <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                 </div>
 
@@ -554,8 +562,8 @@ const Login = ({ onClose }: Props) => {
                   </button>
                 )}
 
-                <button 
-                  className="login-btn" 
+                <button
+                  className="login-btn"
                   onClick={handleResetPassword}
                   disabled={loading || otpTimer <= 0 || !otp || !password || !confirmPassword}
                 >
