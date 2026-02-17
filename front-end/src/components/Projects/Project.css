@@ -1,5 +1,4 @@
 
-
 /* ---- Page wrapper ---- */
 .project-board {
   width: 100%;
@@ -444,5 +443,255 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+/* ---- Board actions (only Add Column button remains) ---- */
+.board-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+/* Project Settings Button and Panel Styles */
+
+.board-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.add-col-btn {
+  background-color: #4a6cf7;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-col-btn:hover {
+  background-color: #3a5bd9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.add-col-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Settings Button Styles */
+.settings-btn {
+  background-color: #f0f2f5;
+  color: #2c3e50;
+  border: 1px solid #e0e4e8;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.settings-btn:hover {
+  background-color: #e4e8ec;
+  border-color: #cbd0d6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.settings-btn .icon {
+  font-size: 16px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.settings-btn:hover .icon {
+  transform: rotate(90deg);
+}
+
+/* Filter Button Styles */
+.filter-btn {
+  background-color: #f0f2f5;
+  color: #2c3e50;
+  border: 1px solid #e0e4e8;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.filter-btn:hover {
+  background-color: #e4e8ec;
+  border-color: #cbd0d6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn .icon {
+  font-size: 16px;
+}
+
+.filter-active-indicator {
+  color: #4a6cf7;
+  font-size: 12px;
+  margin-left: 4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Settings Overlay and Panel */
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.settings-panel {
+  background-color: white;
+  border-radius: 16px;
+  width: 600px;
+  max-width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a2639;
+}
+
+.close-settings-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7a8f;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.close-settings-btn:hover {
+  background-color: #f0f2f5;
+  color: #dc3545;
+  transform: scale(1.1);
+}
+
+.settings-content {
+  padding: 24px;
+}
+
+.settings-section {
+  margin-bottom: 28px;
+}
+
+.settings-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.settings-section p {
+  margin: 8px 0;
+  color: #6b7a8f;
+  line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .board-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .add-col-btn,
+  .settings-btn,
+  .filter-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .settings-panel {
+    width: 95%;
+    max-height: 90vh;
   }
 }

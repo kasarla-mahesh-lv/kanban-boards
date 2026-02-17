@@ -882,3 +882,174 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(203, 213, 225, 0.2) transparent;
 }
+/* Member Management Styles */
+.members-dropdown {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.add-member-toggle {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.add-member-btn {
+  width: 100%;
+  padding: 8px;
+  background: var(--primary-light, #e3f2fd);
+  border: 1px dashed var(--primary-color, #2196f3);
+  border-radius: 4px;
+  color: var(--primary-color, #2196f3);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.add-member-btn:hover {
+  background: var(--primary-color, #2196f3);
+  color: white;
+}
+
+.add-member-form {
+  padding: 16px;
+  background: var(--bg-secondary, #f5f5f5);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.add-member-form h5 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: var(--text-primary, #333);
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.member-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+
+.member-input:focus {
+  outline: none;
+  border-color: var(--primary-color, #2196f3);
+}
+
+.member-input:disabled {
+  background: var(--bg-disabled, #f0f0f0);
+  cursor: not-allowed;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cancel-btn,
+.save-member-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn {
+  background: var(--bg-secondary, #e0e0e0);
+  color: var(--text-primary, #333);
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: var(--bg-hover, #d0d0d0);
+}
+
+.save-member-btn {
+  background: var(--primary-color, #2196f3);
+  color: white;
+}
+
+.save-member-btn:hover:not(:disabled) {
+  background: var(--primary-dark, #1976d2);
+}
+
+.cancel-btn:disabled,
+.save-member-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: var(--error-color, #f44336);
+  font-size: 12px;
+  margin: 8px 0;
+  padding: 6px 8px;
+  background: var(--error-light, #ffebee);
+  border-radius: 4px;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px !important;
+}
+
+.member-checkbox {
+  flex: 1;
+  min-width: 0;
+}
+
+.delete-member-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #999);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.delete-member-btn:hover:not(:disabled) {
+  background: var(--error-light, #ffebee);
+  color: var(--error-color, #f44336);
+}
+
+.delete-member-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.unassigned-option {
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.no-members-found {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-secondary, #666);
+  font-size: 13px;
+  background: var(--bg-secondary, #f9f9f9);
+  border-radius: 4px;
+  margin: 10px;
+}

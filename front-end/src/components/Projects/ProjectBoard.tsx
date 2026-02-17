@@ -1,15 +1,12 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import FilterPanel from "./FilterPanel";
 import AddTaskModal from "./AddTaskModal";
+import ProjectSettings from "./ProjectSettings";
 import "./Project.css";
 
-import {
-  getProjectColumnsApi,
-  createTaskApi, // ✅ add this in ApiCommon.ts
-} from "../Api/ApiCommon";
+import { getProjectColumnsApi, createTaskApi } from "../Api/ApiCommon";
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 
@@ -57,7 +54,6 @@ const defaultFilters: Filters = {
   exactMatch: false,
 };
 
-// UI column type
 type UIColumn = {
   _id: string;
   title: string;
@@ -78,6 +74,7 @@ const makeDefaultColumns = (): UIColumn[] =>
 const ProjectBoard: React.FC = () => {
   const { projectId } = useParams();
 
+  // (Optional) Title only
   const [project] = useState<any>({ title: "Project Board" });
 
   const [columns, setColumns] = useState<UIColumn[]>([]);
@@ -85,6 +82,7 @@ const ProjectBoard: React.FC = () => {
   const [error, setError] = useState("");
 
   const [showFilters, setShowFilters] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
 
   const [showAddTask, setShowAddTask] = useState(false);
@@ -100,13 +98,10 @@ const ProjectBoard: React.FC = () => {
 
       const cols: any[] = await getProjectColumnsApi(projectId);
 
-      // ✅ backend response shape convert -> UIColumn
       const formatted: UIColumn[] = (cols || []).map((col: any) => ({
         _id: col._id,
         title: col.name || col.title || "Untitled",
-        key: (col.name || col.title || "")
-          .toLowerCase()
-          .replace(/\s/g, ""),
+        key: (col.name || col.title || "untitled").toLowerCase().replace(/\s/g, ""),
         order: col.order ?? 0,
         tasks: col.tasks || [],
       }));
@@ -131,7 +126,7 @@ const ProjectBoard: React.FC = () => {
   const filteredColumns = useMemo(() => {
     if (!columns.length) return columns;
 
-    return columns.map((col: any) => {
+    return columns.map((col) => {
       const filteredTasks = (col.tasks || []).filter((task: any) => {
         // Search
         if (filters.search) {
@@ -143,15 +138,10 @@ const ProjectBoard: React.FC = () => {
         }
 
         // Priority
-        if (
-          filters.priority.length > 0 &&
-          !filters.priority.includes(task.priority)
-        )
-          return false;
+        if (filters.priority.length > 0 && !filters.priority.includes(task.priority)) return false;
 
         // Completed
-        if (filters.completed !== null && task.completed !== filters.completed)
-          return false;
+        if (filters.completed !== null && task.completed !== filters.completed) return false;
 
         // Favorites
         if (filters.favorites && !task.isFavorite) return false;
@@ -192,7 +182,7 @@ const ProjectBoard: React.FC = () => {
     return false;
   }, [filters]);
 
-  /* ================= ✅ ADD TASK (API HIT) ================= */
+  /* ================= ADD TASK (API HIT) ================= */
   const handleAddTask = async (payload: {
     title: string;
     description?: string;
@@ -202,7 +192,6 @@ const ProjectBoard: React.FC = () => {
   }) => {
     if (!projectId) return;
 
-    // ✅ API HIT
     await createTaskApi({
       title: payload.title,
       description: payload.description,
@@ -211,7 +200,6 @@ const ProjectBoard: React.FC = () => {
       columnId: payload.columnId,
     });
 
-    // ✅ reload board from backend (so it will always show saved task)
     await loadColumns();
   };
 
@@ -226,14 +214,34 @@ const ProjectBoard: React.FC = () => {
         </div>
 
         <div className="board-actions">
-          <button className="add-col-btn">+ Add Column</button>
-
-          <button className="filter-btn" onClick={() => setShowFilters(true)}>
-            <span className="icon">☰</span> Filters
-            {hasActiveFilters && (
-              <span className="filter-active-indicator">●</span>
-            )}
+          <button className="add-col-btn" type="button">
+            + Add Column
           </button>
+
+          <button
+            className="settings-btn"
+            type="button"
+            onClick={() => setShowSettings(true)}
+            title="Project Settings"
+          >
+            <span className="icon">⚙️</span> Settings
+          </button>
+
+          <button
+            className="filter-btn"
+            type="button"
+            onClick={() => setShowFilters(true)}
+            title="Filters"
+          >
+            <span className="icon">☰</span> Filters
+            {hasActiveFilters && <span className="filter-active-indicator">●</span>}
+          </button>
+
+          {hasActiveFilters && (
+            <button className="clear-filters-btn" type="button" onClick={clearAllFilters}>
+              Clear
+            </button>
+          )}
         </div>
       </div>
 
@@ -241,7 +249,7 @@ const ProjectBoard: React.FC = () => {
 
       <div className="board-body">
         <div className="columns-row">
-          {displayColumns.map((col: any) => (
+          {displayColumns.map((col) => (
             <div key={col._id} className="column-card">
               <div className="column-title">
                 <span>{col.title}</span>
@@ -257,23 +265,13 @@ const ProjectBoard: React.FC = () => {
                       <div className="task-title">{t.title}</div>
 
                       {t.description && (
-                        <div
-                          style={{
-                            marginTop: 6,
-                            fontSize: 12,
-                            color: "#64748b",
-                          }}
-                        >
+                        <div style={{ marginTop: 6, fontSize: 12, color: "#64748b" }}>
                           {t.description}
                         </div>
                       )}
 
                       {t.priority && (
-                        <span
-                          className={`priority-badge ${String(
-                            t.priority
-                          ).toLowerCase()}`}
-                        >
+                        <span className={`priority-badge ${String(t.priority).toLowerCase()}`}>
                           {t.priority}
                         </span>
                       )}
@@ -284,6 +282,7 @@ const ProjectBoard: React.FC = () => {
 
               <button
                 className="add-task-btn"
+                type="button"
                 onClick={() => {
                   setActiveColumnId(col._id);
                   setShowAddTask(true);
@@ -308,9 +307,7 @@ const ProjectBoard: React.FC = () => {
 
       {showAddTask && activeColumnId && projectId && (
         <AddTaskModal
-          columnTitle={
-            columns.find((c: any) => c._id === activeColumnId)?.title || ""
-          }
+          columnTitle={columns.find((c) => c._id === activeColumnId)?.title || ""}
           projectId={projectId}
           columnId={activeColumnId}
           onClose={() => {
@@ -320,9 +317,16 @@ const ProjectBoard: React.FC = () => {
           onAdd={handleAddTask}
         />
       )}
+
+      {projectId && (
+        <ProjectSettings
+          projectId={projectId}
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
     </div>
   );
 };
 
 export default ProjectBoard;
-
