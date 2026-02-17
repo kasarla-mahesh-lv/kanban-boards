@@ -87,7 +87,7 @@ const Login = ({ onClose }: Props) => {
       setLoading(true);
       const loginData = await loginApi({ email, password });
       console.log(loginData, "loginData");
-      if (loginData?.mfaRequired == false) {
+      if (loginData?.requiresOtp === false) {
         toast.success("Login successful ✅");
         resetAll();
         onClose?.();
@@ -248,8 +248,8 @@ const Login = ({ onClose }: Props) => {
       await resetPasswordApi({
         email,
         otp,
-        newPassword: password,
-        confirmPassword: confirmPassword  // Added confirmPassword
+        password: password,
+          // Added confirmPassword
       });
       toast.success("Password reset successful 🔐");
       resetAll();

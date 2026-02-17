@@ -86,12 +86,13 @@ const [newColumnName, setNewColumnName] = useState("");
       
     );
 
-    const formatted = {
-      _id: newCol._id,
-      title: newCol.name,
-      key: newCol.name.toLowerCase().replace(/\s/g, ""),
-      tasks: newCol.tasks || [],
-    };
+    const formatted: Column = {
+  _id: newCol._id,
+  name: newCol.name,
+  order: newCol.order,
+  tasks: newCol.tasks || [],
+};
+
 
     setColumns((prev) => [...prev, formatted]);
 
@@ -113,16 +114,19 @@ const [newColumnName, setNewColumnName] = useState("");
         const cols = await getProjectColumnsApi(projectId);
 
         // Transform API response to match UI structure
-        const formattedColumns = cols.map((col: any) => ({
-          _id: col._id,
-          title: col.name,
-          key: col.name.toLowerCase().replace(/\s/g, ""),
-          order: col.order,
-          tasks: col.tasks || [],
-        }));
+        const formattedColumns = cols.map((col) => ({
+  _id: col._id,
+  name: col.name,
+  order: col.order,
+  tasks: col.tasks || [],
+}));
+
 
         // Sort by order
-        formattedColumns.sort((a, b) => a.order - b.order);
+        formattedColumns.sort(
+  (a, b) => (a.order ?? 0) - (b.order ?? 0)
+);
+
 
         setColumns(formattedColumns);
       } catch (e) {
@@ -209,10 +213,10 @@ const [newColumnName, setNewColumnName] = useState("");
   const displayColumns =
     filteredColumns.length > 0
       ? filteredColumns
-      : DEFAULT_COLUMNS.map((title, idx) => ({
+      : DEFAULT_COLUMNS.map((name, idx) => ({
           _id: `temp-${idx}`,
-          title,
-          key: title.toLowerCase().replace(/\s/g, ""),
+          name,
+          order:idx,
           tasks: [],
         }));
 
@@ -279,7 +283,7 @@ const [newColumnName, setNewColumnName] = useState("");
 )}
 
 
-          <button className="add-col-btn">+ Add Column</button>
+          
           
           {/* Settings Button */}
           <button
@@ -317,7 +321,7 @@ const [newColumnName, setNewColumnName] = useState("");
           {displayColumns.map((col) => (
             <div key={col._id} className="column-card">
               <div className="column-title">
-                <span>{col.title}</span>
+                <span>{col.name}</span>
                 <span>{col.tasks?.length || 0}</span>
               </div>
 

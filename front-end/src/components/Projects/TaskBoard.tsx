@@ -28,8 +28,8 @@ const TaskBoard = ({ project, tasks, columns, refreshColumns }: Props) => {
     const newStatus = result.destination.droppableId as Task["status"];
 
     try {
-      await updateTaskApi(project._id, taskId, {
-        status: newStatus,
+      await updateTaskApi(taskId,  {
+        status:newStatus,
       });
     } catch (error) {
       console.error("Failed to update task status", error);
@@ -58,9 +58,9 @@ const TaskBoard = ({ project, tasks, columns, refreshColumns }: Props) => {
           {columns.map((col) => (
             <KanbanColumn
               key={col._id}
-              title={col.title}
-              status={col.key as Task["status"]}
-              tasks={tasks}
+              title={col.name}
+              status={col.name as Task["status"]}
+              tasks={tasks.filter((t)=>t.status==col.name)}
             />
           ))}
 
