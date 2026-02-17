@@ -129,6 +129,7 @@ export type LoginResponse = {
   user?: { id: string; name?: string; email: string };
   requiresOtp?: boolean;
   otpSent?: boolean;
+  mfaRequired? : boolean;
 };
 
 export type RegisterPayload = {
