@@ -363,9 +363,70 @@ exports.disableMfa = async (req, res) => {
 
     await user.save();
 
+    res.setHeader("Authorization", `Bearer ${req.token}`);
+
     return res.status(200).json({ message: "MFA disabled", mfaEnabled: false });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
+exports.requestDisableMfaOtp = async (req, res) => {
+  try {
+    const userId = req.userId || req.user?.userId || req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const user = await UserModel.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const otp = generateOtp();
+    const expiry = new Date(Date.now() + 2 * 60 * 1000);
+
+    user.disableMfaOtp = otp;
+    user.disableMfaOtpExpiresAt = expiry;
+    await user.save();
+
+    await sendMail(
+      user.email,
+      "Disable MFA OTP",
+      `Your OTP to disable MFA is ${otp}. Valid for 2 minutes.`
+    );
+    res.setHeader("Authorization", `Bearer ${req.token}`);
+    return res.status(200).json({ message: "Disable MFA OTP sent to email" });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+exports.verifyDisableMfaOtp = async (req, res) => {
+  try {
+    const userId = req.userId || req.user?.userId || req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { otp } = req.body;
+    if (!otp) return res.status(400).json({ message: "OTP required" });
+
+    const user = await UserModel.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.disableMfaOtp || !user.disableMfaOtpExpiresAt)
+      return res.status(400).json({ message: "Please request OTP first" });
+
+    if (user.disableMfaOtpExpiresAt < Date.now())
+      return res.status(400).json({ message: "OTP expired" });
+
+    if (user.disableMfaOtp !== otp)
+      return res.status(400).json({ message: "Invalid OTP" });
+
+    user.mfaEnabled = false;
+    user.disableMfaOtp = null;
+    user.disableMfaOtpExpiresAt = null;
+    await user.save();
+    res.setHeader("Authorization", `Bearer ${req.token}`);
+
+    return res.status(200).json({ message: "MFA disabled ✅", mfaEnabled: false });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+
 
