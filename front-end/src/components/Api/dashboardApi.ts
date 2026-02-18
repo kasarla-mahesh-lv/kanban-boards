@@ -1,4 +1,6 @@
-import { apiGet } from "./ApiCommon";
+import axios from "axios";
 
-export const getDashboardStats = () =>
-  apiGet<any>("/dashboard/stats");
+export const getDashboardStats = async ()=>{
+    const res=await axios.get("/api/dashboard/stats");
+    return res.data;
+}

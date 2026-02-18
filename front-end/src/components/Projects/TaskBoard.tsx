@@ -1,87 +1,62 @@
-import { DragDropContext } from "@hello-pangea/dnd";
-import type { DropResult } from "@hello-pangea/dnd";
 import { useState } from "react";
-
-import { createProjectColumnApi, updateTaskApi } from "../Api/ApiCommon";
-
+import type { Task, TaskStatus } from "./types";
 import KanbanColumn from "./KanbanColumn";
-import type { Project, Task } from "./types";
-import type { Column } from "../Api/ApiCommon";
+
+const INITIAL_TASKS: Task[] = [
+  { id: "1", projectId: "1", code: "PRJ-12", title: "Something", status: "backlog" },
+  { id: "2", projectId: "1", code: "PRJ-16", title: "Header component", status: "todo" },
+  { id: "3", projectId: "1", code: "PRJ-17", title: "Layout component", status: "inprogress" },
+  { id: "4", projectId: "1", code: "PRJ-20", title: "Create APIs", status: "done" },
+  { id: "5", projectId: "2", code: "PRJ-30", title: "HR Dashboard", status: "todo" },
+];
 
 type Props = {
-  project: Project;
-  tasks: Task[];
-  columns: Column[];
-  refreshColumns: () => void;
+  projectId: string;
 };
 
-const TaskBoard = ({ project, tasks, columns, refreshColumns }: Props) => {
+const TaskBoard = ({ projectId }: Props) => {
 
-  // ✅ move useState inside component
-  const [showInput, setShowInput] = useState(false);
-  const [columnName, setColumnName] = useState("");
+  const [allTasks, setAllTasks] = useState<Task[]>(INITIAL_TASKS);
 
-  const onDragEnd = async (result: DropResult) => {
-    if (!result.destination) return;
-
-    const taskId = result.draggableId;
-    const newStatus = result.destination.droppableId as Task["status"];
-
-    try {
-      await updateTaskApi(taskId,  {
-        status:newStatus,
-      });
-    } catch (error) {
-      console.error("Failed to update task status", error);
-    }
+  const moveTask = (taskId: string, newStatus: TaskStatus) => {
+    setAllTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId ? { ...t, status: newStatus } : t
+      )
+    );
   };
 
-  const handleAddColumn = async () => {
-    if (!columnName.trim()) return;
-
-    try {
-      await createProjectColumnApi(project._id, columnName);
-      await refreshColumns();
-
-      setColumnName("");
-      setShowInput(false);
-    } catch (error) {
-      console.error("Failed to create column", error);
-    }
-  };
+    
+  const projectTasks = allTasks.filter(
+    (t) => t.projectId === projectId
+  );
 
   return (
-    <div className="task-board">
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="kanban-board">
-
-          {columns.map((col) => (
-            <KanbanColumn
-              key={col._id}
-              title={col.name}
-              status={col.name as Task["status"]}
-              tasks={tasks.filter((t)=>t.status==col.name)}
-            />
-          ))}
-
-          {showInput ? (
-            <div className="add-column-box">
-              <input
-                value={columnName}
-                onChange={(e) => setColumnName(e.target.value)}
-                placeholder="Enter column name"
-              />
-              <button onClick={handleAddColumn}>Add Group</button>
-              <button onClick={() => setShowInput(false)}>Cancel</button>
-            </div>
-          ) : (
-            <button onClick={() => setShowInput(true)}>
-              + Add Column
-            </button>
-          )}
-
-        </div>
-      </DragDropContext>
+    <div style={{ display: "flex", gap: 16 }}>
+      <KanbanColumn
+        title="Backlog"
+        status="backlog"
+        tasks={projectTasks.filter((t) => t.status === "backlog")}
+        onDropTask={moveTask}
+      />
+      <KanbanColumn
+        title="Todo"
+        status="todo"
+        tasks={projectTasks.filter((t) => t.status === "todo")}
+        onDropTask={moveTask}
+      />
+      <KanbanColumn
+        title="In Progress"
+        status="inprogress"
+        tasks={projectTasks.filter((t) => t.status === "inprogress")}
+        onDropTask={moveTask}
+      />
+      <KanbanColumn
+        title="Done"
+        status="done"
+        tasks={projectTasks.filter((t) => t.status === "done")}
+        onDropTask={moveTask}
+      />
     </div>
   );
 };
