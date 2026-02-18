@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../../components/Auth/AuthContext";
+import Settings from "./Settings"; // Import ProjectSettings component
 import "./Sidebar.css";
 import {
   FaHome,
@@ -46,6 +47,9 @@ const Sidebar: React.FC = () => {
   const [showTeamInput, setShowTeamInput] = useState(false);
 
   const [loadingProjects, setLoadingProjects] = useState(false);
+
+  // Settings modal state
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   /* ---------- LOAD DATA ---------- */
   useEffect(() => {
@@ -117,6 +121,15 @@ const Sidebar: React.FC = () => {
   const handleLogout = () => {
     logout();
     navigate("/logout");
+  };
+
+  /* ---------- SETTINGS HANDLERS ---------- */
+  const openSettings = () => {
+    setIsSettingsOpen(true);
+  };
+
+  const closeSettings = () => {
+    setIsSettingsOpen(false);
   };
 
   return (
@@ -247,10 +260,17 @@ const Sidebar: React.FC = () => {
           <span>Logout</span>
         </div>
 
-        <div className="settings">
+        <div className="settings" onClick={openSettings}>
           <FaCog /> Settings
         </div>
       </div>
+
+      {/* Project Settings Modal */}
+      <Settings
+        projectId={activeProjectId || undefined}
+        isOpen={isSettingsOpen}
+        onClose={closeSettings}
+      />
     </aside>
   );
 };

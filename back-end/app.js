@@ -52,8 +52,6 @@ app.use("/api/history", historyRoutes);
 app.use("/api/team", teamRoutes);
 
 
-
-
 /* -------------------- Start App -------------------- */
 (async () => {
   // Connect to MongoDB

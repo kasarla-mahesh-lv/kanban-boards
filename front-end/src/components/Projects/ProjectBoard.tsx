@@ -7,7 +7,7 @@ import {
 } from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
-import ProjectSettings from "./ProjectSettings"; // Import the new Settings component
+
 import "./Project.css"; 
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
@@ -63,7 +63,7 @@ const ProjectBoard: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+ 
   const [filters, setFilters] = useState<Filters>(defaultFilters);
 
   /* ================= LOAD COLUMNS ================= */
@@ -159,13 +159,7 @@ const ProjectBoard: React.FC = () => {
     setFilters(defaultFilters);
   };
 
-  const handleSettingsClick = () => {
-    setShowSettings(true);
-  };
-
-  const handleCloseSettings = () => {
-    setShowSettings(false);
-  };
+ 
 
   return (
     <div className="project-board">
@@ -180,14 +174,7 @@ const ProjectBoard: React.FC = () => {
         <div className="board-actions">
           <button className="add-col-btn">+ Add Column</button>
           
-          {/* Settings Button */}
-          <button
-            className="settings-btn"
-            onClick={handleSettingsClick}
-            title="Project Settings"
-          >
-            <span className="icon">⚙️</span> Settings
-          </button>
+          
 
           {/* Filter Button */}
           <button
@@ -286,12 +273,6 @@ const ProjectBoard: React.FC = () => {
         />
       )}
 
-      {/* Settings Panel Component - Separate file */}
-      <ProjectSettings
-        projectId={projectId}
-        isOpen={showSettings}
-        onClose={handleCloseSettings}
-      />
     </div>
   );
 };

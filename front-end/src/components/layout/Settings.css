@@ -1,0 +1,540 @@
+/* front-end/src/components/ProjectSettings.css */
+
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.settings-panel {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.settings-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.close-settings-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.close-settings-btn:hover:not(:disabled) {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.close-settings-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-content {
+  padding: 24px;
+}
+
+.project-id-info {
+  background: #f5f5f5;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #555;
+  margin-right: 8px;
+}
+
+.info-value {
+  color: #333;
+  font-family: monospace;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.settings-section {
+  margin-bottom: 32px;
+}
+
+.settings-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  color: #1e3a8a; /* Dark blue */
+  border-bottom: 2px solid #3b82f6; /* Blue */
+  padding-bottom: 8px;
+}
+
+/* MFA Toggle Switch Styles */
+.mfa-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f0f7ff; /* Light blue background */
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #bfdbfe; /* Light blue border */
+}
+
+.mfa-status-text {
+  font-weight: 500;
+  color: #1e3a8a; /* Dark blue */
+  min-width: 90px;
+}
+
+.mfa-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.mfa-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.mfa-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.mfa-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .mfa-slider {
+  background-color: #3b82f6; /* Blue */
+}
+
+input:focus + .mfa-slider {
+  box-shadow: 0 0 1px #3b82f6; /* Blue */
+}
+
+input:checked + .mfa-slider:before {
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.mfa-slider.round {
+  border-radius: 34px;
+}
+
+.mfa-slider.round:before {
+  border-radius: 50%;
+}
+
+.mfa-status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.mfa-status-badge.enabled {
+  background: #dbeafe; /* Light blue */
+  color: #1e3a8a; /* Dark blue */
+  border: 1px solid #3b82f6; /* Blue */
+}
+
+.mfa-status-badge.disabled {
+  background: #e6f0ff; /* Very light blue */
+  color: #64748b; /* Slate gray - neutral */
+  border: 1px solid #94a3b8; /* Slate gray - neutral */
+}
+
+.mfa-info-text {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #dbeafe; /* Light blue */
+  color: #1e3a8a; /* Dark blue */
+  border-radius: 6px;
+  font-size: 0.9rem;
+  border-left: 3px solid #3b82f6; /* Blue */
+}
+
+.mfa-info-text.warning {
+  background: #fff7ed; /* Light orange - kept for warning */
+  color: #9a3412; /* Dark orange - kept for warning */
+  border-left-color: #f97316; /* Orange - kept for warning */
+}
+
+.action-indicator {
+  margin: 10px 0;
+  padding: 8px 12px;
+  background: #dbeafe; /* Light blue */
+  color: #1e3a8a; /* Dark blue */
+  border-radius: 6px;
+  font-size: 0.95rem;
+  text-align: center;
+  animation: pulse 1.5s infinite;
+}
+
+/* Status Indicators */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status-sent {
+  background: #dbeafe; /* Light blue */
+  color: #1e3a8a; /* Dark blue */
+  border-left: 3px solid #3b82f6; /* Blue */
+}
+
+.status-failed {
+  background: #fee2e2; /* Light red - kept for error */
+  color: #991b1b; /* Dark red - kept for error */
+  border-left: 3px solid #ef4444; /* Red - kept for error */
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+
+.status-sent .status-dot {
+  background: #3b82f6; /* Blue */
+}
+
+.status-failed .status-dot {
+  background: #ef4444; /* Red - kept for error */
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* OTP Input Section */
+.otp-input-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f0f7ff; /* Light blue background */
+  border-radius: 8px;
+  animation: slideIn 0.3s ease;
+  border: 1px solid #bfdbfe; /* Light blue border */
+}
+
+.otp-instruction {
+  margin: 0 0 15px 0;
+  font-size: 1rem;
+  color: #1e3a8a; /* Dark blue */
+  font-weight: 500;
+}
+
+.otp-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.otp-input {
+  padding: 12px;
+  border: 2px solid #bfdbfe; /* Light blue border */
+  border-radius: 6px;
+  font-size: 1.2rem;
+  letter-spacing: 4px;
+  text-align: center;
+  font-family: monospace;
+  transition: border-color 0.2s;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: #3b82f6; /* Blue */
+}
+
+.otp-input:disabled {
+  background: #f0f7ff; /* Light blue */
+  cursor: not-allowed;
+}
+
+.otp-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.verify-btn, .resend-btn, .cancel-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 100px;
+}
+
+.verify-btn {
+  background: #3b82f6; /* Blue */
+  color: white;
+}
+
+.verify-btn:hover:not(:disabled) {
+  background: #2563eb; /* Darker blue */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3); /* Blue shadow */
+}
+
+.resend-btn {
+  background: #1e3a8a; /* Dark blue */
+  color: white;
+}
+
+.resend-btn:hover:not(:disabled) {
+  background: #1e40af; /* Even darker blue */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.3); /* Dark blue shadow */
+}
+
+.cancel-btn {
+  background: #64748b; /* Slate gray - neutral */
+  color: white;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #475569; /* Darker slate gray */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+}
+
+.verify-btn:disabled,
+.resend-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.otp-hint {
+  margin: 10px 0 0 0;
+  font-size: 0.9rem;
+  color: #1e3a8a; /* Dark blue */
+  text-align: center;
+  padding: 8px;
+  background: #dbeafe; /* Light blue */
+  border-radius: 4px;
+}
+
+/* Loading States */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #1e3a8a; /* Dark blue */
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #dbeafe; /* Light blue */
+  border-top: 3px solid #3b82f6; /* Blue */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error Message */
+.error-message {
+  background: #fee2e2; /* Light red - kept for error */
+  color: #991b1b; /* Dark red - kept for error */
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 4px solid #ef4444; /* Red - kept for error */
+  font-size: 0.95rem;
+}
+
+.error-icon {
+  font-size: 1.2rem;
+}
+
+/* Footer */
+.settings-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  background: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+}
+
+.settings-cancel-btn {
+  padding: 10px 24px;
+  background: #64748b; /* Slate gray - neutral */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.settings-cancel-btn:hover:not(:disabled) {
+  background: #475569; /* Darker slate gray */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+}
+
+.settings-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .settings-panel {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .settings-header {
+    padding: 16px;
+  }
+
+  .settings-content {
+    padding: 16px;
+  }
+
+  .mfa-toggle-container {
+    flex-wrap: wrap;
+  }
+
+  .otp-actions {
+    flex-direction: column;
+  }
+
+  .verify-btn, .resend-btn, .cancel-btn {
+    width: 100%;
+  }
+}
