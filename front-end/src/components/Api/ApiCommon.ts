@@ -69,6 +69,19 @@ export const apiPut = async <T, P = any>(
     throw new Error(extractErrorMessage(err));
   }
 };
+export const apiPatch = async <T, P = any>(
+  url: string,
+  payload?: P,
+  config?: AxiosRequestConfig
+): Promise<T> => {
+  try {
+    const res = await api.patch<T>(url, payload, config);
+    return res.data;
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+};
+
 
 export const apiDelete = async <T>(
   url: string,
@@ -87,8 +100,9 @@ export type LoginPayload = { email: string; password: string };
 export type LoginResponse = {
   message: string;
   token?: string;
+  requiresOtp?:boolean;
   user?: { id: string; name?: string; email: string };
-  requiresOtp?: boolean;
+  mfaRequired?: boolean;
 };
 
 export type RegisterPayload = {
@@ -110,20 +124,49 @@ export type VerifyOtpPayload = {
   type?: "register" | "login" | "reset" 
 };
 
-export type ResetPasswordPayload = { 
-  email: string; 
-  password: string;
-  otp?: string; // Some implementations send OTP in body
+
+export type ResetPasswordPayload={
+  email:string;
+  newPassword:string;
+  confirmPassword:string;
+  otp?:string;
+};
+
+export const loginApi = async (
+  payload: LoginPayload
+): Promise<LoginResponse> => {
+  try {
+    const res = await api.post("/auth/login", payload);
+
+    if (res?.headers?.authorization) {
+      localStorage.setItem("token", res.headers.authorization);
+      sessionStorage.setItem("token", res.headers.authorization);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      return res.data;
+    }
+
+    const message = res.data.message || "";
+    const otpSent =
+      message.toLowerCase().includes("otp sent") ||
+      message.toLowerCase().includes("sent to email");
+
+    return {
+      ...res.data,
+      requiresOtp: otpSent,
+    };
+  } catch (error) {
+    console.error("Login API error:", error);
+    throw error;
+  }
 };
 
 
-export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> => {
-  const res = await api.post("/auth/login", payload);
-  // Login API doesn't return token, only sends OTP
-  return { 
-    ...res.data, 
-    requiresOtp: true 
-  };
+export type CreateTaskPayload={
+  title:string;
+  description?:string;
+  priority?:string;
+  projectId:string;
+  columnId:string;
 };
 
 /**
@@ -140,10 +183,11 @@ export const verifyOtpApi = async (payload: VerifyOtpPayload): Promise<any> => {
   const res = await api.post("/auth/verify-otp", data);
   
   // If this is login verification and token is returned, store it
-  if (payload.type === "login" && res.data.token) {
-    localStorage.setItem("token", res.data.token);
+  if (payload.type === "login" && res?.headers?.authorization) {
+    console.log("Login succcessful,storing token");
+    localStorage.setItem("token", res?.headers?.authorization);
 
-    sessionStorage.setItem("token", res.data.token);
+    sessionStorage.setItem("token", res?.headers?.authorization);
     localStorage.setItem("user", JSON.stringify(res.data.user));
   }
   
@@ -154,8 +198,17 @@ export const verifyOtpApi = async (payload: VerifyOtpPayload): Promise<any> => {
  * REGISTER - Send OTP for registration
  * Backend: POST /auth/register
  */
-export const registerApi = (payload: RegisterPayload) =>
-  apiPost<RegisterResponse, RegisterPayload>("/auth/register", payload);
+export const registerApi = async (payload: RegisterPayload): Promise<RegisterResponse> => {
+  try {
+    console.log("📝 Register API called with:", payload.email);
+    const res = await api.post("/auth/register", payload);
+    console.log("✅ Register response:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("❌ Register API error:", error);
+    throw error;
+  }
+};
 
 /**
  * SEND OTP - Generic OTP sender (used for registration and forgot password)
@@ -192,15 +245,33 @@ export const resendOtpApi = async (payload: SendOtpPayload & { type?: "register"
  * FORGOT PASSWORD - Send OTP for password reset
  * Backend: POST /auth/forgot-password
  */
-export const forgotPasswordApi = (payload: SendOtpPayload) =>
-  apiPost<any, SendOtpPayload>("/auth/forgot-password", payload);
+export const forgotPasswordApi = async (payload: SendOtpPayload): Promise<any> => {
+  try {
+    console.log("📝 Forgot password API called with:", payload.email);
+    const res = await api.post("/auth/forgot-password", payload);
+    console.log("✅ Forgot password response:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("❌ Forgot password API error:", error);
+    throw error;
+  }
+};
 
 /**
  * RESET PASSWORD - Reset password using OTP
  * Backend: POST /auth/reset-password
  */
-export const resetPasswordApi = (payload: ResetPasswordPayload) =>
-  apiPost<any, ResetPasswordPayload>("/auth/reset-password", payload);
+export const resetPasswordApi = async (payload: ResetPasswordPayload): Promise<any> => {
+  try {
+    console.log("📝 Reset password API called with:", payload.email);
+    const res = await api.post("/auth/reset-password", payload);
+    console.log("✅ Reset password response:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("❌ Reset password API error:", error);
+    throw error;
+  }
+};
 
 /**
  * LOGOUT - Clear local storage
@@ -210,17 +281,29 @@ export const logoutApi = (): void => {
   localStorage.removeItem("user");
   sessionStorage.removeItem("token");
 };
-export const createTeamMemberApi = async (data: any) => {
-  const response = await api.post("/team-members", data);
-  return response.data;
+
+export type CreateTaskResponse = {
+  message?: string;
+  task: Task; 
 };
+
+
 
 
 /* ======================= PROJECT TYPES ======================= */
 export type Project = { _id: string; title: string; description?: string };
 export type Task = { _id: string; title: string; description?: string; priority?: string;status?:string;assignee?:{id:string};createdBy?:{id:string};completed?:boolean;isFavorite?:boolean;isFollowed?:boolean; };
 export type Column = { _id: string; name: string; order?:number; tasks: Task[] };
-export type Member = { id: string; name: string; email: string; avatar?: string };
+export type Member = {
+  _id: string;
+  name: string;
+  email: string;
+  projectId?: string;
+  avatar?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type TaskType = { id: string; name: string; color?: string; icon?: string };
 export type Milestone = { id: string; name: string; dueDate?: string; status?: string };
 export type BlockRelation = { id: string; title: string; type: string; status: string };
@@ -263,11 +346,109 @@ export const createProjectColumnApi = (
 ) =>
   apiPut<Task, Partial<Task>>(`/tasks/${taskId}`, payload);
 
-/* ======================= MEMBERS API CALLS ======================= */
-export const getProjectMembersApi = (projectId: string): Promise<Member[]> =>
-  apiGet<Member[]>(`/projects/${projectId}/members`);
-export const searchProjectMembersApi = (projectId: string, query: string): Promise<Member[]> =>
-  apiGet<Member[]>(`/projects/${projectId}/members/search`, { params: { q: query } });
+
+/* ======================= TEAM/MEMBERS API CALLS ======================= */
+export const getProjectMembersApi = async (projectId: string): Promise<Member[]> => {
+  try {
+    console.log("Fetching members for project:", projectId);
+    const response = await apiGet<any[]>(`/team/project/${projectId}`);
+    console.log("Raw members response:", response);
+
+    return response.map(member => ({
+      _id: member._id,
+      name: member.name,
+      email: member.email,
+      projectId: member.projectId,
+      avatar: member.avatar,
+      createdAt: member.createdAt,
+      updatedAt: member.updatedAt
+    }));
+  } catch (error) {
+    console.error("Error fetching project members:", error);
+    throw error;
+  }
+};
+
+export const searchProjectMembersApi = async (projectId: string, query: string): Promise<Member[]> => {
+  try {
+    console.log("Searching members for project:", projectId, "query:", query);
+    const members = await getProjectMembersApi(projectId);
+    const filtered = members.filter(member =>
+      member.name.toLowerCase().includes(query.toLowerCase()) ||
+      member.email.toLowerCase().includes(query.toLowerCase())
+    );
+    console.log("Filtered members:", filtered);
+    return filtered;
+  } catch (error) {
+    console.error("Error searching project members:", error);
+    throw error;
+  }
+ };
+
+
+
+/* ======================= TEAM/MEMBERS API CALLS ======================= */
+
+type CreateTeamMembersResponse = {
+  teamMember?: Member;
+} & Member;
+
+
+export const createTeamMemberApi = async (projectId: string, payload: { name: string; email: string }): Promise<Member> => {
+  try {
+    console.log("Creating team member with payload:", { ...payload, projectId });
+
+    const response = await apiPost<CreateTeamMembersResponse>('/team', {
+      ...payload,
+      projectId
+    });
+
+    console.log("Create team member response:", response);
+
+    const memberData = response.teamMember ?? response;
+
+    return {
+      _id: memberData._id,
+      name: memberData.name,
+      email: memberData.email,
+      projectId: memberData.projectId,
+      createdAt: memberData.createdAt,
+      updatedAt: memberData.updatedAt
+    };
+  } catch (error) {
+    console.error("Error creating team member:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+    }
+    throw error;
+  }
+};
+
+export const deleteTeamMemberApi = async (memberId: string): Promise<{ message: string }> => {
+  try {
+    console.log("Attempting to delete member with ID:", memberId);
+
+    if (!memberId || memberId.length !== 24) {
+      console.warn("Member ID might be invalid:", memberId);
+    }
+
+    const response = await apiDelete<any>(`/team/${memberId}`);
+    console.log("Delete response:", response);
+
+    return response;
+  } catch (error) {
+    console.error("Error deleting team member:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Error response data:", error.response?.data);
+      console.error("Error response status:", error.response?.status);
+
+      throw new Error(error.response?.data?.message || `Failed to delete member (Status: ${error.response?.status})`);
+    }
+    throw error;
+  }
+};
+
 
 /* ======================= TASK TYPES API CALLS ======================= */
 export const getProjectTypesApi = (projectId: string): Promise<TaskType[]> =>
