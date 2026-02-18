@@ -2,14 +2,18 @@ const mongoose = require("mongoose");
 
 const columnSchema = new mongoose.Schema(
   {
-    name: String,
-    boardId: String,
-    order: Number,
-    cards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Card" }]
+    projectId: { type: mongoose.Schema.Types.ObjectId, ref: "Project", required: true },
+
+    // ✅ always store lowercase
+    name: { type: String, required: true, trim: true, lowercase: true },
+
+    order: { type: Number, default: 1 },
+    cards: { type: Array, default: [] },
   },
   { timestamps: true }
 );
 
-// 🔥 FIX: prevent OverwriteModelError
-module.exports =
-  mongoose.models.Column || mongoose.model("Column", columnSchema);
+// ✅ no duplicates in same project (done == DONE blocked)
+columnSchema.index({ projectId: 1, name: 1 }, { unique: true });
+
+module.exports = mongoose.model("Column", columnSchema);
