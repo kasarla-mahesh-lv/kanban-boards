@@ -1,5 +1,8 @@
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
+import type { Task } from "../Projects/types";
+
+
 /* ======================= AXIOS INSTANCE ======================= */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -292,7 +295,7 @@ export type CreateTaskResponse = {
 
 /* ======================= PROJECT TYPES ======================= */
 export type Project = { _id: string; title: string; description?: string };
-export type Task = { _id: string; title: string; description?: string; priority?: string;status?:string;assignee?:{id:string};createdBy?:{id:string};completed?:boolean;isFavorite?:boolean;isFollowed?:boolean; };
+ //export type Task = { _id: string; title: string; description?: string; priority?: string;status?:string;assignee?:{id:string};createdBy?:{id:string};completed?:boolean;isFavorite?:boolean;isFollowed?:boolean; };
 export type Column = { _id: string; name: string; order?:number; tasks: Task[] };
 export type Member = {
   _id: string;
@@ -324,6 +327,16 @@ export const updateProjectApi = (id: string, payload: { title?: string; descript
   apiPut<Project, typeof payload>(`/projects/${id}`, payload);
 export const deleteProjectApi = (id: string) =>
   apiDelete<{ message: string }>(`/projects/${id}`);
+
+/* ======================= PROJECT DETAILS API ======================= */
+
+export const getProjectByIdApi = (projectId: string): Promise<Project> =>
+  apiGet<Project>(`/projects/${projectId}`);
+
+export const getTasksByProjectApi = (projectId: string): Promise<Task[]> =>
+  apiGet<Task[]>(`/tasks/project/${projectId}`);
+
+
 
 /* ======================= COLUMNS API CALLS ======================= */
 export const getProjectColumnsApi = (projectId: string) =>

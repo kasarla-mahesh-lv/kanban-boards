@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+
+
+
 import {
   getProjectByIdApi,
   getTasksByProjectApi,
-} from "../Api/ApiService";
-import {
   getProjectColumnsApi,
   type Column,
 } from "../Api/ApiCommon";
-
 
 import TaskBoard from "./TaskBoard";
 import type { Project, Task } from "./types";
@@ -41,7 +41,7 @@ const loadProjectDetails = async () => {
     const columnsData = await getProjectColumnsApi(projectId); // 👈 add
 
     setProject(projectData);
-    setTasks(taskData.data);
+    setTasks(taskData);
     setColumns(columnsData); // 👈 add
   } catch (error) {
     console.error("Failed to load project details", error);
