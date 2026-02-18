@@ -70,7 +70,7 @@
   color:black
 }
 
- .login-btn {
+.login-btn {
   width: 100%;
   background: #6366f1;
   color: #fff;
@@ -83,7 +83,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-} 
+}
 
 .login-btn:disabled {
   opacity: 0.7;
