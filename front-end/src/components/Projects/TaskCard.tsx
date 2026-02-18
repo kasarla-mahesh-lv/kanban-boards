@@ -1,26 +1,26 @@
-import { Draggable } from "@hello-pangea/dnd";
 import type { Task } from "./types";
 
-type Props = {
-  task: Task;
-  index: number;
-};
-
-const TaskCard = ({ task, index }: Props) => {
+const TaskCard = ({ task }: { task: Task }) => {
+    
+        const onDragStart=(e:React.DragEvent<HTMLDivElement>)=>{
+         e.dataTransfer.setData("taskId",task.id);
+        };
+    
   return (
-    <Draggable draggableId={task._id} index={index}>
-      {(provided) => (
-        <div
-          className="task-card"
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-        >
-          <h5>{task.title}</h5>
-          {task.description && <p>{task.description}</p>}
-        </div>
-      )}
-    </Draggable>
+    <div
+    draggable
+    onDragStart={onDragStart}
+      style={{
+        background: "#fff",
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 8,
+        boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+      }}
+    >
+      <small>{task.code}</small>
+      <div>{task.title}</div>
+    </div>
   );
 };
 

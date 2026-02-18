@@ -1,34 +1,55 @@
-import { Droppable } from "@hello-pangea/dnd";
+import type { Task, TaskStatus} from "./types";
 import TaskCard from "./TaskCard";
-import type { Task } from "./types";
 
 type Props = {
   title: string;
-  status: Task["status"];
+  status:TaskStatus;
   tasks: Task[];
+  onDropTask:(taskId:string,status:TaskStatus)=>void;
+  
 };
+ 
+const KanbanColumn = ({ title, tasks,status,onDropTask }: Props) => {
+    const onDragOver=(e:React.DragEvent<HTMLDivElement>)=>{
+        e.preventDefault();
+    };
+     const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    const taskId = e.dataTransfer.getData("taskId");
+    onDropTask(taskId, status);
+  };
 
-const KanbanColumn = ({ title, status, tasks }: Props) => {
   return (
-    <Droppable droppableId={String(status)}>
-      {(provided) => (
-        <div
-          className="kanban-column"
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-        >
-          <h4>{title}</h4>
+    <div
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      style={{
+        width: 260,
+        background: "#f8fafc",
+        padding: 12,
+        borderRadius: 10,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <b>{title}</b>
+        <span>{tasks.length} tasks</span>
+      </div>
 
-          {tasks
-            .filter((task) => task.status === status)
-            .map((task, index) => (
-              <TaskCard key={task._id} task={task} index={index} />
-            ))}
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} />
+      ))}
 
-          {provided.placeholder}
-        </div>
-      )}
-    </Droppable>
+      <button
+        style={{
+          marginTop: 8,
+          border: "none",
+          background: "none",
+          color: "#64748b",
+          cursor: "pointer",
+        }}
+      >
+        + Add task
+      </button>
+    </div>
   );
 };
 

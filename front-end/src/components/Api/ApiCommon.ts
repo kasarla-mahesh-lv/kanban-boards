@@ -1,7 +1,5 @@
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
-import type { Task } from "../Projects/types";
-
 
 /* ======================= AXIOS INSTANCE ======================= */
 const api = axios.create({
@@ -11,21 +9,47 @@ const api = axios.create({
 
 /* ======================= TOKEN INTERCEPTOR ======================= */
 api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem("token");
+  // Try to get token from multiple storage locations
+  const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
   if (token) {
     config.headers = config.headers ?? {};
+    // Ensure token is properly formatted
     config.headers.Authorization = token.startsWith("Bearer ")
       ? token
       : `Bearer ${token}`;
   }
 
+  console.log("API Request:", {
+    url: config.url,
+    method: config.method,
+    token: token ? "Present" : "Missing"
+  });
+
   return config;
 });
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log(`✅ ${response.config.url}:`, response.data);
+    return response;
+  },
+  (error) => {
+    console.error(`❌ ${error.config?.url}:`, error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
 
 /* ======================= COMMON ERROR HANDLER ======================= */
 const extractErrorMessage = (err: unknown): string => {
   const error = err as AxiosError<any>;
+  console.error("API Error:", {
+    message: error?.message,
+    response: error?.response?.data,
+    status: error?.response?.status
+  });
+
   return (
     error?.response?.data?.message ||
     error?.response?.data?.error ||
@@ -72,6 +96,7 @@ export const apiPut = async <T, P = any>(
     throw new Error(extractErrorMessage(err));
   }
 };
+
 export const apiPatch = async <T, P = any>(
   url: string,
   payload?: P,
@@ -84,7 +109,6 @@ export const apiPatch = async <T, P = any>(
     throw new Error(extractErrorMessage(err));
   }
 };
-
 
 export const apiDelete = async <T>(
   url: string,
@@ -103,9 +127,10 @@ export type LoginPayload = { email: string; password: string };
 export type LoginResponse = {
   message: string;
   token?: string;
-  requiresOtp?:boolean;
   user?: { id: string; name?: string; email: string };
-  mfaRequired?: boolean;
+  requiresOtp?: boolean;
+  otpSent?: boolean;
+  mfaRequired? : boolean;
 };
 
 export type RegisterPayload = {
@@ -121,10 +146,16 @@ export type RegisterResponse = {
 };
 
 export type SendOtpPayload = { email: string };
-export type VerifyOtpPayload = { 
-  email: string; 
-  otp: string; 
-  type?: "register" | "login" | "reset" 
+export type VerifyOtpPayload = {
+  email: string;
+  otp: string;
+  type?: "register" | "login" | "reset"
+};
+export type ResetPasswordPayload = {
+  email: string;
+  newPassword: string;
+  confirmPassword: string;
+  otp?: string;
 };
 export type CreateTaskPayload = {
   title: string;
@@ -134,38 +165,37 @@ export type CreateTaskPayload = {
   columnId: string;
 };
 
-
-export type ResetPasswordPayload={
-  email:string;
-  newPassword:string;
-  confirmPassword:string;
-  otp?:string;
+export type CreateTaskResponse = {
+  message?: string;
+  task: Task; 
 };
 
-export const loginApi = async (
-  payload: LoginPayload
-): Promise<LoginResponse> => {
+/* ======================= AUTH API CALLS ======================= */
+export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> => {
   try {
+    console.log("📝 Login API called with:", payload.email);
     const res = await api.post("/auth/login", payload);
-
+    console.log("✅ Login response:", res);
     if (res?.headers?.authorization) {
-      localStorage.setItem("token", res.headers.authorization);
-      sessionStorage.setItem("token", res.headers.authorization);
+      console.log(res?.headers?.authorization, "_________________________________")
+      localStorage.setItem("token", res?.headers?.authorization);
+      sessionStorage.setItem("token", res?.headers?.authorization);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       return res.data;
     }
 
+    // return true;
     const message = res.data.message || "";
-    const otpSent =
-      message.toLowerCase().includes("otp sent") ||
+    const otpSent = message.toLowerCase().includes("otp sent") ||
       message.toLowerCase().includes("sent to email");
 
     return {
       ...res.data,
       requiresOtp: otpSent,
+      otpSent: otpSent
     };
   } catch (error) {
-    console.error("Login API error:", error);
+    console.error("❌ Login API error:", error);
     throw error;
   }
 };
@@ -181,25 +211,24 @@ export const verifyOtpApi = async (payload: VerifyOtpPayload): Promise<any> => {
     otp: payload.otp,
     type: payload.type || "register"
   };
-  
-  const res = await api.post("/auth/verify-otp", data);
-  
-  // If this is login verification and token is returned, store it
-  if (payload.type === "login" && res?.headers?.authorization) {
-    console.log("Login succcessful,storing token");
-    localStorage.setItem("token", res?.headers?.authorization);
 
+  console.log("🔐 Verifying OTP with data:", data);
+
+  const res = await api.post("/auth/verify-otp", data);
+
+  console.log("✅ Verify OTP response:", res);
+
+
+  if (payload.type === "login" && res?.headers?.authorization) {
+    console.log("🎉 Login successful, storing token");
+    localStorage.setItem("token", res?.headers?.authorization);
     sessionStorage.setItem("token", res?.headers?.authorization);
     localStorage.setItem("user", JSON.stringify(res.data.user));
   }
-  
+
   return res.data;
 };
 
-/**
- * REGISTER - Send OTP for registration
- * Backend: POST /auth/register
- */
 export const registerApi = async (payload: RegisterPayload): Promise<RegisterResponse> => {
   try {
     console.log("📝 Register API called with:", payload.email);
@@ -212,41 +241,19 @@ export const registerApi = async (payload: RegisterPayload): Promise<RegisterRes
   }
 };
 
-/**
- * SEND OTP - Generic OTP sender (used for registration and forgot password)
- * Backend: POST /auth/register (for registration) or /auth/forgot-password (for reset)
- */
 export const sendOtpApi = (payload: SendOtpPayload) =>
   apiPost<any, SendOtpPayload>("/auth/send-otp", payload);
 
-/**
- * REMOVED: verifyLoginOtpApi - Use verifyOtpApi with type="login" instead
- */
-
-/**
- * RESEND OTP - Not directly supported in your backend
- * Use this carefully - it calls the appropriate endpoint based on context
- */
 export const resendOtpApi = async (payload: SendOtpPayload & { type?: "register" | "login" | "reset" }) => {
   if (payload.type === "login") {
-    // For login, we need to call login API again
-    // This should be handled in the component with stored credentials
     throw new Error("Please use the login button to resend OTP");
   } else if (payload.type === "reset") {
-    // For password reset
     return apiPost<any, SendOtpPayload>("/auth/forgot-password", payload);
   } else {
-    // For registration
-    // Note: Your backend doesn't have a separate resend endpoint
-    // You might need to call register API again
     throw new Error("Please use the register button to resend OTP");
   }
 };
 
-/**
- * FORGOT PASSWORD - Send OTP for password reset
- * Backend: POST /auth/forgot-password
- */
 export const forgotPasswordApi = async (payload: SendOtpPayload): Promise<any> => {
   try {
     console.log("📝 Forgot password API called with:", payload.email);
@@ -259,10 +266,6 @@ export const forgotPasswordApi = async (payload: SendOtpPayload): Promise<any> =
   }
 };
 
-/**
- * RESET PASSWORD - Reset password using OTP
- * Backend: POST /auth/reset-password
- */
 export const resetPasswordApi = async (payload: ResetPasswordPayload): Promise<any> => {
   try {
     console.log("📝 Reset password API called with:", payload.email);
@@ -275,34 +278,26 @@ export const resetPasswordApi = async (payload: ResetPasswordPayload): Promise<a
   }
 };
 
-/**
- * LOGOUT - Clear local storage
- */
 export const logoutApi = (): void => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   sessionStorage.removeItem("token");
 };
 
-export type CreateTaskResponse = {
-  message?: string;
-  task: Task; 
-};
-
-
-
+// ... (rest of your existing code for projects, teams, etc. remains the same)
 
 // ... (rest of your Api/ApiCommon.ts remains the same)
 /* ======================= PROJECT TYPES ======================= */
 export type Project = { _id: string; title: string; description?: string };
- //export type Task = { _id: string; title: string; description?: string; priority?: string;status?:string;assignee?:{id:string};createdBy?:{id:string};completed?:boolean;isFavorite?:boolean;isFollowed?:boolean; };
-export type Column = { _id: string; name: string; order?:number; tasks: Task[] };
+export type Task = { _id: string; title: string; description?: string; priority?: string };
+export type Column = { _id: string; title: string; key: string; tasks: Task[] };
+
 export type Member = {
   _id: string;
   name: string;
   email: string;
-  projectId?: string;
   avatar?: string;
+  projectId?: string;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -328,37 +323,12 @@ export const updateProjectApi = (id: string, payload: { title?: string; descript
 export const deleteProjectApi = (id: string) =>
   apiDelete<{ message: string }>(`/projects/${id}`);
 
-/* ======================= PROJECT DETAILS API ======================= */
-
-export const getProjectByIdApi = (projectId: string): Promise<Project> =>
-  apiGet<Project>(`/projects/${projectId}`);
-
-export const getTasksByProjectApi = (projectId: string): Promise<Task[]> =>
-  apiGet<Task[]>(`/tasks/project/${projectId}`);
-
-
-
 /* ======================= COLUMNS API CALLS ======================= */
 export const getProjectColumnsApi = (projectId: string) =>
-  apiGet<Column[]>(
-    `/columns/${projectId}/columns`
-  );
+  apiGet<Column[]>(`/projects/get-columns-tasks?projectId=${projectId}`);
 
-
-export const createProjectColumnApi = (
-  projectId: string,
-  name: string
-) =>
-  apiPost<Column, { name: string }>(
-    `/columns/${projectId}/columns`,
-    { name }
-  );
-  export const updateTaskApi = (
-  taskId: string,
-  payload: Partial<Task>
-) =>
-  apiPut<Task, Partial<Task>>(`/tasks/${taskId}`, payload);
-
+export const createColumnApi = (projectId: string, payload: { title: string }) =>
+  apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
 
  export const createTaskApi = (payload: CreateTaskPayload) =>
   apiPost<CreateTaskResponse, CreateTaskPayload>("/projects/create-task", payload);
@@ -412,29 +382,20 @@ export const searchProjectMembersApi = async (projectId: string, query: string):
     console.error("Error searching project members:", error);
     throw error;
   }
- };
-
-
-
-/* ======================= TEAM/MEMBERS API CALLS ======================= */
-
-type CreateTeamMembersResponse = {
-  teamMember?: Member;
-} & Member;
-
+};
 
 export const createTeamMemberApi = async (projectId: string, payload: { name: string; email: string }): Promise<Member> => {
   try {
     console.log("Creating team member with payload:", { ...payload, projectId });
 
-    const response = await apiPost<CreateTeamMembersResponse>('/team', {
+    const response = await apiPost<any>('/team', {
       ...payload,
       projectId
     });
 
     console.log("Create team member response:", response);
 
-    const memberData = response.teamMember ?? response;
+    const memberData = response.teamMember || response;
 
     return {
       _id: memberData._id,
@@ -478,7 +439,6 @@ export const deleteTeamMemberApi = async (memberId: string): Promise<{ message: 
   }
 };
 
-
 /* ======================= TASK TYPES API CALLS ======================= */
 export const getProjectTypesApi = (projectId: string): Promise<TaskType[]> =>
   apiGet<TaskType[]>(`/projects/${projectId}/types`);
@@ -490,16 +450,20 @@ export const getProjectMilestonesApi = (projectId: string): Promise<Milestone[]>
 /* ======================= BLOCKERS API CALLS ======================= */
 export const getBlockersApi = (projectId: string): Promise<BlockRelation[]> =>
   apiGet<BlockRelation[]>(`/tasks/blockers`, { params: { projectId } });
+
 export const getBlockingApi = (projectId: string): Promise<BlockRelation[]> =>
   apiGet<BlockRelation[]>(`/tasks/blocking`, { params: { projectId } });
 
 /* ======================= FILTER PRESETS API CALLS ======================= */
 export const getFilterPresetsApi = (projectId: string): Promise<FilterPreset[]> =>
   apiGet<FilterPreset[]>(`/projects/${projectId}/filters/presets`);
+
 export const saveFilterPresetApi = (projectId: string, payload: { name: string; filters: any }) =>
   apiPost<FilterPreset, typeof payload>(`/projects/${projectId}/filters/presets`, payload);
+
 export const updateFilterPresetApi = (projectId: string, presetId: string, payload: { name?: string; filters?: any }) =>
   apiPut<FilterPreset, typeof payload>(`/projects/${projectId}/filters/presets/${presetId}`, payload);
+
 export const deleteFilterPresetApi = (projectId: string, presetId: string) =>
   apiDelete<{ message: string }>(`/projects/${projectId}/filters/presets/${presetId}`);
 
