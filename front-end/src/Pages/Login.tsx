@@ -92,6 +92,7 @@ const Login = ({ onClose }: Props) => {
         resetAll();
         onClose?.();
         nav("/", { replace: true });
+        return;
       }
 
       setMode("loginOtp");
@@ -249,7 +250,8 @@ const Login = ({ onClose }: Props) => {
         email,
         otp,
         newPassword: password,
-        confirmPassword: confirmPassword  // Added confirmPassword
+        confirmPassword:confirmPassword
+          // Added confirmPassword
       });
       toast.success("Password reset successful 🔐");
       resetAll();
