@@ -1,4 +1,3 @@
-
 /* ---- Page wrapper ---- */
 .project-board {
   width: 100%;
@@ -31,21 +30,38 @@
   color: #64748b;
 }
 
+/* ---- Board actions ---- */
+.board-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 /* ---- Add Column button ---- */
 .add-col-btn {
+  background-color: #4a6cf7;
+  color: #ffffff;
   border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 900;
-  color: #0f172a;
-  background: transparent;
-  transition: background 140ms ease, transform 140ms ease;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .add-col-btn:hover {
-  background: #f1f5f9;
+  background-color: #3a5bd9;
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.add-col-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* ---- Error ---- */
@@ -191,41 +207,15 @@
 .priority-badge.low {
   background: #22c55e;
 }
-
 .priority-badge.medium {
   background: #f59e0b;
 }
-
 .priority-badge.high {
   background: #ef4444;
 }
 
-
-.add-task-btn {
-  margin: 14px 12px 14px;
-  width: calc(100% - 24px);
-  border: none;
-  cursor: pointer;
-
-  padding: 13px 14px;
-  border-radius: 16px;
-  font-weight: 950;
-  font-size: 15px;
-  color: #ffffff;
-
-  background: linear-gradient(90deg, #4f46e5, #22c55e);
-  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.22);
-
-  transition: transform 150ms ease, filter 150ms ease, box-shadow 150ms ease;
-}
-
-.add-task-btn:hover {
-  filter: brightness(1.06);
-  transform: translateY(-2px);
-  box-shadow: 0 18px 38px rgba(79, 70, 229, 0.28);
-}
-
-
+/* ---- Add Task button ---- */
+.add-task-btn,
 .column-card > button {
   margin: 14px 12px 14px;
   width: calc(100% - 24px);
@@ -244,16 +234,16 @@
   transition: transform 150ms ease, filter 150ms ease, box-shadow 150ms ease;
 }
 
+.add-task-btn:hover,
 .column-card > button:hover {
   filter: brightness(1.06);
   transform: translateY(-2px);
   box-shadow: 0 18px 38px rgba(79, 70, 229, 0.28);
 }
 
-
-   
-
-
+/* =========================================================
+   ✅ MODAL (Base) - works for Add Task + Edit Task
+   ========================================================= */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -370,7 +360,8 @@
   background-repeat: no-repeat;
 }
 
-/* Actions (your TSX uses inline style on wrapper div) */
+/* Actions wrapper: supports inline-style wrapper too */
+.modal-actions,
 .modal-box > div[style] {
   display: flex;
   justify-content: flex-end;
@@ -386,12 +377,11 @@
   border-radius: 12px;
   font-weight: 950;
   font-size: 13px;
-
-  transition: transform 140ms ease, filter 140ms ease,
-    box-shadow 140ms ease;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
 }
 
-/* Cancel (first button) */
+/* Cancel button */
+.modal-cancel-btn,
 .modal-box button:first-child {
   background: #ffffff;
   color: #0f172a;
@@ -399,18 +389,21 @@
   box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
 }
 
+.modal-cancel-btn:hover,
 .modal-box button:first-child:hover {
   transform: translateY(-1px);
   filter: brightness(0.98);
 }
 
-/* Add Task (second button) ✅ colorful */
+/* Primary button */
+.modal-primary-btn,
 .modal-box button:last-child {
   color: #ffffff;
   background: linear-gradient(90deg, #4f46e5, #22c55e);
   box-shadow: 0 14px 30px rgba(79, 70, 229, 0.22);
 }
 
+.modal-primary-btn:hover,
 .modal-box button:last-child:hover {
   transform: translateY(-2px);
   filter: brightness(1.06);
@@ -425,65 +418,152 @@
   box-shadow: none !important;
 }
 
-/* Animations */
-@keyframes overlayFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes modalPopIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-/* ---- Board actions (only Add Column button remains) ---- */
-.board-actions {
+/* =========================================================
+   ✅ EDIT TASK MODAL (Dedicated) - if your TSX uses these names
+   ========================================================= */
+/* Overlay aliases (so whichever class you used, styling works) */
+.edit-task-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
-  gap: 12px;
   align-items: center;
-}
-/* Project Settings Button and Panel Styles */
-
-.board-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: overlayFadeIn 180ms ease-out;
 }
 
-.add-col-btn {
-  background-color: #4a6cf7;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Modal box aliases */
+.edit-task-modal,
+.edit-task-box {
+  width: 560px;
+  max-width: 96vw;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
+  padding: 20px 22px;
+  transform-origin: center;
+  animation: modalPopIn 220ms ease-out;
 }
 
-.add-col-btn:hover {
-  background-color: #3a5bd9;
+/* Title */
+.edit-task-modal h2,
+.edit-task-modal h3,
+.edit-task-box h2,
+.edit-task-box h3 {
+  margin: 0 0 14px 0;
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: -0.3px;
+  color: #0f172a;
+}
+
+/* Labels */
+.edit-task-modal label,
+.edit-task-box label {
+  display: block;
+  margin: 10px 0 6px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #334155;
+  letter-spacing: 0.2px;
+}
+
+/* Inputs */
+.edit-task-modal input,
+.edit-task-modal textarea,
+.edit-task-modal select,
+.edit-task-box input,
+.edit-task-box textarea,
+.edit-task-box select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+  background: #ffffff;
+  color: #0f172a;
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.edit-task-modal textarea,
+.edit-task-box textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.35;
+}
+
+.edit-task-modal input:focus,
+.edit-task-modal textarea:focus,
+.edit-task-modal select:focus,
+.edit-task-box input:focus,
+.edit-task-box textarea:focus,
+.edit-task-box select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.add-col-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Actions row */
+.edit-task-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
 }
 
-/* Settings Button Styles */
+/* Buttons */
+.edit-task-actions button {
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 950;
+  font-size: 13px;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+}
+
+/* Cancel */
+.edit-task-actions button:first-child {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+}
+
+.edit-task-actions button:first-child:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.98);
+}
+
+/* Save */
+.edit-task-actions button:last-child {
+  color: #ffffff;
+  background: linear-gradient(90deg, #4f46e5, #22c55e);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.22);
+}
+
+.edit-task-actions button:last-child:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 18px 40px rgba(79, 70, 229, 0.28);
+}
+
+.edit-task-actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* ---- Settings Button Styles ---- */
 .settings-btn {
   background-color: #f0f2f5;
   color: #2c3e50;
@@ -522,7 +602,7 @@
   transform: rotate(90deg);
 }
 
-/* Filter Button Styles */
+/* ---- Filter Button Styles ---- */
 .filter-btn {
   background-color: #f0f2f5;
   color: #2c3e50;
@@ -570,7 +650,7 @@
   }
 }
 
-/* Settings Overlay and Panel */
+/* ---- Settings Overlay and Panel ---- */
 .settings-overlay {
   position: fixed;
   top: 0;
@@ -676,13 +756,29 @@
   line-height: 1.6;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .board-actions {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+/* ---- Animations ---- */
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
 
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ---- Responsive adjustments ---- */
+@media (max-width: 768px) {
   .add-col-btn,
   .settings-btn,
   .filter-btn {
@@ -693,5 +789,167 @@
   .settings-panel {
     width: 95%;
     max-height: 90vh;
+  }
+}
+/* =========================
+   Edit Task Modal (Light)
+   ========================= */
+.edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 9999;
+  animation: editFadeIn 180ms ease-out;
+}
+
+.edit-card {
+  width: 100%;
+  max-width: 560px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.18);
+  padding: 20px 22px;
+  animation: editPopIn 220ms ease-out;
+}
+
+.edit-head h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  color: #0f172a;
+}
+
+.edit-head p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.edit-form {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.edit-input,
+.edit-textarea,
+.edit-select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.edit-textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.35;
+}
+
+/* Soft focus */
+.edit-input:focus,
+.edit-textarea:focus,
+.edit-select:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Light select arrow */
+.edit-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 36px;
+  background-image: linear-gradient(45deg, transparent 50%, #94a3b8 50%),
+    linear-gradient(135deg, #94a3b8 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.edit-btn {
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 13px;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+}
+
+.edit-btn-ghost {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.06);
+}
+
+.edit-btn-ghost:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.99);
+}
+
+.edit-btn-primary {
+  color: #0f172a;
+  background: linear-gradient(90deg, #dbeafe, #dcfce7);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.10);
+}
+
+.edit-btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+}
+
+@keyframes editFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes editPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
