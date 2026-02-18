@@ -197,8 +197,20 @@ exports.login = async (req, res) => {
     );
 
 
-    return res.status(200).json({
-      message: "OTP sent to email. Please verify OTP using /verify-otp with type=login"
+
+    const userData = await UserModel.findById(user._id);
+    userData.tokens.push({ token });
+    await userData.save();
+    res.setHeader("Authorization", `Bearer ${token}`);
+
+    res.status(200).json({
+      message: "Login Successful 🤝👍",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+        
+      }
     });
 
   } catch (error) {

@@ -1,4 +1,3 @@
-// src/controllers/projectController.js
 const mongoose = require("mongoose");
 const ProjectModel = require("../models/project");
 const Column = require("../models/column");
@@ -7,8 +6,8 @@ const Task = require("../models/task");
 // ✅ GET /api/projects -> all projects
 exports.getAllProjects = async (req, res) => {
   try {
-    const projectList = await ProjectModel.find().sort({ createdAt: -1 });
-    return res.status(200).json(projectList);
+    const projects = await Project.find().sort({ createdAt: -1 });
+    return res.status(200).json(projects);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -56,12 +55,10 @@ exports.getProjectById = async (req, res) => {
       return res.status(400).json({ message: "Invalid projectId" });
     }
 
-    const projectDoc = await ProjectModel.findById(projectId);
-    if (!projectDoc) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-    return res.status(200).json(projectDoc);
+    return res.status(200).json(project);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -76,12 +73,10 @@ exports.getProjectTasks = async (req, res) => {
       return res.status(400).json({ message: "Invalid projectId" });
     }
 
-    const projectDoc = await ProjectModel.findById(projectId);
-    if (!projectDoc) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-    return res.status(200).json(projectDoc.tasks);
+    return res.status(200).json(project.tasks);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -110,12 +105,10 @@ exports.addTaskToProject = async (req, res) => {
       return res.status(400).json({ message: "title is required" });
     }
 
-    const projectDoc = await ProjectModel.findById(projectId);
-    if (!projectDoc) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-    projectDoc.tasks.push({
+    project.tasks.push({
       title: title.trim(),
       description,
       status,
@@ -125,13 +118,13 @@ exports.addTaskToProject = async (req, res) => {
       blockers,
     });
 
-    await projectDoc.save();
+    await project.save();
 
-    const newTaskDoc = projectDoc.tasks[projectDoc.tasks.length - 1];
+    const newTask = project.tasks[project.tasks.length - 1];
 
     return res.status(201).json({
       message: "Task added",
-      task: newTaskDoc,
+      task: newTask,
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -151,23 +144,21 @@ exports.getTaskByTaskIdInProject = async (req, res) => {
       return res.status(400).json({ message: "Invalid taskId" });
     }
 
-    const projectDoc = await ProjectModel.findById(projectId);
-    if (!projectDoc) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-    const taskDoc = projectDoc.tasks.id(taskId);
-    if (!taskDoc) {
+    const task = project.tasks.id(taskId);
+    if (!task) {
       return res.status(404).json({ message: "Task not found in this project" });
     }
 
     return res.status(200).json({
       project: {
-        _id: projectDoc._id,
-        title: projectDoc.title,
-        description: projectDoc.description,
+        _id: project._id,
+        title: project.title,
+        description: project.description,
       },
-      task: taskDoc,
+      task,
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -178,6 +169,7 @@ exports.getTaskByTaskIdInProject = async (req, res) => {
 exports.updateTaskInProject = async (req, res) => {
   try {
     const { projectId, taskId } = req.params;
+    const { title, description, status, dueDate, priority, assignee, blockers } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(projectId)) {
       return res.status(400).json({ message: "Invalid projectId" });
@@ -187,33 +179,25 @@ exports.updateTaskInProject = async (req, res) => {
       return res.status(400).json({ message: "Invalid taskId" });
     }
 
-    const projectDoc = await ProjectModel.findById(projectId);
-    if (!projectDoc) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-    const taskDoc = projectDoc.tasks.id(taskId);
-    if (!taskDoc) {
-      return res.status(404).json({ message: "Task not found in this project" });
-    }
+    const task = project.tasks.id(taskId);
+    if (!task) return res.status(404).json({ message: "Task not found in this project" });
 
-    // update only fields sent
-    const { title, description, status, dueDate, priority, assignee, blockers } =
-      req.body;
+    if (title !== undefined) task.title = title;
+    if (description !== undefined) task.description = description;
+    if (status !== undefined) task.status = status;
+    if (dueDate !== undefined) task.dueDate = dueDate;
+    if (priority !== undefined) task.priority = priority;
+    if (assignee !== undefined) task.assignee = assignee;
+    if (blockers !== undefined) task.blockers = blockers;
 
-    if (title !== undefined) taskDoc.title = title;
-    if (description !== undefined) taskDoc.description = description;
-    if (status !== undefined) taskDoc.status = status;
-    if (dueDate !== undefined) taskDoc.dueDate = dueDate;
-    if (priority !== undefined) taskDoc.priority = priority;
-    if (assignee !== undefined) taskDoc.assignee = assignee;
-    if (blockers !== undefined) taskDoc.blockers = blockers;
-
-    await projectDoc.save();
+    await project.save();
 
     return res.status(200).json({
       message: "Task updated successfully",
-      task: taskDoc,
+      task,
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -233,18 +217,14 @@ exports.deleteTaskInProject = async (req, res) => {
       return res.status(400).json({ message: "Invalid taskId" });
     }
 
-    const projectDoc = await ProjectModel.findById(projectId);
-    if (!projectDoc) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-    const taskDoc = projectDoc.tasks.id(taskId);
-    if (!taskDoc) {
-      return res.status(404).json({ message: "Task not found in this project" });
-    }
+    const task = project.tasks.id(taskId);
+    if (!task) return res.status(404).json({ message: "Task not found in this project" });
 
-    taskDoc.deleteOne();
-    await projectDoc.save();
+    task.deleteOne();
+    await project.save();
 
     return res.status(200).json({ message: "Task deleted" });
   } catch (err) {

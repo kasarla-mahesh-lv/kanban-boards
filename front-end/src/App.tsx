@@ -5,6 +5,7 @@ import Sidebar from "./components/layout/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { Taskbar } from "./components/Taskbar";
 
+
 import Dashboard from "./components/dashboard/Dashboard";
 import History from "./components/History";
 import Reports from "./Pages/Reports";
@@ -35,7 +36,14 @@ const DashboardLayout: React.FC = () => {
 
         <div className="content-container">
           <Routes>
+            {/* DASHBOARD */}
             <Route path="/" element={<Dashboard />} />
+
+            {/* PROJECTS */}
+            
+            
+
+            {/* OTHER PAGES */}
             <Route path="/history" element={<History />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/notifications" element={<NotificationPage />} />

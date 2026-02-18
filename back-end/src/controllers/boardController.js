@@ -12,6 +12,7 @@ exports.createBoard = async (req, res) => {
 };
 
 
+
 //patch api 
 exports.updateBoard = async (req, res) => {
   try {

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
 import { useParams } from "react-router-dom";
 import {
   type Column,
   type Project,
-  getProjectColumnsApi
+  getProjectColumnsApi,
+  createProjectColumnApi,
 } from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
@@ -57,14 +58,51 @@ const defaultFilters: Filters = {
 };
 
 const ProjectBoard: React.FC = () => {
-  const { projectId } = useParams();
+  const { projectId } = useParams<{ projectId: string }>();
+
   const [project] = useState<Project | null>(null);
   const [columns, setColumns] = useState<Column[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [showFilters, setShowFilters] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
+  
+  const [showAddInput, setShowAddInput] = useState(false);
+const [newColumnName, setNewColumnName] = useState("");
+
+  
+
+  const currentUserId = "ajay"; // Later replace with auth user
+
+  //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
+  const handleAddColumn = async () => {
+  if (!projectId || !newColumnName.trim()) return;
+
+  try {
+    const newCol = await createProjectColumnApi(projectId, 
+      newColumnName
+      
+    );
+
+    const formatted: Column = {
+  _id: newCol._id,
+  name: newCol.name,
+  order: newCol.order,
+  tasks: newCol.tasks || [],
+};
+
+
+    setColumns((prev) => [...prev, formatted]);
+
+    setNewColumnName("");
+    setShowAddInput(false);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 
   /* ================= LOAD COLUMNS ================= */
   useEffect(() => {
@@ -76,16 +114,19 @@ const ProjectBoard: React.FC = () => {
         const cols = await getProjectColumnsApi(projectId);
 
         // Transform API response to match UI structure
-        const formattedColumns = cols.map((col: any) => ({
-          _id: col._id,
-          title: col.name,
-          key: col.name.toLowerCase().replace(/\s/g, ""),
-          order: col.order,
-          tasks: col.tasks || [],
-        }));
+        const formattedColumns = cols.map((col) => ({
+  _id: col._id,
+  name: col.name,
+  order: col.order,
+  tasks: col.tasks || [],
+}));
+
 
         // Sort by order
-        formattedColumns.sort((a, b) => a.order - b.order);
+        formattedColumns.sort(
+  (a, b) => (a.order ?? 0) - (b.order ?? 0)
+);
+
 
         setColumns(formattedColumns);
       } catch (e) {
@@ -97,37 +138,64 @@ const ProjectBoard: React.FC = () => {
     })();
   }, [projectId]);
 
-  // Filter tasks based on current filters
-  const filteredColumns = React.useMemo(() => {
-    if (!columns.length) return columns;
-    
+  // ✅ Active filter check (safe)
+  const hasActiveFilters = useMemo(() => {
+    return Object.values(filters).some((value) =>
+      Array.isArray(value)
+        ? value.length > 0
+        : value !== null && value !== false && value !== ""
+    );
+  }, [filters]);
+
+  // ✅ Safe filtering
+  const filteredColumns = useMemo(() => {
     return columns.map((col) => {
       const filteredTasks = (col.tasks || []).filter((task: any) => {
-        // Search filter
+        const title = (task.title || "").toLowerCase();
+
+        // Search
         if (filters.search) {
+          const search = filters.search.toLowerCase();
           const match = filters.exactMatch
-            ? task.title === filters.search
-            : task.title.toLowerCase().includes(filters.search.toLowerCase());
+            ? title === search
+            : title.includes(search);
           if (!match) return false;
         }
 
         // Assigned to me
-        if (filters.assignedToMe && task.assignee?.id !== "ajay") return false;
+        if (
+          filters.assignedToMe &&
+          task.assignee?.id !== currentUserId
+        )
+          return false;
 
         // Assignees
-        if (filters.assignees.length > 0 && 
-            !filters.assignees.includes(task.assignee?.id)) return false;
+        if (
+          filters.assignees.length > 0 &&
+          !filters.assignees.includes(task.assignee?.id)
+        )
+          return false;
 
         // Priority
-        if (filters.priority.length > 0 && 
-            !filters.priority.includes(task.priority)) return false;
+        if (
+          filters.priority.length > 0 &&
+          !filters.priority.includes(task.priority)
+        )
+          return false;
 
         // Completed
-        if (filters.completed !== null && 
-            task.completed !== filters.completed) return false;
+        if (
+          filters.completed !== null &&
+          task.completed !== filters.completed
+        )
+          return false;
 
         // Created by me
-        if (filters.createdByMe && task.createdBy?.id !== "ajay") return false;
+        if (
+          filters.createdByMe &&
+          task.createdBy?.id !== currentUserId
+        )
+          return false;
 
         // Favorites
         if (filters.favorites && !task.isFavorite) return false;
@@ -140,16 +208,17 @@ const ProjectBoard: React.FC = () => {
 
       return { ...col, tasks: filteredTasks };
     });
-  }, [columns, filters]);
+  }, [columns, filters, currentUserId]);
 
-  const displayColumns = filteredColumns.length
-    ? filteredColumns
-    : DEFAULT_COLUMNS.map((t, idx) => ({
-        _id: `temp-${idx}`,
-        title: t,
-        key: t.toLowerCase().replace(/\s/g, ""),
-        tasks: [],
-      }));
+  const displayColumns =
+    filteredColumns.length > 0
+      ? filteredColumns
+      : DEFAULT_COLUMNS.map((name, idx) => ({
+          _id: `temp-${idx}`,
+          name,
+          order:idx,
+          tasks: [],
+        }));
 
   const handleApplyFilters = (newFilters: Filters) => {
     setFilters(newFilters);
@@ -178,7 +247,43 @@ const ProjectBoard: React.FC = () => {
         </div>
 
         <div className="board-actions">
-          <button className="add-col-btn">+ Add Column</button>
+    
+        {!showAddInput ? (
+  <button
+    className="add-col-btn"
+    onClick={() => setShowAddInput(true)}
+  >
+    + Add Column
+  </button>
+) : (
+  <div className="add-group-box-header">
+    <input
+      type="text"
+      placeholder="Enter group name..."
+      value={newColumnName}
+      onChange={(e) => setNewColumnName(e.target.value)}
+      autoFocus
+    />
+
+    <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+      <button onClick={handleAddColumn} className="btn btn-primary">
+        Add group
+      </button>
+
+      <button className="btn btn-danger"
+        onClick={() => {
+          setShowAddInput(false);
+          setNewColumnName("");
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
+
+          
           
           {/* Settings Button */}
           <button
@@ -194,13 +299,8 @@ const ProjectBoard: React.FC = () => {
             className="filter-btn"
             onClick={() => setShowFilters(true)}
           >
-            <span className="icon">☰</span> Filters
-            {Object.keys(filters).some(key => 
-              key !== 'search' && 
-              Array.isArray(filters[key as keyof Filters]) 
-                ? (filters[key as keyof Filters] as any[]).length > 0
-                : filters[key as keyof Filters] && key !== 'dueDateRange' && key !== 'creationDate'
-            ) && (
+            ☰ Filters
+            {hasActiveFilters && (
               <span className="filter-active-indicator">●</span>
             )}
           </button>
@@ -209,37 +309,10 @@ const ProjectBoard: React.FC = () => {
 
       {error && <div className="board-error">{error}</div>}
 
-      {/* Active filters summary */}
-      {filters !== defaultFilters && (
+      {hasActiveFilters && (
         <div className="active-filters-bar">
-          <span className="active-filters-label">Active filters:</span>
-          {filters.priority.length > 0 && (
-            <span className="filter-tag">
-              Priority: {filters.priority.join(', ')}
-              <button onClick={() => setFilters({...filters, priority: []})}>✕</button>
-            </span>
-          )}
-          {filters.assignedToMe && (
-            <span className="filter-tag">
-              Assigned to me
-              <button onClick={() => setFilters({...filters, assignedToMe: false})}>✕</button>
-            </span>
-          )}
-          {filters.completed === true && (
-            <span className="filter-tag">
-              Completed
-              <button onClick={() => setFilters({...filters, completed: null})}>✕</button>
-            </span>
-          )}
-          {filters.completed === false && (
-            <span className="filter-tag">
-              Not completed
-              <button onClick={() => setFilters({...filters, completed: null})}>✕</button>
-            </span>
-          )}
-          <button className="clear-all-filters" onClick={clearAllFilters}>
-            Clear all
-          </button>
+          <span>Active filters:</span>
+          <button onClick={clearAllFilters}>Clear all</button>
         </div>
       )}
 
@@ -248,8 +321,8 @@ const ProjectBoard: React.FC = () => {
           {displayColumns.map((col) => (
             <div key={col._id} className="column-card">
               <div className="column-title">
-                <span>{col.title}</span>
-                <span className="count">{col.tasks?.length || 0}</span>
+                <span>{col.name}</span>
+                <span>{col.tasks?.length || 0}</span>
               </div>
 
               <div className="tasks-area">
@@ -257,10 +330,15 @@ const ProjectBoard: React.FC = () => {
                   <div className="no-tasks">No tasks</div>
                 ) : (
                   col.tasks.map((t: any) => (
-                    <div key={t._id || t.id} className="task-item">
-                      <div className="task-title">{t.title}</div>
+                    <div
+                      key={t._id || t.id}
+                      className="task-item"
+                    >
+                      <div className="task-title">
+                        {t.title}
+                      </div>
                       {t.priority && (
-                        <span className={`priority-badge ${t.priority.toLowerCase()}`}>
+                        <span className="priority-badge">
                           {t.priority}
                         </span>
                       )}
@@ -269,13 +347,16 @@ const ProjectBoard: React.FC = () => {
                 )}
               </div>
 
-              <button className="add-task-btn">+ Add Task</button>
+              <button className="add-task-btn">
+                + Add Task
+              </button>
             </div>
           ))}
         </div>
+    
+
       </div>
 
-      {/* Filter Panel Component */}
       {projectId && (
         <FilterPanel
           projectId={projectId}
