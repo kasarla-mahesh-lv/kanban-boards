@@ -102,8 +102,8 @@
 }
 /* ---- Add Group Button (Vaiz style) ---- */
 .add-group-column {
-  min-width: 280px;
-  height: 56px;
+  /* min-width: 20px;
+  height: 36px;
   border-radius: 16px;
 
   background: #f1f5f9;
@@ -117,7 +117,20 @@
   font-size: 14px;
 
   cursor: pointer;
-  transition: all 160ms ease;
+  transition: all 160ms ease; */
+    width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid #5b5ce2;
+  background: transparent;
+  color: #5b5ce2;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .add-group-column:hover {
@@ -455,13 +468,31 @@
   cursor: not-allowed;
   transform: none;
 }
+
+
+
+
+.add-group-column:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+
+
+
+
+
+
+
+
+
 .add-group-wrapper {
-  min-width: 280px;
+  min-width: 320px;
 }
 
 .add-group-column {
-  height: 56px;
-  border-radius: 16px;
+  height: 30px;
+  border-radius: 18px;
   background: #f1f5f9;
   display: flex;
   align-items: center;
@@ -469,91 +500,59 @@
   font-weight: 700;
   color: #64748b;
   cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.add-group-column:hover {
-  background: #e2e8f0;
+  transition: all 0.2s ease;
 }
 
 .add-group-input-container {
-  background: #f1f5f9;
-  border-radius: 16px;
-  padding: 12px;
+  background: transparent;
+  min-width: 320px;
 }
-
 .add-group-input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 14px;
   border-radius: 12px;
   border: 2px solid #60a5fa;
   outline: none;
   font-size: 14px;
+  transition: 0.2s ease;
+}
+.add-group-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .add-group-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-top: 10px;
 }
+
 
 .add-group-btn {
   background: #3b82f6;
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.cancel-btn {
-  background: transparent;
-  border: none;
-  color: #334155;
   font-weight: 600;
   cursor: pointer;
 }
-.add-group-wrapper {
-  min-width: 260px;
-}
+.add-group-btn:hover {
+  background: #2563eb;
 
-.add-group-column {
-  background: #f1f3f5;
-  padding: 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  text-align: center;
-  font-weight: 500;
 }
-
-.add-group-input-container {
-  background: #ffffff;
-  padding: 12px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.add-group-input {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.add-group-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.add-group-btn,
 .cancel-btn {
-  padding: 6px 10px;
+  border-radius: 8px;
+  background: transparent;
   border: none;
-  border-radius: 6px;
+  color: #475569;
+  font-weight: 600;
   cursor: pointer;
+  
+}
+.cancel-btn:hover {
+  text-decoration: none;
 }
 /* ---- Board actions (only Add Column button remains) ---- */
 .board-actions {

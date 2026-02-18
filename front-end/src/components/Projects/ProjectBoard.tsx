@@ -248,7 +248,7 @@ const [newColumnName, setNewColumnName] = useState("");
 
         <div className="board-actions">
     
-        {!showAddInput ? (
+        {/* {!showAddInput ? (
   <button
     className="add-col-btn"
     onClick={() => setShowAddInput(true)}
@@ -280,7 +280,7 @@ const [newColumnName, setNewColumnName] = useState("");
       </button>
     </div>
   </div>
-)}
+)} */}
 
 
           
@@ -317,46 +317,87 @@ const [newColumnName, setNewColumnName] = useState("");
       )}
 
       <div className="board-body">
-        <div className="columns-row">
-          {displayColumns.map((col) => (
-            <div key={col._id} className="column-card">
-              <div className="column-title">
-                <span>{col.name}</span>
-                <span>{col.tasks?.length || 0}</span>
-              </div>
+    <div className="columns-row">
 
-              <div className="tasks-area">
-                {(col.tasks?.length || 0) === 0 ? (
-                  <div className="no-tasks">No tasks</div>
-                ) : (
-                  col.tasks.map((t: any) => (
-                    <div
-                      key={t._id || t.id}
-                      className="task-item"
-                    >
-                      <div className="task-title">
-                        {t.title}
-                      </div>
-                      {t.priority && (
-                        <span className="priority-badge">
-                          {t.priority}
-                        </span>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-
-              <button className="add-task-btn">
-                + Add Task
-              </button>
-            </div>
-          ))}
+    {displayColumns.map((col) => (
+      <div key={col._id} className="column-card">
+        <div className="column-title">
+          <span>{col.name}</span>
+          <span>{col.tasks?.length || 0}</span> 
         </div>
+
+      <div className="tasks-area">
+        {(col.tasks?.length || 0) === 0 ? (
+          <div className="no-tasks">No tasks</div>
+        ) : (
+          col.tasks.map((t: any) => (
+            <div key={t._id || t.id} className="task-item">
+              <div className="task-title">{t.title}</div>
+              {t.priority && (
+                <span className="priority-badge">
+                  {t.priority}
+                </span>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      <button className="add-task-btn">
+        + Add Task
+      </button>
+    </div>
+  ))}
+
+  {/* ✅ VAIZ STYLE ADD GROUP */}
+  <div className="add-group-wrapper">
+  {showAddInput ? (
+    <div className="add-group-input-container">
+      <input
+        className="add-group-input"
+        placeholder="Enter group name..."
+        value={newColumnName}
+        onChange={(e) => setNewColumnName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleAddColumn();
+        }}
+        autoFocus
+      />
+
+      <div className="add-group-actions">
+        <button
+          className="add-group-btn"
+          onClick={handleAddColumn}
+        >
+          Add group
+        </button>
+
+        <button
+          className="cancel-btn"
+          onClick={() => {
+            setShowAddInput(false);
+            setNewColumnName("");
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  ) : (
+    <button
+      className="add-group-column"
+      onClick={() => setShowAddInput(true)}
+    >
+      +
+    </button>
+  )}
+</div>
+
+
     
 
       </div>
-
+</div>
       {projectId && (
         <FilterPanel
           projectId={projectId}
@@ -376,5 +417,6 @@ const [newColumnName, setNewColumnName] = useState("");
     </div>
   );
 };
+
 
 export default ProjectBoard;
