@@ -17,7 +17,7 @@ import {
   resetPasswordApi,
   loginApi,
   forgotPasswordApi,
-  verifyMfaOtpApi,
+  //verifyMfaOtpApi,
 } from "../components/Api/ApiCommon";
 import "./Login.css";
 
@@ -56,12 +56,12 @@ interface VerifyOtpResponse {
   };
 }
 
-interface MfaVerifyResponse {
+/*interface MfaVerifyResponse {
   message: string;
   mfaEnabled: boolean;
   success?: boolean;
   token?: string;
-}
+}*/
 
 const OTP_DURATION = 120;
 
