@@ -69,7 +69,7 @@ const Login = ({ onClose }: Props) => {
   const nav = useNavigate();
 
   const [mode, setMode] = useState<Mode>("login");
-  const [mfaRequired, setMfaRequired] = useState(false);
+  const [, setMfaRequired] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
