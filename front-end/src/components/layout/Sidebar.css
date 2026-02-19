@@ -223,8 +223,10 @@
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: var(--text-muted);
-  font-size: 14px;
+  /* color: var(--text-muted); */
+  font-size: 16px;
+  color: grey;
+
 }
 
 .project-item:hover {
@@ -233,7 +235,8 @@
 }
 
 .project-item.active {
-  background: #e0e7ff;
+  background: rgb(113, 113, 244);
+  color:white
 }
 
 .project-name {
@@ -380,4 +383,5 @@
   padding: 6px 12px;
   display: block;
   opacity: 0.6;
+  
 }

@@ -60,6 +60,11 @@
   font-size: 13px;
   color: #6b7280;
 }
+.close-icon {
+  font-size: 20px;
+  color: #6b7280;
+  cursor: pointer;
+}
 
 /* Popover */
 .popover {
@@ -71,7 +76,12 @@
   box-shadow: 0 12px 28px rgba(0,0,0,0.06);
   animation: fadePop 0.15s ease;
 }
-
+.no-results {
+  padding: 10px;
+  font-size: 13px;
+  color: #888;
+  text-align: center;
+}
 @keyframes fadePop {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
@@ -96,6 +106,8 @@
   border-radius: 8px;
   margin-bottom: 8px;
   font-size: 13px;
+  background-color: white;
+  color:black;
 }
 
 /* Calendar */
@@ -127,6 +139,7 @@
 /* Subtasks */
 .subtasks {
   margin-top: 22px;
+  color:black;
 }
 
 .sub-header {
@@ -162,6 +175,7 @@
 .subtask-row {
   border-bottom: 1px solid #f5f5f5;
   font-size: 13px;
+  color:black
 }
 
 .sub-icons {
@@ -179,6 +193,7 @@
   border: 1px solid #e5e7eb;
   background: #fafafa;
   font-size: 13px;
+  color:black
 }
 
 /* Description */
@@ -194,6 +209,7 @@
   padding: 10px;
   resize: none;
   background: #fafafa;
+  color:black;
 }
 
 /* Tabs */
@@ -225,6 +241,7 @@
   border-radius: 10px;
   padding: 8px;
   background: #fafafa;
+  color:black;
 }
 
 .editor-toolbar {
@@ -253,7 +270,81 @@
   border-radius: 8px;
   margin-top: 6px;
   font-size: 13px;
+  color:black;
 }
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.member-row:hover {
+  background: #f4f6fb;
+}
+.member-icon {
+  color: #6366f1;
+  font-size: 16px;
+}
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-name {
+  font-size: 14px;
+}
+.email-tooltip {
+  position: absolute;
+  right: 10px;
+  background: #111827;
+  color: white;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: 0.15s;
+  pointer-events: none;
+}
+
+.member-row:hover .email-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.assignee-avatars {
+  display: flex;
+  gap: 4px;
+}
+
+.avatar.small {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+}
+
+.drawer {
+  width: 420px;
+  height: 100vh;
+  background: #fff;
+  border-left: 1px solid #eee;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.08);
+}
+
+
 
 /* Activity */
 .activity-empty {

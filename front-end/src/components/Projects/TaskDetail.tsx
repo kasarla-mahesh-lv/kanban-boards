@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
+
+
 import "./TaskDetail.css";
+import { getProjectMembersApi, searchProjectMembersApi } from "../Api/ApiCommon";
+
 
 import {
   FiTag,
@@ -15,26 +19,38 @@ import {
   FiList,
   FiPaperclip,
   FiSmile,
-  FiSend
+  FiSend,
+    FiX,
+   
 } from "react-icons/fi";
 
 type Subtask = { id: number; title: string };
 
-const users = ["Chandu", "Sravani", "Admin", "Lakshmi"];
+// const users = ["Chandu", "Sravani", "Admin", "Lakshmi"];
 const typesList = ["Bug", "Feature", "Task", "Label"];
 
 type Props = {
   taskTitle?: string;
+  projectId: string;
+  onClose: () => void;
 };
 
-const TaskSidebar: React.FC<Props> = ({ taskTitle }) => {
+type Member = {
+  _id: string;
+  name: string;
+  email?: string;
+  
+};
+
+const TaskSidebar: React.FC<Props> = ({ taskTitle ,onClose,projectId}) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [openField, setOpenField] = useState<string | null>(null);
 
   const [type, setType] = useState("Select type");
   const [priority, setPriority] = useState("Select priority");
-  const [assignee, setAssignee] = useState("Not assigned");
+ const [assignees, setAssignees] = useState<Member[]>([]);
+
 
   const [search, setSearch] = useState("");
   const [assignSearch, setAssignSearch] = useState("");
@@ -56,9 +72,20 @@ const TaskSidebar: React.FC<Props> = ({ taskTitle }) => {
 
   const [activities, setActivities] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<"comments" | "activities">("comments");
+  const [members, setMembers] = useState<Member[]>([]);
+  // const { projectId } = useParams();
+ 
+
+
 
 
   const log = (msg: string) => setActivities((a) => [...a, msg]);
+  useEffect(() => {
+  if (openField === "assign") {
+     getProjectMembersApi(projectId).then(setMembers);
+  }
+}, [openField,projectId]);
+
 
   useEffect(() => {
     const close = (e: any) => {
@@ -91,6 +118,23 @@ const TaskSidebar: React.FC<Props> = ({ taskTitle }) => {
     log("Subtask added");
   };
 
+  const handleMemberSearch = async (value: string) => {
+  setAssignSearch(value);
+
+  if (!projectId) return;
+
+  if (!value.trim()) {
+    const data = await getProjectMembersApi(projectId);
+    setMembers(data);
+    setMembers([]);
+    return;
+  }
+
+  const result = await searchProjectMembersApi(projectId, value);
+  setMembers(result);
+};
+
+
   const sendComment = () => {
     if (!commentInput && !file) return;
     setComments([...comments, { text: commentInput, file }]);
@@ -101,29 +145,49 @@ const TaskSidebar: React.FC<Props> = ({ taskTitle }) => {
 
   return (
     <div className="drawer" ref={ref}>
+      
       <div className="content">
         <h1 className="title">
   {taskTitle || "Task Details"}
 </h1>
+<FiX className="close-icon" onClick={onClose} />
         {/* TYPES */}
-        <Field icon={<FiTag />} color="#f59e0b" label="Types" value={type} onClick={() => setOpenField("types")} />
-        {openField === "types" && (
-          <Popover>
-            <input
-              className="search"
-              placeholder="Type to search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {typesList
-              .filter((t) => t.toLowerCase().includes(search.toLowerCase()))
-              .map((t) => (
-                <Item key={t} onClick={() => { setType(t); setOpenField(null); }}>
-                  {t}
-                </Item>
-              ))}
-          </Popover>
-        )}
+        {/* TYPES */}
+<Field
+  icon={<FiTag />}
+  color="#f59e0b"
+  label="Types"
+  value={type}
+  onClick={() => setOpenField("types")}
+/>
+
+{openField === "types" && (
+  <Popover>
+    <input
+      className="search"
+      placeholder="Type to search..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+    />
+
+    {typesList
+      .filter((t) =>
+        t.toLowerCase().includes(search.toLowerCase())
+      )
+      .map((t) => (
+        <Item
+          key={t}
+          onClick={() => {
+            setType(t);
+            setOpenField(null);
+          }}
+        >
+          {t}
+        </Item>
+      ))}
+  </Popover>
+)}
+
 
         {/* DATES */}
         <Field
@@ -177,24 +241,69 @@ const TaskSidebar: React.FC<Props> = ({ taskTitle }) => {
         )}
 
         {/* ASSIGN */}
-        <Field icon={<FiUser />} color="#a78bfa" label="Assign" value={assignee} onClick={() => setOpenField("assign")} />
-        {openField === "assign" && (
-          <Popover>
+        {/* ASSIGN */}
+<Field
+  icon={<FiUser />}
+  color="#a78bfa"
+  label="Assign"
+  value={
+    assignees.length === 0
+      ? "Not assigned"
+      : assignees.map(a => a.name).join(", ")
+  }
+  onClick={() => 
+        {
+           setAssignSearch("");
+           setMembers([]);  
+           setOpenField("assign")}
+        }
+       
+/>
+
+
+{openField === "assign" && (
+  <Popover>
+    <input
+      className="search"
+      placeholder="Search user..."
+      value={assignSearch}
+      onChange={(e) => handleMemberSearch(e.target.value)}
+    />
+
+    {assignSearch.trim() !== "" &&  (
+      members.length === 0 ? (
+      <div className="no-results">No users found</div>
+    ) : (
+      members.map((m) => (
+        <div
+          key={m._id}
+          className="member-row"
+          
+          onClick={() => {
+            setAssignees((prev) => {
+              const exists = prev.find((p) => p._id === m._id);
+              if (exists) return prev.filter((p) => p._id !== m._id);
+              return [...prev, m];
+            });
+            setOpenField(null);
+          }}
+        >
             <input
-              className="search"
-              placeholder="Search user..."
-              value={assignSearch}
-              onChange={(e) => setAssignSearch(e.target.value)}
-            />
-            {users
-              .filter((u) => u.toLowerCase().includes(assignSearch.toLowerCase()))
-              .map((u) => (
-                <Item key={u} onClick={() => { setAssignee(u); setOpenField(null); }}>
-                  {u}
-                </Item>
-              ))}
-          </Popover>
-        )}
+    type="checkbox"
+    checked={assignees.some((a) => a._id === m._id)}
+    readOnly
+  />
+          
+           <FiUser className="member-icon" />
+          <span className="member-name">{m.name}</span>
+          <span className="email-tooltip">{m.email}</span>
+        </div>
+      ))
+    ))}
+  </Popover>
+)}
+
+   
 
         {/* SUBTASK TABLE */}
         <div className="subtasks">

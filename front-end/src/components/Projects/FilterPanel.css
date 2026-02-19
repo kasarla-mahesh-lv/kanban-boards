@@ -574,6 +574,7 @@
 
 .form-group {
   margin-bottom: 20px;
+  
 }
 
 .label {
@@ -937,6 +938,8 @@
   border-radius: 4px;
   font-size: 13px;
   transition: border-color 0.2s;
+  background-color: white;
+  color: black;
 }
 
 .member-input:focus {
@@ -954,6 +957,15 @@
   gap: 8px;
   margin-top: 12px;
 }
+.filter-panel {
+  width: 380px;
+  height: 100vh;
+  background: #fff;
+  border-left: 1px solid #eee;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.08);
+
+}
+
 
 .cancel-btn,
 .save-member-btn {

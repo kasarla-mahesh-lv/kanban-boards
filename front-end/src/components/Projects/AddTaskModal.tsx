@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 
 type Props = {
@@ -7,14 +6,11 @@ type Props = {
   columnId: string;
 
   onClose: () => void;
-
   onAdd: (payload: {
     title: string;
     description?: string;
     priority?: string;
-    projectId: string;
-    columnId: string;
-  }) => Promise<void> | void;
+  }) => void;
 };
 
 const AddTaskModal: React.FC<Props> = ({
@@ -27,66 +23,39 @@ const AddTaskModal: React.FC<Props> = ({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Medium");
-  const [saving, setSaving] = useState(false);
 
-  const submit = async () => {
-    if (!title.trim()) return alert("Task title is required");
+  const submit = () => {
+    if (!title.trim()) return;
 
-    try {
-      setSaving(true);
-      await onAdd({ title, description, priority, projectId, columnId });
-      onClose();
-    } catch (e: any) {
-      alert(e?.message || "Failed to create task");
-    } finally {
-      setSaving(false);
-    }
+    onAdd({ title, description, priority });
+    onClose();
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-head">
-          <h3>Add Task</h3>
-          <p>{columnTitle}</p>
-        </div>
+        <h3>Add Task</h3>
+        <p>{columnTitle}</p>
 
-        <div className="form-group">
-          <label>Task Name</label>
-          <input
-            type="text"
-            placeholder="Enter task name"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
+        <input
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-        <div className="form-group">
-          <label>Description</label>
-          <textarea
-            placeholder="Enter description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-        <div className="form-group">
-          <label>Priority</label>
-          <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-            <option>Low</option>
-            <option>Medium</option>
-            <option>High</option>
-          </select>
-        </div>
+        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
 
-        <div style={{ marginTop: 20, display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button onClick={onClose} disabled={saving}>
-            Cancel
-          </button>
-          <button onClick={submit} disabled={saving}>
-            {saving ? "Adding..." : "Add Task"}
-          </button>
-        </div>
+        <button onClick={submit}>Add Task</button>
       </div>
     </div>
   );

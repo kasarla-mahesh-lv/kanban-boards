@@ -1,12 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
-import { type Project, getProjectColumnsApi, createTaskApi } from "../Api/ApiCommon";
-
-import FilterPanel from "./FilterPanel";
 import AddTaskModal from "./AddTaskModal";
-import ProjectSettings from "./ProjectSettings";
-import "./Project.css";
+import {
+  type Column,
+  type Project,
+  getProjectColumnsApi,
+  createTaskApi
+} from "../Api/ApiCommon";
+import FilterPanel from "./FilterPanel";
+import ProjectSettings from "./ProjectSettings"; // Import the new Settings component
+import "./Project.css"; 
+import TaskDeatils from "./TaskDetail"; // ✅ Import our new panel
+
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 
@@ -115,6 +121,7 @@ const ProjectBoard: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null); // ✅ New state for task details
 
   // Add Task modal
   const [showAddTask, setShowAddTask] = useState(false);
@@ -158,6 +165,36 @@ const ProjectBoard: React.FC = () => {
   useEffect(() => {
     if (!projectId) return;
     void loadColumns(projectId);
+  //  const [selectedTask, setSelectedTask] = useState<any | null>(null); // ✅ New state for task details
+  });
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    (async () => {
+      try {
+        setLoading(true);
+        const cols = await getProjectColumnsApi(projectId);
+
+        const formattedColumns = cols.map((col: any) => ({
+          _id: col._id,
+          title: col.name,
+          key: col.name.toLowerCase().replace(/\s/g, ""),
+          order: col.order,
+          tasks: col.tasks || [],
+        }));
+
+        // Sort by order
+        formattedColumns.sort((a, b) => a.order - b.order);
+
+        setColumns(formattedColumns);
+      } catch (e) {
+        console.error(e);
+        setError("Failed to load columns.");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [projectId]);
 
   /* ================= CLOSE MENU ON OUTSIDE CLICK / SCROLL / RESIZE ================= */
@@ -215,7 +252,6 @@ const ProjectBoard: React.FC = () => {
 
         return true;
       });
-
       return { ...col, tasks: filteredTasks };
     });
   }, [columns, filters]);
@@ -380,11 +416,16 @@ const ProjectBoard: React.FC = () => {
 
           <button className="filter-btn" type="button" onClick={() => setShowFilters(true)}>
             <span className="icon">☰</span> Filters
-          </button>
-
-          <button className="clear-all-filters" type="button" onClick={clearAllFilters}>
-            Clear all
-          </button>
+            {Object.keys(filters).some(key => 
+              key !== 'search' && 
+              Array.isArray(filters[key as keyof Filters]) 
+                ? (filters[key as keyof Filters] as any[]).length > 0
+                : filters[key as keyof Filters] && key !== 'dueDateRange' && key !== 'creationDate'
+            ) && (
+              <span className="filter-active-indicator">●</span>
+            )}
+            </button>
+        
         </div>
       </div>
 
@@ -400,41 +441,25 @@ const ProjectBoard: React.FC = () => {
               </div>
 
               <div className="tasks-area">
-                {(col.tasks?.length || 0) === 0 ? (
+                {col.tasks.length === 0 ? (
                   <div className="no-tasks">No tasks</div>
                 ) : (
-                  col.tasks.map((t) => {
-                    const taskId = String(t._id || t.id || "");
-                    return (
-                      <div key={taskId} className="task-item" style={{ position: "relative" }}>
-                        {/* 3 dots */}
-                        <button
-                          type="button"
-                          aria-label="Task menu"
-                          onClick={(e) => openTaskMenu(e, col._id, t)}
-                          style={{
-                            position: "absolute",
-                            top: 8,
-                            right: 8,
-                            border: "none",
-                            background: "transparent",
-                            cursor: "pointer",
-                            fontSize: 18,
-                            lineHeight: 1,
-                          }}
+                  col.tasks.map((t: any) => (
+                    <div
+                      key={t._id}
+                      className="task-item"
+                      onClick={() => setSelectedTask(t)} // ✅ Show details
+                    >
+                      <div className="task-title">{t.title}</div>
+                      {t.priority && (
+                        <span
+                          className={`priority-badge ${t.priority.toLowerCase()}`}
                         >
-                          ⋮
-                        </button>
-
-                        <div className="task-title">{t.title}</div>
-                        {t.priority && (
-                          <span className={`priority-badge ${String(t.priority).toLowerCase()}`}>
-                            {t.priority}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })
+                          {t.priority}
+                        </span>
+                      )}
+                    </div>
+                  ))
                 )}
               </div>
 
@@ -492,15 +517,37 @@ const ProjectBoard: React.FC = () => {
         )}
 
       {/* Filter Panel */}
-      {projectId && (
+      {/* {projectId && (
         <FilterPanel
           projectId={projectId}
           isOpen={showFilters}
           onClose={() => setShowFilters(false)}
-          onApply={handleApplyFilters}
+          onApply={(f) => setFilters(f)}
           currentFilters={filters}
         />
-      )}
+      )}  */}
+
+      <div className="panel-stack">
+  {showFilters && projectId && (
+    <FilterPanel
+      projectId={projectId}
+      isOpen={true}
+      onClose={() => setShowFilters(false)}
+      onApply={(f) => setFilters(f)}
+      currentFilters={filters}
+    />
+  )}
+
+  {selectedTask && projectId && (
+    <TaskDeatils
+      taskTitle={selectedTask.title}
+      projectId={projectId}
+      onClose={() => setSelectedTask(null)}
+    />
+  )}
+</div>
+
+
 
       {/* Add Task Modal */}
       {showAddTask && activeColumnId && projectId && (
