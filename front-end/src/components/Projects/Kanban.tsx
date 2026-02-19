@@ -34,7 +34,7 @@ const Kanban = () => {
   return (
     <div className="kanban-page">
       {projects.map((project) => (
-        <TaskBoard key={project._id} project={project} tasks={[]} columns={[]} refreshColumns={()=>{}}/>
+        <TaskBoard key={project._id} projectId={project._id}/>
         
       ))}
       

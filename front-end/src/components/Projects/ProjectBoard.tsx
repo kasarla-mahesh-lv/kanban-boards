@@ -1,15 +1,12 @@
-import React, { useEffect, useState,useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
 import { useParams } from "react-router-dom";
-import {
-  type Column,
-  type Project,
-  getProjectColumnsApi,
-  createProjectColumnApi,
-} from "../Api/ApiCommon";
+import { type Project, getProjectColumnsApi, createTaskApi,createColumnApi } from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
-import ProjectSettings from "./ProjectSettings"; // Import the new Settings component
-import "./Project.css"; 
+import AddTaskModal from "./AddTaskModal";
+import ProjectSettings from "./ProjectSettings";
+import "./Project.css";
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 
@@ -57,150 +54,167 @@ const defaultFilters: Filters = {
   exactMatch: false,
 };
 
+type Task = {
+  _id?: string;
+  id?: string;
+  title: string;
+  priority?: string;
+  description?: string;
+  completed?: boolean;
+  assignee?: { id?: string };
+  createdBy?: { id?: string };
+  isFavorite?: boolean;
+  isFollowed?: boolean;
+};
+
+type UIColumn = {
+  _id: string;
+  title: string;
+  key: string;
+  order?: number;
+  tasks: Task[];
+};
+
+const makeDefaultColumns = (): UIColumn[] =>
+  DEFAULT_COLUMNS.map((t, idx) => ({
+    _id: `temp-${idx}`,
+    title: t,
+    key: t.toLowerCase().replace(/\s/g, ""),
+    order: idx,
+    tasks: [],
+  }));
+
+type EditDraft = {
+  taskId: string;
+  columnId: string;
+  title: string;
+  description: string;
+  priority: string;
+};
+
+type TaskMenuState = {
+  taskId: string;
+  columnId: string;
+  task: Task;
+  x: number; // fixed-left
+  y: number; // fixed-top
+};
+
+const MENU_WIDTH = 180;
+const MENU_HEIGHT = 92; // ~2 rows (Edit + Delete + divider)
+const MENU_GAP = 8;
+
 const ProjectBoard: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-
   const [project] = useState<Project | null>(null);
-  const [columns, setColumns] = useState<Column[]>([]);
+
+  const [columns, setColumns] = useState<UIColumn[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [showFilters, setShowFilters] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [filters, setFilters] = useState<Filters>(defaultFilters);
-  
-  const [showAddInput, setShowAddInput] = useState(false);
+  // Add Column (Group) state
+const [showAddInput, setShowAddInput] = useState(false);
 const [newColumnName, setNewColumnName] = useState("");
 
-  
 
-  const currentUserId = "ajay"; // Later replace with auth user
+  // Add Task modal
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
 
-  //const [activeColumn, setActiveColumn] = useState<Column | null>(null);
-  const handleAddColumn = async () => {
-  if (!projectId || !newColumnName.trim()) return;
+  // ✅ Portal menu state
+  const [menu, setMenu] = useState<TaskMenuState | null>(null);
 
-  try {
-    const newCol = await createProjectColumnApi(projectId, 
-      newColumnName
-      
-    );
+  // Edit modal (UI-only)
+  const [editDraft, setEditDraft] = useState<EditDraft | null>(null);
 
-    const formatted: Column = {
-  _id: newCol._id,
-  name: newCol.name,
-  order: newCol.order,
-  tasks: newCol.tasks || [],
-};
-
-
-    setColumns((prev) => [...prev, formatted]);
-
-    setNewColumnName("");
-    setShowAddInput(false);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   /* ================= LOAD COLUMNS ================= */
+  const loadColumns = async (pid: string) => {
+    try {
+      setError("");
+      setLoading(true);
+
+      const cols = await getProjectColumnsApi(pid);
+
+      const formatted: UIColumn[] = (cols || []).map((col: any) => ({
+        _id: col._id,
+        title: col.name || col.title || "Untitled",
+        key: (col.name || col.title || "untitled").toLowerCase().replace(/\s/g, ""),
+        order: col.order ?? 0,
+        tasks: Array.isArray(col.tasks) ? col.tasks : [],
+      }));
+
+      formatted.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      setColumns(formatted.length ? formatted : makeDefaultColumns());
+    } catch (e: unknown) {
+      console.error(e);
+      setError(e instanceof Error ? e.message : "Failed to load columns.");
+      setColumns(makeDefaultColumns());
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!projectId) return;
-
-    (async () => {
-      try {
-        setLoading(true);
-        const cols = await getProjectColumnsApi(projectId);
-
-        // Transform API response to match UI structure
-        const formattedColumns = cols.map((col) => ({
-  _id: col._id,
-  name: col.name,
-  order: col.order,
-  tasks: col.tasks || [],
-}));
-
-
-        // Sort by order
-        formattedColumns.sort(
-  (a, b) => (a.order ?? 0) - (b.order ?? 0)
-);
-
-
-        setColumns(formattedColumns);
-      } catch (e) {
-        console.error(e);
-        setError("Failed to load columns.");
-      } finally {
-        setLoading(false);
-      }
-    })();
+    void loadColumns(projectId);
   }, [projectId]);
 
-  // ✅ Active filter check (safe)
-  const hasActiveFilters = useMemo(() => {
-    return Object.values(filters).some((value) =>
-      Array.isArray(value)
-        ? value.length > 0
-        : value !== null && value !== false && value !== ""
-    );
-  }, [filters]);
+  /* ================= CLOSE MENU ON OUTSIDE CLICK / SCROLL / RESIZE ================= */
+  useEffect(() => {
+    const onDocMouseDown = (e: MouseEvent) => {
+      if (!menu) return;
 
-  // ✅ Safe filtering
+      const target = e.target as Node;
+      const inMenu = !!menuRef.current?.contains(target);
+
+      // If clicked outside the menu, close
+      if (!inMenu) setMenu(null);
+    };
+
+    const onWindowResize = () => {
+      if (menu) setMenu(null);
+    };
+
+    const onWindowScroll = () => {
+      // scroll anywhere -> close (prevents wrong positioning)
+      if (menu) setMenu(null);
+    };
+
+    document.addEventListener("mousedown", onDocMouseDown);
+    window.addEventListener("resize", onWindowResize);
+    window.addEventListener("scroll", onWindowScroll, true);
+
+    return () => {
+      document.removeEventListener("mousedown", onDocMouseDown);
+      window.removeEventListener("resize", onWindowResize);
+      window.removeEventListener("scroll", onWindowScroll, true);
+    };
+  }, [menu]);
+
+  /* ================= FILTER TASKS ================= */
   const filteredColumns = useMemo(() => {
+    if (!columns.length) return columns;
+
     return columns.map((col) => {
       const filteredTasks = (col.tasks || []).filter((task: any) => {
-        const title = (task.title || "").toLowerCase();
-
-        // Search
-        if (filters.search) {
-          const search = filters.search.toLowerCase();
-          const match = filters.exactMatch
-            ? title === search
-            : title.includes(search);
+        if (filters.search.trim()) {
+          const q = filters.search.trim();
+          const t = (task.title || "").toString();
+          const match = filters.exactMatch ? t === q : t.toLowerCase().includes(q.toLowerCase());
           if (!match) return false;
         }
 
-        // Assigned to me
-        if (
-          filters.assignedToMe &&
-          task.assignee?.id !== currentUserId
-        )
-          return false;
-
-        // Assignees
-        if (
-          filters.assignees.length > 0 &&
-          !filters.assignees.includes(task.assignee?.id)
-        )
-          return false;
-
-        // Priority
-        if (
-          filters.priority.length > 0 &&
-          !filters.priority.includes(task.priority)
-        )
-          return false;
-
-        // Completed
-        if (
-          filters.completed !== null &&
-          task.completed !== filters.completed
-        )
-          return false;
-
-        // Created by me
-        if (
-          filters.createdByMe &&
-          task.createdBy?.id !== currentUserId
-        )
-          return false;
-
-        // Favorites
+        if (filters.assignedToMe && task.assignee?.id !== "ajay") return false;
+        if (filters.assignees.length > 0 && !filters.assignees.includes(task.assignee?.id)) return false;
+        if (filters.priority.length > 0 && !filters.priority.includes(task.priority)) return false;
+        if (filters.completed !== null && task.completed !== filters.completed) return false;
+        if (filters.createdByMe && task.createdBy?.id !== "ajay") return false;
         if (filters.favorites && !task.isFavorite) return false;
-
-        // Followed
         if (filters.followed && !task.isFollowed) return false;
 
         return true;
@@ -208,113 +222,229 @@ const [newColumnName, setNewColumnName] = useState("");
 
       return { ...col, tasks: filteredTasks };
     });
-  }, [columns, filters, currentUserId]);
+  }, [columns, filters]);
 
-  const displayColumns =
-    filteredColumns.length > 0
-      ? filteredColumns
-      : DEFAULT_COLUMNS.map((name, idx) => ({
-          _id: `temp-${idx}`,
-          name,
-          order:idx,
-          tasks: [],
-        }));
+  const displayColumns = filteredColumns.length ? filteredColumns : makeDefaultColumns();
 
-  const handleApplyFilters = (newFilters: Filters) => {
-    setFilters(newFilters);
+  const handleApplyFilters = (newFilters: Filters) => setFilters(newFilters);
+  const clearAllFilters = () => setFilters(defaultFilters);
+
+  const handleSettingsClick = () => setShowSettings(true);
+  const handleCloseSettings = () => setShowSettings(false);
+
+  /* ================= ADD TASK (API HIT) ================= */
+  const handleAddTask = async (payload: {
+    title: string;
+    description?: string;
+    priority?: string;
+    projectId: string;
+    columnId: string;
+  }) => {
+    if (!projectId) return;
+
+    try {
+      setLoading(true);
+      await createTaskApi({
+        title: payload.title,
+        description: payload.description,
+        priority: payload.priority || "Medium",
+        projectId: payload.projectId,
+        columnId: payload.columnId,
+      });
+
+      setShowAddTask(false);
+      setActiveColumnId(null);
+
+      await loadColumns(projectId);
+    } catch (e: unknown) {
+      console.error(e);
+      setError(e instanceof Error ? e.message : "Failed to create task.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const clearAllFilters = () => {
-    setFilters(defaultFilters);
+  /* ================= MENU OPEN (PORTAL + CLAMP) ================= */
+  const openTaskMenu = (e: React.MouseEvent<HTMLButtonElement>, columnId: string, task: Task) => {
+    e.stopPropagation();
+
+    const taskId = String(task._id || task.id || "");
+    if (!taskId) return;
+
+    // toggle same menu
+    if (menu?.taskId === taskId) {
+      setMenu(null);
+      return;
+    }
+
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    // prefer open down, if not enough space then up
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+
+    const preferX = rect.right - MENU_WIDTH; // align right edges
+    const clampedX = Math.max(8, Math.min(preferX, viewportW - MENU_WIDTH - 8));
+
+    const spaceBelow = viewportH - rect.bottom;
+    const spaceAbove = rect.top;
+
+    const openDown = spaceBelow >= MENU_HEIGHT + MENU_GAP || spaceBelow >= spaceAbove;
+
+    const yDown = rect.bottom + MENU_GAP;
+    const yUp = rect.top - MENU_GAP - MENU_HEIGHT;
+
+    const clampedY = openDown
+      ? Math.max(8, Math.min(yDown, viewportH - MENU_HEIGHT - 8))
+      : Math.max(8, Math.min(yUp, viewportH - MENU_HEIGHT - 8));
+
+    setMenu({
+      taskId,
+      columnId,
+      task,
+      x: clampedX,
+      y: clampedY,
+    });
   };
 
-  const handleSettingsClick = () => {
-    setShowSettings(true);
+  /* ================= EDIT / DELETE (UI ONLY) ================= */
+  const onEditClick = (colId: string, task: Task) => {
+    const taskId = String(task._id || task.id || "");
+    if (!taskId) return;
+
+    setMenu(null);
+    setEditDraft({
+      taskId,
+      columnId: colId,
+      title: task.title || "",
+      description: task.description || "",
+      priority: task.priority || "Medium",
+    });
   };
 
-  const handleCloseSettings = () => {
-    setShowSettings(false);
+  const onDeleteClick = (colId: string, task: Task) => {
+    const taskId = String(task._id || task.id || "");
+    if (!taskId) return;
+
+    setMenu(null);
+
+    const ok = window.confirm("Delete this task?");
+    if (!ok) return;
+
+    setColumns((prev) =>
+      prev.map((c) =>
+        c._id !== colId ? c : { ...c, tasks: (c.tasks || []).filter((t) => String(t._id || t.id) !== taskId) }
+      )
+    );
   };
+
+  const saveEditLocal = () => {
+    if (!editDraft) return;
+
+    const { columnId, taskId, title, description, priority } = editDraft;
+
+    if (!title.trim()) {
+      alert("Title is required");
+      return;
+    }
+
+    setColumns((prev) =>
+      prev.map((c) => {
+        if (c._id !== columnId) return c;
+        return {
+          ...c,
+          tasks: (c.tasks || []).map((t) => {
+            const id = String(t._id || t.id || "");
+            if (id !== taskId) return t;
+            return { ...t, title: title.trim(), description, priority };
+          }),
+        };
+      })
+    );
+
+    setEditDraft(null);
+  };
+//   const handleAddColumn = () => {
+//   if (!newColumnName.trim()) return;
+
+//   const newColumn: UIColumn = {
+//     _id: `temp-${Date.now()}`,
+//     title: newColumnName.trim(),
+//     key: newColumnName.toLowerCase().replace(/\s/g, ""),
+//     order: columns.length,
+//     tasks: [],
+//   };
+
+//   setColumns((prev) => [...prev, newColumn]);
+//   setNewColumnName("");
+//   setShowAddInput(false);
+// };
+const handleAddColumn = async () => {
+  const name = newColumnName.trim();
+
+  if (!name || !projectId) return;
+
+  // Duplicate check (case insensitive)
+  const isDuplicate = columns.some(
+    (col) => col.title.trim().toLowerCase() === name.toLowerCase()
+  );
+
+  if (isDuplicate) {
+    alert("Column already exists");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    // ✅ Correct backend call
+    await createColumnApi(projectId, { name });
+
+    setNewColumnName("");
+    setShowAddInput(false);
+
+    // ✅ Reload columns
+    await loadColumns(projectId);
+
+  } catch (error: any) {
+    console.error("Create column error:", error);
+    alert(error?.message || "Failed to create column");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
+
 
   return (
     <div className="project-board">
       <div className="project-board-header">
         <div>
           <h1>{project?.title || "Project Board"}</h1>
-          <p style={{ marginTop: 4, opacity: 0.7 }}>
-            {loading ? "Loading..." : "Project Board"}
-          </p>
+          <p style={{ marginTop: 4, opacity: 0.7 }}>{loading ? "Loading..." : "Project Board"}</p>
         </div>
 
         <div className="board-actions">
-    
-        {/* {!showAddInput ? (
-  <button
-    className="add-col-btn"
-    onClick={() => setShowAddInput(true)}
-  >
-    + Add Column
-  </button>
-) : (
-  <div className="add-group-box-header">
-    <input
-      type="text"
-      placeholder="Enter group name..."
-      value={newColumnName}
-      onChange={(e) => setNewColumnName(e.target.value)}
-      autoFocus
-    />
-
-    <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-      <button onClick={handleAddColumn} className="btn btn-primary">
-        Add group
-      </button>
-
-      <button className="btn btn-danger"
-        onClick={() => {
-          setShowAddInput(false);
-          setNewColumnName("");
-        }}
-      >
-        Cancel
-      </button>
-    </div>
-  </div>
-)} */}
-
-
           
-          
-          {/* Settings Button */}
-          <button
-            className="settings-btn"
-            onClick={handleSettingsClick}
-            title="Project Settings"
-          >
+
+          <button className="settings-btn" type="button" onClick={handleSettingsClick} title="Project Settings">
             <span className="icon">⚙️</span> Settings
           </button>
 
-          {/* Filter Button */}
-          <button
-            className="filter-btn"
-            onClick={() => setShowFilters(true)}
-          >
-            ☰ Filters
-            {hasActiveFilters && (
-              <span className="filter-active-indicator">●</span>
-            )}
+          <button className="filter-btn" type="button" onClick={() => setShowFilters(true)}>
+            <span className="icon">☰</span> Filters
+          </button>
+
+          <button className="clear-all-filters" type="button" onClick={clearAllFilters}>
+            Clear all
           </button>
         </div>
       </div>
 
       {error && <div className="board-error">{error}</div>}
-
-      {hasActiveFilters && (
-        <div className="active-filters-bar">
-          <span>Active filters:</span>
-          <button onClick={clearAllFilters}>Clear all</button>
-        </div>
-      )}
 
       <div className="board-body">
     <div className="columns-row">
@@ -322,7 +452,7 @@ const [newColumnName, setNewColumnName] = useState("");
     {displayColumns.map((col) => (
       <div key={col._id} className="column-card">
         <div className="column-title">
-          <span>{col.name}</span>
+          <span>{col.title}</span>
           <span>{col.tasks?.length || 0}</span> 
         </div>
 
@@ -408,15 +538,93 @@ const [newColumnName, setNewColumnName] = useState("");
         />
       )}
 
-      {/* Settings Panel Component - Separate file */}
-      <ProjectSettings
-        projectId={projectId}
-        isOpen={showSettings}
-        onClose={handleCloseSettings}
-      />
+      {/* Add Task Modal */}
+      {showAddTask && activeColumnId && projectId && (
+        <AddTaskModal
+          columnTitle={columns.find((c) => c._id === activeColumnId)?.title || ""}
+          projectId={projectId}
+          columnId={activeColumnId}
+          onClose={() => {
+            setShowAddTask(false);
+            setActiveColumnId(null);
+          }}
+          onAdd={handleAddTask}
+        />
+      )}
+
+      {/* Edit modal (UI-only) */}
+      {/* Edit modal (UI-only) */}
+{editDraft && (
+  <div className="edit-overlay" onClick={() => setEditDraft(null)}>
+    <div className="edit-card" onClick={(e) => e.stopPropagation()}>
+      <div className="edit-head">
+        <h3>Edit Task</h3>
+        <p>Update title, description and priority</p>
+      </div>
+
+      <div className="edit-form">
+        <div className="edit-field">
+          <label>Title</label>
+          <input
+            className="edit-input"
+            value={editDraft.title}
+            onChange={(e) => setEditDraft({ ...editDraft, title: e.target.value })}
+            placeholder="Enter title"
+          />
+        </div>
+
+        <div className="edit-field">
+          <label>Description</label>
+          <textarea
+            className="edit-textarea"
+            value={editDraft.description}
+            onChange={(e) => setEditDraft({ ...editDraft, description: e.target.value })}
+            rows={3}
+            placeholder="Enter description"
+          />
+        </div>
+
+        <div className="edit-field">
+          <label>Priority</label>
+          <select
+            className="edit-select"
+            value={editDraft.priority}
+            onChange={(e) => setEditDraft({ ...editDraft, priority: e.target.value })}
+          >
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="edit-actions">
+        <button type="button" className="edit-btn edit-btn-ghost" onClick={() => setEditDraft(null)}>
+          Cancel
+        </button>
+        <button type="button" className="edit-btn edit-btn-primary" onClick={saveEditLocal}>
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+      {/* Settings */}
+      <ProjectSettings projectId={projectId} isOpen={showSettings} onClose={handleCloseSettings} />
     </div>
   );
 };
 
+const menuBtn: React.CSSProperties = {
+  width: "100%",
+  padding: "10px 12px",
+  textAlign: "left",
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  fontWeight: 700,
+};
 
 export default ProjectBoard;

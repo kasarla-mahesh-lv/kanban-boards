@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { sendOtp, verifyOtp,login, register,forgotPassword, resetPassword } = require("../controllers/authController");
-const { requestMfaOtp, verifyMfaOtp,disableMfa } = require("../controllers/authController");
+const { requestMfaOtp, verifyMfaOtp,disableMfa,requestDisableMfaOtp,verifyDisableMfaOtp } = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authmiddlewares");
 
 
@@ -158,6 +158,51 @@ router.patch("/mfa/verify", authMiddleware, verifyMfaOtp);
  *         description: Unauthorized
  */
 router.patch("/mfa/disable", authMiddleware, disableMfa);
+/**
+ * @openapi
+ * /api/auth/mfa/disable/request:
+ *   patch:
+ *     tags: [MFA]
+ *     summary: Request OTP to disable MFA
+ *     description: Sends OTP to user's email. Use /mfa/disable/verify to confirm and disable MFA.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Disable MFA OTP sent to email
+ *       401:
+ *         description: Unauthorized
+ */
+router.patch("/mfa/disable/request", authMiddleware, requestDisableMfaOtp);
+/**
+ * @openapi
+ * /api/auth/mfa/disable/verify:
+ *   patch:
+ *     tags: [MFA]
+ *     summary: Verify OTP and disable MFA
+ *     description: Verifies OTP sent to email and disables MFA for the logged-in user.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [otp]
+ *             properties:
+ *               otp:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: MFA disabled successfully
+ *       400:
+ *         description: Invalid or expired OTP
+ *       401:
+ *         description: Unauthorized
+ */
+router.patch("/mfa/disable/verify", authMiddleware, verifyDisableMfaOtp);
 
 /**
  * @swagger
