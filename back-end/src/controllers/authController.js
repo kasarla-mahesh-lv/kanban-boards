@@ -23,9 +23,8 @@ try{
       // 🔥 FETCH USER FIRST
      let user = await UserModel.findOne({ email });
 
-    // already verified user
-    if(user && user.isVerified)
-        return res.status(400).json({message:"User already registered, please login"});
+    if (user && user.isVerified !== false)
+    return res.status(400).json({ message: "User already registered, please login" });
 
     // generate OTP
     const otp = Math.floor(100000 + Math.random()*900000).toString();
@@ -151,15 +150,21 @@ exports.login = async (req, res) => {
     const user = await UserModel.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid email 📩" });
 
-    if (!user.isVerified) {
+
+    if (user?.isVerified === false) {
       return res.status(401).json({ message: "Please verify OTP before login" });
+    }
+
+    if (user?.isVerified === undefined) {
+       user.isVerified = true;
+      await user.save();
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
         // ✅ ✅ MAIN CHANGE: If MFA is OFF => direct token => dashboard
-    if (!user.mfaEnabled) {
+    if (!user?.mfaEnabled) {
       const token = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET,
@@ -325,13 +330,13 @@ exports.verifyMfaOtp = async (req, res) => {
     const user = await UserModel.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!user.mfaOtp || !user.mfaOtpExpiresAt)
+    if (!user?.mfaOtp || !user?.mfaOtpExpiresAt)
       return res.status(400).json({ message: "Please request MFA OTP first" });
 
-    if (user.mfaOtpExpiresAt < Date.now())
+    if (user?.mfaOtpExpiresAt < Date.now())
       return res.status(400).json({ message: "OTP expired" });
 
-    if (user.mfaOtp !== otp)
+    if (user?.mfaOtp !== otp)
       return res.status(400).json({ message: "Invalid OTP" });
 
     user.mfaEnabled = true;
@@ -407,13 +412,13 @@ exports.verifyDisableMfaOtp = async (req, res) => {
     const user = await UserModel.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!user.disableMfaOtp || !user.disableMfaOtpExpiresAt)
+    if (!user?.disableMfaOtp || !user?.disableMfaOtpExpiresAt)
       return res.status(400).json({ message: "Please request OTP first" });
 
-    if (user.disableMfaOtpExpiresAt < Date.now())
+    if (user?.disableMfaOtpExpiresAt < Date.now())
       return res.status(400).json({ message: "OTP expired" });
 
-    if (user.disableMfaOtp !== otp)
+    if (user?.disableMfaOtp !== otp)
       return res.status(400).json({ message: "Invalid OTP" });
 
     user.mfaEnabled = false;
