@@ -1,6 +1,7 @@
 // front-end/src/components/Api/ApiCommon.ts
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
+
 /* ======================= AXIOS INSTANCE ======================= */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -177,16 +178,78 @@ export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> =>
   try {
     console.log("📝 Login API called with:", payload.email);
     const res = await api.post("/auth/login", payload);
-    console.log("✅ Login response:", res);
+    console.log("✅ Login response:", res.data);
+    console.log("✅ Login headers:", res.headers);
     
+    // Check if token is in authorization header (MFA disabled - direct login)
     if (res?.headers?.authorization) {
-      console.log(res?.headers?.authorization, "_________________________________");
-      localStorage.setItem("token", res?.headers?.authorization);
-      sessionStorage.setItem("token", res?.headers?.authorization);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      return res.data;
+      console.log("🎉 Token received in headers - MFA disabled");
+      const token = res.headers.authorization;
+      localStorage.setItem("token", token);
+      sessionStorage.setItem("token", token);
+      
+      // When MFA is disabled, we get token directly
+      if (res.data.user) {
+        const userData = {
+          ...res.data.user,
+          mfaEnabled: false
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        console.log("✅ User data saved with MFA disabled:", userData);
+      }
+      
+      return {
+        ...res.data,
+        token: token,
+        requiresOtp: false,
+        mfaRequired: false
+      };
     }
-
+    
+    // Check if token is in response data (MFA disabled - direct login)
+    if (res.data.token) {
+      console.log("🎉 Token received in response data - MFA disabled");
+      localStorage.setItem("token", res.data.token);
+      sessionStorage.setItem("token", res.data.token);
+      
+      if (res.data.user) {
+        const userData = {
+          ...res.data.user,
+          mfaEnabled: false
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        console.log("✅ User data saved with MFA disabled:", userData);
+      }
+      
+      return {
+        ...res.data,
+        requiresOtp: false,
+        mfaRequired: false
+      };
+    }
+    
+    // Check if MFA is required (user has MFA enabled)
+    if (!res.data.token && res.data.message && res.data.message.includes("OTP")) {
+      console.log("🔐 MFA required - OTP sent");
+      
+      // IMPORTANT: Check if token is in headers even for MFA required case
+      // The backend might still send a token for the MFA session
+      if (res?.headers?.authorization) {
+        const token = res.headers.authorization;
+        localStorage.setItem("token", token);
+        sessionStorage.setItem("token", token);
+        console.log("🎉 Token stored for MFA session from headers");
+      }
+      
+      return {
+        ...res.data,
+        mfaRequired: true,
+        requiresOtp: true,
+        otpSent: true
+      };
+    }
+    
+    // Check if OTP is required (login with OTP flow)
     const message = res.data.message || "";
     const otpSent = message.toLowerCase().includes("otp sent") ||
                     message.toLowerCase().includes("sent to email");
@@ -220,21 +283,125 @@ export const verifyOtpApi = async (payload: VerifyOtpPayload): Promise<any> => {
     };
 
     console.log("🔐 Verifying OTP with data:", data);
-
     const res = await api.post("/auth/verify-otp", data);
+    console.log("✅ Verify OTP response:", res.data);
+    console.log("✅ Verify OTP headers:", res.headers);
 
-    console.log("✅ Verify OTP response:", res);
-
-    if (payload.type === "login" && res?.headers?.authorization) {
-      console.log("🎉 Login successful, storing token");
-      localStorage.setItem("token", res?.headers?.authorization);
-      sessionStorage.setItem("token", res?.headers?.authorization);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+    // Handle login verification with token in headers
+    if (payload.type === "login") {
+      if (res?.headers?.authorization) {
+        console.log("🎉 Login successful, storing token from headers");
+        const token = res.headers.authorization;
+        localStorage.setItem("token", token);
+        sessionStorage.setItem("token", token);
+        
+        // For normal login OTP verification, MFA remains disabled
+        if (res.data.user) {
+          const userData = {
+            ...res.data.user,
+            mfaEnabled: false
+          };
+          localStorage.setItem("user", JSON.stringify(userData));
+          console.log("✅ User data saved with MFA disabled:", userData);
+        }
+        
+        return {
+          ...res.data,
+          token: token,
+          success: true
+        };
+      }
+      
+      if (res.data.token) {
+        console.log("🎉 Login successful, storing token from response");
+        localStorage.setItem("token", res.data.token);
+        sessionStorage.setItem("token", res.data.token);
+        
+        if (res.data.user) {
+          const userData = {
+            ...res.data.user,
+            mfaEnabled: false
+          };
+          localStorage.setItem("user", JSON.stringify(userData));
+          console.log("✅ User data saved with MFA disabled:", userData);
+        }
+        
+        return {
+          ...res.data,
+          success: true
+        };
+      }
     }
 
-    return res.data;
+    // Handle MFA verification for login (when MFA is enabled)
+    if (payload.type === "mfa") {
+      if (res?.headers?.authorization) {
+        const token = res.headers.authorization;
+        localStorage.setItem("token", token);
+        sessionStorage.setItem("token", token);
+        
+        // IMPORTANT: When MFA verification succeeds, MFA is enabled
+        if (res.data.user) {
+          const userData = {
+            ...res.data.user,
+            mfaEnabled: true
+          };
+          localStorage.setItem("user", JSON.stringify(userData));
+          console.log("✅ User data saved with MFA ENABLED:", userData);
+        } else {
+          // If no user data in response, create one with MFA enabled
+          const userData = {
+            id: '',
+            name: '',
+            email: payload.email,
+            mfaEnabled: true
+          };
+          localStorage.setItem("user", JSON.stringify(userData));
+          console.log("✅ User data created with MFA ENABLED:", userData);
+        }
+        
+        return {
+          ...res.data,
+          token: token,
+          success: true
+        };
+      }
+      
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+        sessionStorage.setItem("token", res.data.token);
+        
+        if (res.data.user) {
+          const userData = {
+            ...res.data.user,
+            mfaEnabled: true
+          };
+          localStorage.setItem("user", JSON.stringify(userData));
+          console.log("✅ User data saved with MFA ENABLED:", userData);
+        } else {
+          const userData = {
+            id: '',
+            name: '',
+            email: payload.email,
+            mfaEnabled: true
+          };
+          localStorage.setItem("user", JSON.stringify(userData));
+          console.log("✅ User data created with MFA ENABLED:", userData);
+        }
+        
+        return {
+          ...res.data,
+          success: true
+        };
+      }
+    }
+
+    return {
+      ...res.data,
+      success: true
+    };
   } catch (error) {
-    console.error("❌ Verify OTP error:", error);
+    console.error("❌ Verify OTP API error:", error);
     throw error;
   }
 };
@@ -581,11 +748,13 @@ export const logoutApi = (): void => {
   console.log("👋 Logged out successfully");
 };
 
+// ... (rest of your existing code for projects, teams, etc. remains the same)
+
 // ... (rest of your Api/ApiCommon.ts remains the same)
 /* ======================= PROJECT TYPES ======================= */
 export type Project = { _id: string; title: string; description?: string };
 export type Task = { _id: string; title: string; description?: string; priority?: string };
-export type Column = { _id: string; name: string; order: number; tasks?: Task[] };
+export type Column = { _id: string; title: string; key: string; tasks: Task[] };
 
 export type Member = {
   _id: string;
