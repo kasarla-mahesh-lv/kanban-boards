@@ -12,12 +12,37 @@
 
 /* ---------- Header ---------- */
 
+/* =========================
+   Project Board - Professional UI
+   Works with your classNames:
+   .project-board, .project-board-header, .add-col-btn,
+   .board-error, .columns-row, .column-card, .column-title,
+   .count, .tasks-area, .no-tasks, .task-item, .add-task-btn
+   + Modal (AddTaskModal):
+   .modal-overlay, .modal-box, .modal-head, .modal-title,
+   .modal-sub, .form-group, .label, .input, .textarea,
+   .modal-actions, .btn-ghost, .btn-primary
+   
+   ⚠️ FILTER STYLES REMOVED COMPLETELY
+========================= */
+
+/* ---- Page wrapper ---- */
+.project-board {
+  width: 100%;
+  padding: 22px 26px;
+  box-sizing: border-box;
+  min-height: calc(100vh - 0px);
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+/* ---- Header (Title left, button right) ---- */
 .project-board-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
   gap: 16px;
+  margin-bottom: 14px;
 }
 
 .project-board-header h1 {
@@ -41,11 +66,13 @@
   align-items: center;
 }
 
-.add-col-btn,
-.settings-btn,
-.filter-btn {
-  padding: 10px 18px;
-  border-radius: 10px;
+.add-col-btn {
+  background-color: #4a6cf7;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -60,6 +87,8 @@
   color: white;
   border: none;
   box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .add-col-btn:hover {
