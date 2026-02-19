@@ -397,7 +397,7 @@ const handleAddColumn = async () => {
     setLoading(true);
 
     // ✅ Correct backend call
-    await createColumnApi(projectId, { name });
+    await createColumnApi(projectId, { title : name });
 
     setNewColumnName("");
     setShowAddInput(false);
@@ -613,14 +613,6 @@ const handleAddColumn = async () => {
   );
 };
 
-const menuBtn: React.CSSProperties = {
-  width: "100%",
-  padding: "10px 12px",
-  textAlign: "left",
-  background: "transparent",
-  border: "none",
-  cursor: "pointer",
-  fontWeight: 700,
-};
+
 
 export default ProjectBoard;
