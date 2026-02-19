@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+
 import { useParams } from "react-router-dom";
-import { type Project, getProjectColumnsApi, createTaskApi } from "../Api/ApiCommon";
+import { type Project, getProjectColumnsApi, createTaskApi,createColumnApi } from "../Api/ApiCommon";
 
 import FilterPanel from "./FilterPanel";
 import AddTaskModal from "./AddTaskModal";
@@ -115,6 +115,10 @@ const ProjectBoard: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
  
   const [filters, setFilters] = useState<Filters>(defaultFilters);
+  // Add Column (Group) state
+const [showAddInput, setShowAddInput] = useState(false);
+const [newColumnName, setNewColumnName] = useState("");
+
 
   // Add Task modal
   const [showAddTask, setShowAddTask] = useState(false);
@@ -359,6 +363,60 @@ const ProjectBoard: React.FC = () => {
 
     setEditDraft(null);
   };
+//   const handleAddColumn = () => {
+//   if (!newColumnName.trim()) return;
+
+//   const newColumn: UIColumn = {
+//     _id: `temp-${Date.now()}`,
+//     title: newColumnName.trim(),
+//     key: newColumnName.toLowerCase().replace(/\s/g, ""),
+//     order: columns.length,
+//     tasks: [],
+//   };
+
+//   setColumns((prev) => [...prev, newColumn]);
+//   setNewColumnName("");
+//   setShowAddInput(false);
+// };
+const handleAddColumn = async () => {
+  const name = newColumnName.trim();
+
+  if (!name || !projectId) return;
+
+  // Duplicate check (case insensitive)
+  const isDuplicate = columns.some(
+    (col) => col.title.trim().toLowerCase() === name.toLowerCase()
+  );
+
+  if (isDuplicate) {
+    alert("Column already exists");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    // ✅ Correct backend call
+    await createColumnApi(projectId, { name });
+
+    setNewColumnName("");
+    setShowAddInput(false);
+
+    // ✅ Reload columns
+    await loadColumns(projectId);
+
+  } catch (error: any) {
+    console.error("Create column error:", error);
+    alert(error?.message || "Failed to create column");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
+
 
   return (
     <div className="project-board">
@@ -369,9 +427,7 @@ const ProjectBoard: React.FC = () => {
         </div>
 
         <div className="board-actions">
-          <button className="add-col-btn" type="button">
-            + Add Column
-          </button>
+          
 
          
 
@@ -388,107 +444,87 @@ const ProjectBoard: React.FC = () => {
       {error && <div className="board-error">{error}</div>}
 
       <div className="board-body">
-        <div className="columns-row">
-          {displayColumns.map((col) => (
-            <div key={col._id} className="column-card">
-              <div className="column-title">
-                <span>{col.title}</span>
-                <span className="count">{col.tasks?.length || 0}</span>
-              </div>
+    <div className="columns-row">
 
-              <div className="tasks-area">
-                {(col.tasks?.length || 0) === 0 ? (
-                  <div className="no-tasks">No tasks</div>
-                ) : (
-                  col.tasks.map((t) => {
-                    const taskId = String(t._id || t.id || "");
-                    return (
-                      <div key={taskId} className="task-item" style={{ position: "relative" }}>
-                        {/* 3 dots */}
-                        <button
-                          type="button"
-                          aria-label="Task menu"
-                          onClick={(e) => openTaskMenu(e, col._id, t)}
-                          style={{
-                            position: "absolute",
-                            top: 8,
-                            right: 8,
-                            border: "none",
-                            background: "transparent",
-                            cursor: "pointer",
-                            fontSize: 18,
-                            lineHeight: 1,
-                          }}
-                        >
-                          ⋮
-                        </button>
-
-                        <div className="task-title">{t.title}</div>
-                        {t.priority && (
-                          <span className={`priority-badge ${String(t.priority).toLowerCase()}`}>
-                            {t.priority}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              <button
-                className="add-task-btn"
-                type="button"
-                onClick={() => {
-                  setActiveColumnId(col._id);
-                  setShowAddTask(true);
-                }}
-              >
-                + Add Task
-              </button>
-            </div>
-          ))}
+    {displayColumns.map((col) => (
+      <div key={col._id} className="column-card">
+        <div className="column-title">
+          <span>{col.title}</span>
+          <span>{col.tasks?.length || 0}</span> 
         </div>
+
+      <div className="tasks-area">
+        {(col.tasks?.length || 0) === 0 ? (
+          <div className="no-tasks">No tasks</div>
+        ) : (
+          col.tasks.map((t: any) => (
+            <div key={t._id || t.id} className="task-item">
+              <div className="task-title">{t.title}</div>
+              {t.priority && (
+                <span className="priority-badge">
+                  {t.priority}
+                </span>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
-      {/* ✅ PORTAL MENU (always visible, no overlap/clipping) */}
-      {menu &&
-        createPortal(
-          <div
-            ref={menuRef}
-            style={{
-              position: "fixed",
-              left: menu.x,
-              top: menu.y,
-              width: MENU_WIDTH,
-              background: "#fff",
-              border: "1px solid #e5e7eb",
-              borderRadius: 12,
-              boxShadow: "0 12px 28px rgba(0,0,0,0.14)",
-              overflow: "hidden",
-              zIndex: 100000,
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => onEditClick(menu.columnId, menu.task)}
-              style={menuBtn}
-            >
-              Edit
-            </button>
-            <div style={{ height: 1, background: "#f1f5f9" }} />
-            <button
-              type="button"
-              onClick={() => onDeleteClick(menu.columnId, menu.task)}
-              style={{ ...menuBtn, color: "#dc2626" }}
-            >
-              Delete
-            </button>
-          </div>,
-          document.body
-        )}
+      <button className="add-task-btn">
+        + Add Task
+      </button>
+    </div>
+  ))}
 
-      {/* Filter Panel */}
+  {/* ✅ VAIZ STYLE ADD GROUP */}
+  <div className="add-group-wrapper">
+  {showAddInput ? (
+    <div className="add-group-input-container">
+      <input
+        className="add-group-input"
+        placeholder="Enter group name..."
+        value={newColumnName}
+        onChange={(e) => setNewColumnName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleAddColumn();
+        }}
+        autoFocus
+      />
+
+      <div className="add-group-actions">
+        <button
+          className="add-group-btn"
+          onClick={handleAddColumn}
+        >
+          Add group
+        </button>
+
+        <button
+          className="cancel-btn"
+          onClick={() => {
+            setShowAddInput(false);
+            setNewColumnName("");
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  ) : (
+    <button
+      className="add-group-column"
+      onClick={() => setShowAddInput(true)}
+    >
+      +
+    </button>
+  )}
+</div>
+
+
+    
+
+      </div>
+</div>
       {projectId && (
         <FilterPanel
           projectId={projectId}
