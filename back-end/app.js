@@ -49,7 +49,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 /* -------------------- Routes -------------------- */
 app.use("/api/auth", authRoutes);
 // app.use("/api/boards", boardRoutes);
-//app.use("/api/columns", columnRoutes);
+
 app.use("/api/projects", columnRoutes);
 app.use("/api/columns", columnRoutes);
 
