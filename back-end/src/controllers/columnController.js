@@ -1,115 +1,169 @@
 const mongoose = require("mongoose");
 const Column = require("../models/column");
 
-// ✅ Create Column (Add Group)
-exports.createColumn = async (req, res) => {
+/* =========================
+   GET COLUMNS BY PROJECT
+   GET /api/projects/:projectId/columns
+========================= */
+exports.getColumnsByProject = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { name } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(projectId)) {
       return res.status(400).json({ message: "Invalid projectId" });
     }
-    
 
-    if (!name || !name.trim()) {
-      return res.status(400).json({ message: "Column name required" });
+    const columns = await Column.find({ projectId }).sort({ order: 1 });
+    return res.status(200).json(columns);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+/* =========================
+   CREATE COLUMN (Add Group)
+   POST /api/projects/:projectId/columns
+   - lowercase store
+   - no duplicates (case-insensitive)
+========================= */
+exports.createColumn = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    let { name } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "Invalid projectId" });
     }
 
-    // ✅ next order (last order + 1)
-    const last = await Column.findOne({ boardId: projectId }).sort({ order: -1 });
-    const nextOrder = last ? last.order + 1 : 1;
+    if (!name || !String(name).trim()) {
+      return res.status(400).json({ message: "Column name is required" });
+    }
+
+    // ✅ normalize
+    name = String(name).trim().toLowerCase();
+
+    // ✅ duplicate check (project + name)
+    const exists = await Column.findOne({ projectId, name });
+    if (exists) {
+      return res.status(409).json({ message: `Column "${name}" already exists` });
+    }
+
+    // ✅ Find "done" column
+    const doneCol = await Column.findOne({ projectId, name: "done" });
+
+    let nextOrder;
+
+    if (doneCol) {
+      // ✅ Shift columns after done to the right
+      await Column.updateMany(
+        { projectId, order: { $gt: doneCol.order } },
+        { $inc: { order: 1 } }
+      );
+
+      // ✅ Insert right after done
+      nextOrder = doneCol.order + 1;
+    } else {
+      // fallback: add at end
+      const last = await Column.findOne({ projectId }).sort({ order: -1 });
+      nextOrder = last ? last.order + 1 : 1;
+    }
 
     const column = await Column.create({
-      boardId: projectId,
-      name: name.trim(),
+      projectId,
+      name,
       order: nextOrder,
       cards: [],
     });
 
     return res.status(201).json(column);
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ message: "Column already exists" });
+    }
     return res.status(500).json({ message: err.message });
   }
 };
 
-// ✅ Update Column (name/order)
+
+/* =========================
+   UPDATE COLUMN
+   PATCH /api/columns/:columnId
+========================= */
 exports.updateColumn = async (req, res) => {
   try {
-    const { projectId, columnId } = req.params;
-    const { name, order } = req.body;
+    const { columnId } = req.params;
+    let { name, order } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(projectId)) {
-      return res.status(400).json({ message: "Invalid projectId" });
-    }
     if (!mongoose.Types.ObjectId.isValid(columnId)) {
       return res.status(400).json({ message: "Invalid columnId" });
     }
 
-    if (name === undefined && order === undefined) {
-      return res.status(400).json({ message: "Provide name or order to update" });
-    }
+    const column = await Column.findById(columnId);
+    if (!column) return res.status(404).json({ message: "Column not found" });
 
     const updateData = {};
-    if (name !== undefined) updateData.name = name;
-    if (order !== undefined) updateData.order = order;
 
-    // ✅ make sure column belongs to this project
-    const updated = await Column.findOneAndUpdate(
-      { _id: columnId, boardId: projectId },
+    if (name !== undefined) {
+      name = String(name).trim().toLowerCase();
+      if (!name) return res.status(400).json({ message: "Column name cannot be empty" });
+
+      const duplicate = await Column.findOne({
+        projectId: column.projectId,
+        _id: { $ne: columnId },
+        name,
+      });
+
+      if (duplicate) {
+        return res.status(409).json({ message: `Column "${name}" already exists` });
+      }
+
+      updateData.name = name;
+    }
+
+    if (order !== undefined) {
+      const n = Number(order);
+      if (!Number.isFinite(n) || n < 0) {
+        return res.status(400).json({ message: "order must be a valid number" });
+      }
+      updateData.order = n;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: "Nothing to update" });
+    }
+
+    const updated = await Column.findByIdAndUpdate(
+      columnId,
       { $set: updateData },
       { new: true, runValidators: true }
     );
 
-    if (!updated) {
-      return res.status(404).json({ message: "Column not found for this project" });
-    }
-
     return res.status(200).json(updated);
   } catch (err) {
-    return res.status(500).json({ message: "Update failed", error: err.message });
-  }
-};
-
-// ✅ Get columns by projectId
-exports.getColumnsByBoard = async (req, res) => {
-  try {
-    const { projectId } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(projectId)) {
-      return res.status(400).json({ message: "Invalid projectId" });
+    if (err.code === 11000) {
+      return res.status(409).json({ message: "Column already exists" });
     }
-
-    const columns = await Column.find({ boardId: projectId }).sort({ order: 1 });
-    return res.status(200).json(columns);
-  } catch (error) {
-    return res.status(500).json({ message: "Failed to fetch columns", error: error.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
-// ✅ Delete Column
+/* =========================
+   DELETE COLUMN
+   DELETE /api/columns/:columnId
+========================= */
 exports.deleteColumn = async (req, res) => {
   try {
-    const { projectId, columnId } = req.params;
+    const { columnId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(projectId)) {
-      return res.status(400).json({ message: "Invalid projectId" });
-    }
     if (!mongoose.Types.ObjectId.isValid(columnId)) {
       return res.status(400).json({ message: "Invalid columnId" });
     }
 
-    const deleted = await Column.findOneAndDelete({
-      _id: columnId,
-      boardId: projectId,
-    });
-
-    if (!deleted) {
-      return res.status(404).json({ message: "Column not found for this project" });
-    }
+    const deleted = await Column.findByIdAndDelete(columnId);
+    if (!deleted) return res.status(404).json({ message: "Column not found" });
 
     return res.status(200).json({ message: "Column deleted successfully" });
-  } catch (error) {
-    return res.status(500).json({ message: "Delete failed", error: error.message });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
 };
