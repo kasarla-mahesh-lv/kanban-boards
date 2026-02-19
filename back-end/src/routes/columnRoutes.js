@@ -1,14 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
+const authMiddleware = require("../middlewares/authmiddlewares");
 const {
   createColumn,
   updateColumn,
   deleteColumn,
-  getColumnsByBoard,
+  getColumnsByProject,
 } = require("../controllers/columnController");
-
-const authMiddleware = require("../middlewares/authmiddlewares");
 
 /**
  * @openapi
@@ -33,14 +32,14 @@ const authMiddleware = require("../middlewares/authmiddlewares");
  *       200:
  *         description: Columns list
  */
-router.get("/:projectId/columns", authMiddleware, getColumnsByBoard);
+router.get("/:projectId/columns", authMiddleware, getColumnsByProject);
 
 /**
  * @openapi
  * /api/projects/{projectId}/columns:
  *   post:
  *     tags: [Columns]
- *     summary: Create a column in a project (Add group)
+ *     summary: Create a column in a project (Add Group)
  *     parameters:
  *       - in: path
  *         name: projectId
@@ -61,6 +60,8 @@ router.get("/:projectId/columns", authMiddleware, getColumnsByBoard);
  *     responses:
  *       201:
  *         description: Column created
+ *       409:
+ *         description: Duplicate column name
  */
 router.post("/:projectId/columns", authMiddleware, createColumn);
 
@@ -69,7 +70,7 @@ router.post("/:projectId/columns", authMiddleware, createColumn);
  * /api/columns/{columnId}:
  *   patch:
  *     tags: [Columns]
- *     summary: Update a column
+ *     summary: Update a column (name/order)
  *     parameters:
  *       - in: path
  *         name: columnId
