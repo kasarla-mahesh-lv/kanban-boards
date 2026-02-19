@@ -19,7 +19,7 @@ const Register: React.FC = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      setErr("");
+      setErr("");  
 
       console.log("register");
       return true;
