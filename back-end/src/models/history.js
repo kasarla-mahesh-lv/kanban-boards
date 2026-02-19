@@ -2,26 +2,27 @@ const mongoose = require("mongoose");
 
 const historySchema = new mongoose.Schema(
   {
-    userName: {
-      type: String,
+    taskId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Task",
       required: true
     },
-
-    actionType: {
+    createdBy: {
+      type: String
+    },
+    personId: {
       type: String,
       required: true
-    },
-
-    taskTitle: String,
-    taskCode: String,
-    taskId: String,
-
-    fromColumn: String,
-    toColumn: String,
-
-    boardId: String
   },
+  activity: {
+      type: String,
+      required: true
+  }
+  },
+  
+  
   { timestamps: true }
 );
+
 
 module.exports = mongoose.model("History", historySchema);
