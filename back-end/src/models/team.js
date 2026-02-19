@@ -19,6 +19,24 @@ const teamSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Projects",
       required: true
+    },
+    // ✅ NEW FIELDS FOR EMAIL INVITATION
+    status: {
+      type: String,
+      enum: ["pending", "active"],
+      default: "pending"
+    },
+    invitationToken: {
+      type: String,
+      default: null
+    },
+    invitedAt: {
+      type: Date,
+      default: null
+    },
+    acceptedAt: {
+      type: Date,
+      default: null
     }
   },
   { timestamps: true }
