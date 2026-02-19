@@ -80,10 +80,10 @@ const AddTaskModal: React.FC<Props> = ({
         </div>
 
         <div style={{ marginTop: 20, display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button onClick={onClose} disabled={saving}>
+          <button  className="btn-ghost" onClick={onClose} disabled={saving}>
             Cancel
           </button>
-          <button onClick={submit} disabled={saving}>
+          <button className="btn-primary" onClick={submit} disabled={saving}>
             {saving ? "Adding..." : "Add Task"}
           </button>
         </div>
@@ -93,4 +93,3 @@ const AddTaskModal: React.FC<Props> = ({
 };
 
 export default AddTaskModal;
-
