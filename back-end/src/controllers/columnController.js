@@ -34,11 +34,12 @@ exports.createColumn = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(projectId)) {
       return res.status(400).json({ message: "Invalid projectId" });
     }
+
     if (!name || !String(name).trim()) {
       return res.status(400).json({ message: "Column name is required" });
     }
 
-    // ✅ normalize (case-insensitive)
+    // ✅ normalize
     name = String(name).trim().toLowerCase();
 
     // ✅ duplicate check (project + name)
@@ -47,26 +48,42 @@ exports.createColumn = async (req, res) => {
       return res.status(409).json({ message: `Column "${name}" already exists` });
     }
 
-    // ✅ order auto
-    const last = await Column.findOne({ projectId }).sort({ order: -1 });
-    const nextOrder = last ? last.order + 1 : 1;
+    // ✅ Find "done" column
+    const doneCol = await Column.findOne({ projectId, name: "done" });
+
+    let nextOrder;
+
+    if (doneCol) {
+      // ✅ Shift columns after done to the right
+      await Column.updateMany(
+        { projectId, order: { $gt: doneCol.order } },
+        { $inc: { order: 1 } }
+      );
+
+      // ✅ Insert right after done
+      nextOrder = doneCol.order + 1;
+    } else {
+      // fallback: add at end
+      const last = await Column.findOne({ projectId }).sort({ order: -1 });
+      nextOrder = last ? last.order + 1 : 1;
+    }
 
     const column = await Column.create({
       projectId,
-      name, // model will store lowercase anyway
+      name,
       order: nextOrder,
       cards: [],
     });
 
     return res.status(201).json(column);
   } catch (err) {
-    // unique index duplicate
     if (err.code === 11000) {
       return res.status(409).json({ message: "Column already exists" });
     }
     return res.status(500).json({ message: err.message });
   }
 };
+
 
 /* =========================
    UPDATE COLUMN
