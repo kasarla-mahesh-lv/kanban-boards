@@ -1,33 +1,19 @@
-/* =========================
-   Project Board - Professional UI
-   Works with your classNames:
-   .project-board, .project-board-header, .add-col-btn,
-   .board-error, .columns-row, .column-card, .column-title,
-   .count, .tasks-area, .no-tasks, .task-item, .add-task-btn
-   + Modal (AddTaskModal):
-   .modal-overlay, .modal-box, .modal-head, .modal-title,
-   .modal-sub, .form-group, .label, .input, .textarea,
-   .modal-actions, .btn-ghost, .btn-primary
-   
-   ⚠️ FILTER STYLES REMOVED COMPLETELY
-========================= */
-
 /* ---- Page wrapper ---- */
 .project-board {
   width: 100%;
   padding: 22px 26px;
   box-sizing: border-box;
-  min-height: calc(100vh - 0px);
+  min-height: 100vh;
   background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
 }
 
-/* ---- Header (Title left, button right) ---- */
+/* ---- Header ---- */
 .project-board-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
 .project-board-header h1 {
@@ -44,414 +30,26 @@
   color: #64748b;
 }
 
+/* ---- Board actions ---- */
+.board-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 /* ---- Add Column button ---- */
 .add-col-btn {
-  border: none;
-  cursor: pointer;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 900;
-  color: #0f172a;
-  background: transparent;
-  transition: background 140ms ease, transform 140ms ease;
-}
-
-.add-col-btn:hover {
-  background: #f1f5f9;
-  transform: translateY(-1px);
-}
-
-.add-col-btn:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-/* ---- Error banner ---- */
-.board-error {
-  width: 100%;
-  padding: 12px 14px;
-  margin: 10px 0 14px;
-  border-radius: 14px;
-  background: #fff1f2;
-  border: 1px solid #fecdd3;
-  color: #9f1239;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 10px 20px rgba(225, 29, 72, 0.08);
-  animation: slideDown 220ms ease both;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ---- Board body layout ---- */
-.board-body {
-  display: flex;
-  position: relative;
-}
-
-/* ---- Columns grid ---- */
-.columns-row {
-  display: flex;
-  gap: 22px;
-  align-items: flex-start;
-  width: 100%;
-  overflow-x: auto;
-  padding-bottom: 10px;
-}
-
-/* responsive */
-@media (max-width: 1200px) {
-  .columns-row {
-    grid-template-columns: repeat(2, minmax(250px, 1fr));
-  }
-}
-@media (max-width: 760px) {
-  .project-board {
-    padding: 16px;
-  }
-  .columns-row {
-    grid-template-columns: 1fr;
-  }
-  .project-board-header h1 {
-    font-size: 30px;
-  }
-}
-
-/* ---- Column Card ---- */
-.column-card {
-  flex: 0 0 320px;   /* 👈 fixed width like Jira/Trello */
-  max-width: 360px;
-  min-height: 600px;
-
-  background: #ffffff;
-  border-radius: 20px;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
-
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-@keyframes popIn {
-  from { opacity: 0; transform: translateY(10px) scale(0.99); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.column-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.14);
-  border-color: rgba(79, 70, 229, 0.35);
-}
-
-/* ---- Column title row (top bar) ---- */
-.column-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-
-  padding: 14px 14px 12px;
-  border-bottom: 1px solid #eef2f7;
-  position: relative;
-}
-
-.column-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 4px;
-  width: 100%;
-  background: linear-gradient(90deg, #4f46e5, #22c55e);
-  opacity: 0.95;
-}
-
-/* Title text */
-.column-title span:first-child {
-  font-size: 16px;
-  font-weight: 950;
-  color: #0f172a;
-}
-
-/* Count badge */
-.count {
-  min-width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 999px;
-  background: #eef2ff;
-  border: 1px solid #e0e7ff;
-  color: #4338ca;
-  font-weight: 900;
-  font-size: 13px;
-}
-
-/* ---- Tasks area (scroll inside column) ---- */
-.tasks-area {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-/* Nice scrollbar (optional) */
-.tasks-area::-webkit-scrollbar {
-  width: 10px;
-}
-.tasks-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-.tasks-area::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
-  border-radius: 999px;
-  border: 2px solid #ffffff;
-}
-.tasks-area::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
-}
-
-/* Empty state */
-.no-tasks {
-  border: 1px dashed #cbd5e1;
-  border-radius: 14px;
-  padding: 20px 12px;
-  text-align: center;
-  color: #94a3b8;
-  background: #fbfdff;
-  font-weight: 600;
-}
-
-/* ---- Task item (basic) ---- */
-.task-item {
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  border-radius: 16px;
-  padding: 12px;
-
-  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.06);
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-  animation: taskIn 200ms ease both;
-}
-
-@keyframes taskIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.task-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
-  border-color: rgba(15, 23, 42, 0.12);
-}
-
-/* ---- Add Task button ---- */
-.add-task-btn {
-  margin: 14px 12px 14px;
-  width: calc(100% - 24px);
-  border: none;
-  cursor: pointer;
-
-  padding: 13px 14px;
-  border-radius: 16px;
-  font-weight: 950;
-  font-size: 15px;
-  color: #ffffff;
-
-  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22);
-
-  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
-}
-
-.add-task-btn:hover {
-  filter: brightness(1.06);
-  transform: translateY(-2px);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.30);
-}
-
-.add-task-btn:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-/* =========================
-   MODAL (AddTaskModal)
-========================= */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 16px;
-  animation: fadeIn 140ms ease both;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal-box {
-  width: 520px;
-  max-width: 95vw;
-  background: #ffffff;
-  border-radius: 18px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
-  padding: 16px;
-  animation: slideUp 180ms ease both;
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px) scale(0.99); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-head {
-  margin-bottom: 10px;
-}
-
-.modal-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 950;
-  color: #0f172a;
-}
-
-.modal-sub {
-  margin: 6px 0 0;
-  font-size: 12px;
-  color: #64748b;
-}
-
-/* form */
-.form-group { 
-  margin-top: 12px; 
-}
-
-.label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 900;
-  color: #334155;
-}
-
-.input,
-.textarea {
-  width: 100%;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 10px 12px;
-  font-size: 13px;
-  outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-  background: #fff;
-}
-
-.input:focus,
-.textarea:focus {
-  border-color: rgba(79, 70, 229, 0.55);
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
-}
-
-.textarea {
-  min-height: 96px;
-  resize: vertical;
-}
-
-/* actions */
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.btn-primary {
-  border: none;
-  background: linear-gradient(90deg, #4f46e5, #22c55e);
-  color: #ffffff;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 950;
-  cursor: pointer;
-  transition: transform 140ms ease, filter 140ms ease;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.06);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-.btn-ghost {
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  color: #0f172a;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 950;
-  cursor: pointer;
-  transition: background 140ms ease, transform 140ms ease;
-}
-
-.btn-ghost:hover {
-  background: #f8fafc;
-  transform: translateY(-1px);
-}
-
-.btn-ghost:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-/* disabled state */
-.btn-primary:disabled,
-.btn-ghost:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  transform: none;
-}
-/* ---- Board actions (only Add Column button remains) ---- */
-.board-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-/* Project Settings Button and Panel Styles */
-
-.board-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.add-col-btn {
   background-color: #4a6cf7;
-  color: white;
+  color: #ffffff;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -466,7 +64,506 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Settings Button Styles */
+/* ---- Error ---- */
+.board-error {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 10px 0 14px;
+  border-radius: 14px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---- Columns row ---- */
+.columns-row {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+/* ---- Column Card ---- */
+.column-card {
+  flex: 0 0 320px;
+  max-width: 360px;
+  min-height: 600px;
+
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.column-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.14);
+}
+
+/* ---- Column Title ---- */
+.column-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  border-bottom: 1px solid #eef2f7;
+  position: relative;
+}
+
+.column-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #4f46e5, #22c55e);
+}
+
+.column-title span:first-child {
+  font-size: 16px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+/* Count badge */
+.count {
+  min-width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+/* ---- Tasks Area ---- */
+.tasks-area {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ---- No Tasks ---- */
+.no-tasks {
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 20px 12px;
+  text-align: center;
+  color: #94a3b8;
+  background: #fbfdff;
+  font-weight: 600;
+}
+
+/* ---- Task Item ---- */
+.task-item {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.06);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.task-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+}
+
+/* Task title */
+.task-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Priority badge */
+.priority-badge {
+  margin-top: 6px;
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  border-radius: 999px;
+  color: #fff;
+}
+
+/* Priority colors */
+.priority-badge.low {
+  background: #22c55e;
+}
+.priority-badge.medium {
+  background: #f59e0b;
+}
+.priority-badge.high {
+  background: #ef4444;
+}
+
+/* ---- Add Task button ---- */
+.add-task-btn,
+.column-card > button {
+  margin: 14px 12px 14px;
+  width: calc(100% - 24px);
+  border: none;
+  cursor: pointer;
+
+  padding: 13px 14px;
+  border-radius: 16px;
+  font-weight: 950;
+  font-size: 15px;
+  color: #ffffff;
+
+  background: linear-gradient(90deg, #4f46e5, #22c55e);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.22);
+
+  transition: transform 150ms ease, filter 150ms ease, box-shadow 150ms ease;
+}
+
+.add-task-btn:hover,
+.column-card > button:hover {
+  filter: brightness(1.06);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px rgba(79, 70, 229, 0.28);
+}
+
+/* =========================================================
+   ✅ MODAL (Base) - works for Add Task + Edit Task
+   ========================================================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+  padding: 16px;
+
+  animation: overlayFadeIn 180ms ease-out;
+}
+
+.modal-box {
+  width: 560px;
+  max-width: 96vw;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
+  padding: 20px 22px;
+
+  transform-origin: center;
+  animation: modalPopIn 220ms ease-out;
+}
+
+.modal-head {
+  margin-bottom: 12px;
+}
+
+.modal-head h3 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: -0.3px;
+  color: #0f172a;
+}
+
+.modal-head p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+/* Form */
+.form-group {
+  margin-top: 14px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #334155;
+  letter-spacing: 0.2px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  box-sizing: border-box;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+
+  outline: none;
+  background: #ffffff;
+  color: #0f172a;
+
+  transition: border-color 140ms ease, box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+.form-group textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.35;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+  transform: translateY(-1px);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Select arrow look */
+.form-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 36px;
+
+  background-image: linear-gradient(45deg, transparent 50%, #64748b 50%),
+    linear-gradient(135deg, #64748b 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+/* Actions wrapper: supports inline-style wrapper too */
+.modal-actions,
+.modal-box > div[style] {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* Buttons inside modal */
+.modal-box button {
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 950;
+  font-size: 13px;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+}
+
+/* Cancel button */
+.modal-cancel-btn,
+.modal-box button:first-child {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+}
+
+.modal-cancel-btn:hover,
+.modal-box button:first-child:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.98);
+}
+
+/* Primary button */
+.modal-primary-btn,
+.modal-box button:last-child {
+  color: #ffffff;
+  background: linear-gradient(90deg, #4f46e5, #22c55e);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.22);
+}
+
+.modal-primary-btn:hover,
+.modal-box button:last-child:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 18px 40px rgba(79, 70, 229, 0.28);
+}
+
+.modal-box button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* =========================================================
+   ✅ EDIT TASK MODAL (Dedicated) - if your TSX uses these names
+   ========================================================= */
+/* Overlay aliases (so whichever class you used, styling works) */
+.edit-task-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: overlayFadeIn 180ms ease-out;
+}
+
+/* Modal box aliases */
+.edit-task-modal,
+.edit-task-box {
+  width: 560px;
+  max-width: 96vw;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
+  padding: 20px 22px;
+  transform-origin: center;
+  animation: modalPopIn 220ms ease-out;
+}
+
+/* Title */
+.edit-task-modal h2,
+.edit-task-modal h3,
+.edit-task-box h2,
+.edit-task-box h3 {
+  margin: 0 0 14px 0;
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: -0.3px;
+  color: #0f172a;
+}
+
+/* Labels */
+.edit-task-modal label,
+.edit-task-box label {
+  display: block;
+  margin: 10px 0 6px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #334155;
+  letter-spacing: 0.2px;
+}
+
+/* Inputs */
+.edit-task-modal input,
+.edit-task-modal textarea,
+.edit-task-modal select,
+.edit-task-box input,
+.edit-task-box textarea,
+.edit-task-box select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+  background: #ffffff;
+  color: #0f172a;
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.edit-task-modal textarea,
+.edit-task-box textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.35;
+}
+
+.edit-task-modal input:focus,
+.edit-task-modal textarea:focus,
+.edit-task-modal select:focus,
+.edit-task-box input:focus,
+.edit-task-box textarea:focus,
+.edit-task-box select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+  transform: translateY(-1px);
+}
+
+/* Actions row */
+.edit-task-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* Buttons */
+.edit-task-actions button {
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 950;
+  font-size: 13px;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+}
+
+/* Cancel */
+.edit-task-actions button:first-child {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+}
+
+.edit-task-actions button:first-child:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.98);
+}
+
+/* Save */
+.edit-task-actions button:last-child {
+  color: #ffffff;
+  background: linear-gradient(90deg, #4f46e5, #22c55e);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.22);
+}
+
+.edit-task-actions button:last-child:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 18px 40px rgba(79, 70, 229, 0.28);
+}
+
+.edit-task-actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* ---- Settings Button Styles ---- */
 .settings-btn {
   background-color: #f0f2f5;
   color: #2c3e50;
@@ -505,7 +602,7 @@
   transform: rotate(90deg);
 }
 
-/* Filter Button Styles */
+/* ---- Filter Button Styles ---- */
 .filter-btn {
   background-color: #f0f2f5;
   color: #2c3e50;
@@ -553,7 +650,7 @@
   }
 }
 
-/* Settings Overlay and Panel */
+/* ---- Settings Overlay and Panel ---- */
 .settings-overlay {
   position: fixed;
   top: 0;
@@ -659,13 +756,29 @@
   line-height: 1.6;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .board-actions {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+/* ---- Animations ---- */
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
 
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ---- Responsive adjustments ---- */
+@media (max-width: 768px) {
   .add-col-btn,
   .settings-btn,
   .filter-btn {
@@ -676,5 +789,167 @@
   .settings-panel {
     width: 95%;
     max-height: 90vh;
+  }
+}
+/* =========================
+   Edit Task Modal (Light)
+   ========================= */
+.edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 9999;
+  animation: editFadeIn 180ms ease-out;
+}
+
+.edit-card {
+  width: 100%;
+  max-width: 560px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.18);
+  padding: 20px 22px;
+  animation: editPopIn 220ms ease-out;
+}
+
+.edit-head h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  color: #0f172a;
+}
+
+.edit-head p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.edit-form {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.edit-input,
+.edit-textarea,
+.edit-select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.edit-textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.35;
+}
+
+/* Soft focus */
+.edit-input:focus,
+.edit-textarea:focus,
+.edit-select:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Light select arrow */
+.edit-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 36px;
+  background-image: linear-gradient(45deg, transparent 50%, #94a3b8 50%),
+    linear-gradient(135deg, #94a3b8 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.edit-btn {
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 13px;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+}
+
+.edit-btn-ghost {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.06);
+}
+
+.edit-btn-ghost:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.99);
+}
+
+.edit-btn-primary {
+  color: #0f172a;
+  background: linear-gradient(90deg, #dbeafe, #dcfce7);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.10);
+}
+
+.edit-btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+}
+
+@keyframes editFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes editPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
