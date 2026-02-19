@@ -5,7 +5,7 @@ import { type Project, getProjectColumnsApi, createTaskApi } from "../Api/ApiCom
 
 import FilterPanel from "./FilterPanel";
 import AddTaskModal from "./AddTaskModal";
-import ProjectSettings from "./ProjectSettings";
+
 import "./Project.css";
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
@@ -113,7 +113,7 @@ const ProjectBoard: React.FC = () => {
   const [error, setError] = useState("");
 
   const [showFilters, setShowFilters] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+ 
   const [filters, setFilters] = useState<Filters>(defaultFilters);
 
   // Add Task modal
@@ -225,8 +225,7 @@ const ProjectBoard: React.FC = () => {
   const handleApplyFilters = (newFilters: Filters) => setFilters(newFilters);
   const clearAllFilters = () => setFilters(defaultFilters);
 
-  const handleSettingsClick = () => setShowSettings(true);
-  const handleCloseSettings = () => setShowSettings(false);
+ 
 
   /* ================= ADD TASK (API HIT) ================= */
   const handleAddTask = async (payload: {
@@ -374,9 +373,7 @@ const ProjectBoard: React.FC = () => {
             + Add Column
           </button>
 
-          <button className="settings-btn" type="button" onClick={handleSettingsClick} title="Project Settings">
-            <span className="icon">⚙️</span> Settings
-          </button>
+         
 
           <button className="filter-btn" type="button" onClick={() => setShowFilters(true)}>
             <span className="icon">☰</span> Filters
@@ -575,8 +572,7 @@ const ProjectBoard: React.FC = () => {
 )}
 
 
-      {/* Settings */}
-      <ProjectSettings projectId={projectId} isOpen={showSettings} onClose={handleCloseSettings} />
+    
     </div>
   );
 };
