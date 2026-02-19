@@ -116,6 +116,8 @@ const ProjectBoard: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
  
   const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [columnError, setColumnError] = useState<string | null>(null);
+
   // Add Column (Group) state
 const [showAddInput, setShowAddInput] = useState(false);
 const [newColumnName, setNewColumnName] = useState("");
@@ -364,48 +366,73 @@ const [newColumnName, setNewColumnName] = useState("");
 
     setEditDraft(null);
   };
+// const handleAddColumn = async () => {
+//   const name = newColumnName.trim();
+
+//   if (!name || !projectId) return;
+
+//   // ✅ Duplicate check (case insensitive)
+//   const isDuplicate = columns.some(
+//     (col) => col.title.trim().toLowerCase() === name.toLowerCase()
+//   );
+
+//   if (isDuplicate) {
+//     alert("Column already exists");
+//     return;
+//   }
+
+//   try {
+//     setLoading(true);
+
+//     // ✅ Correct backend call
+//     await createColumnApi(projectId, { name });
+
+//     setNewColumnName("");
+//     setShowAddInput(false);
+
+//     // ✅ Reload columns from backend
+//     await loadColumns(projectId);
+
+//   } catch (error: any) {
+//     console.error("Create column error:", error);
+//     alert(error?.message || "Failed to create column");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 const handleAddColumn = async () => {
   const name = newColumnName.trim();
 
   if (!name || !projectId) return;
 
-  // ✅ Duplicate check (case insensitive)
   const isDuplicate = columns.some(
     (col) => col.title.trim().toLowerCase() === name.toLowerCase()
   );
 
   if (isDuplicate) {
-    alert("Column already exists");
+    setColumnError("Column already exists");
     return;
   }
 
   try {
     setLoading(true);
+    setColumnError(null);
 
-    // ✅ Correct backend call
     await createColumnApi(projectId, { name });
 
     setNewColumnName("");
     setShowAddInput(false);
 
-    // ✅ Reload columns from backend
     await loadColumns(projectId);
 
   } catch (error: any) {
-    console.error("Create column error:", error);
-    alert(error?.message || "Failed to create column");
+    setColumnError(error?.message || "Failed to create column");
   } finally {
     setLoading(false);
   }
 };
 
-
-
-
-
-
-
-  return (
+ return (
     <div className="project-board">
       <div className="project-board-header">
         <div>
@@ -467,7 +494,7 @@ const handleAddColumn = async () => {
   <div className="add-group-wrapper">
   {showAddInput ? (
     <div className="add-group-input-container">
-      <input
+      {/* <input
         className="add-group-input"
         placeholder="Enter group name..."
         value={newColumnName}
@@ -476,7 +503,30 @@ const handleAddColumn = async () => {
           if (e.key === "Enter") handleAddColumn();
         }}
         autoFocus
-      />
+      /> */}
+      <div className="mb-2">
+  <input
+    type="text"
+    className={`form-control ${columnError ? "is-invalid" : ""}`}
+    placeholder="Enter group name..."
+    value={newColumnName}
+    onChange={(e) => {
+      setNewColumnName(e.target.value);
+      if (columnError) setColumnError(null);
+    }}
+    onKeyDown={(e) => {
+      if (e.key === "Enter") handleAddColumn();
+    }}
+    autoFocus
+  />
+
+  {columnError && (
+    <div className="invalid-feedback">
+      {columnError}
+    </div>
+  )}
+</div>
+
 
       <div className="add-group-actions">
         <button
