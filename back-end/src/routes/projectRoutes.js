@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-// ✅ controllers ni okate place lo import cheyyi (top lo)
 const {
   createProject,
   getAllProjects,
@@ -13,31 +12,59 @@ const {
   deleteTaskInProject,
   openProject,
   createTaskInProject,
-  getColumnsTasks
+  getColumnsTasks,
 } = require("../controllers/projectController");
+
 const authMiddleware = require("../middlewares/authmiddlewares");
+//const requirePermission = require("../middlewares/requirePermission");
 
 // ✅ all projects
-router.get("/",authMiddleware, getAllProjects);
+router.get("/", authMiddleware, getAllProjects);
 
 // ✅ create project
-router.post("/", authMiddleware,createProject);
+router.post("/", authMiddleware, createProject);
 
-// ✅ open project (must be before /:projectId)
-router.get("/:projectId/open",authMiddleware, openProject);
+// ✅ open project (keep before /:projectId)
+router.get("/:projectId/open", authMiddleware, openProject);
 
 // ✅ tasks
-router.get("/:projectId/tasks/:taskId",authMiddleware, getTaskByTaskIdInProject);
-router.get("/:projectId/tasks",authMiddleware, getProjectTasks);
-router.post("/:projectId/tasks",authMiddleware, addTaskToProject);
-router.patch("/:projectId/tasks/:taskId",authMiddleware, updateTaskInProject);
-router.delete("/:projectId/tasks/:taskId",authMiddleware, deleteTaskInProject);
+router.get("/:projectId/tasks", authMiddleware, getProjectTasks);
+router.get("/:projectId/tasks/:taskId", authMiddleware, getTaskByTaskIdInProject);
+
+// ✅ RBAC: permissions
+// router.post(
+//   "/:projectId/tasks",
+//   authMiddleware,
+//   requirePermission("task:create"),
+//   addTaskToProject
+// );
+
+// router.patch(
+//   "/:projectId/tasks/:taskId",
+//   authMiddleware,
+//   requirePermission("task:update"),
+//   updateTaskInProject
+// );
+
+// router.delete(
+//   "/:projectId/tasks/:taskId",
+//   authMiddleware,
+//   requirePermission("task:delete"),
+//   deleteTaskInProject
+// );
+
+// (optional) your existing endpoints
 router.post("/create-task", authMiddleware, createTaskInProject);
 router.get("/get-columns-tasks", getColumnsTasks);
 
-// ✅ project details
-router.get("/:projectId",authMiddleware, getProjectById);
+// ✅ project details (keep last)
+router.get("/:projectId", authMiddleware, getProjectById);
+router.post("/:projectId/tasks",authMiddleware,addTaskToProject);
 
+
+module.exports = router;
+
+//-------------------- Swagger Documentation --------------------
 /**
  * @openapi
  * /api/projects/{projectId}/open:
@@ -86,6 +113,7 @@ router.get("/:projectId",authMiddleware, getProjectById);
  *         description: Project created
  */
 router.post("/",authMiddleware, createProject);
+
 /**
  * @openapi
  * /api/projects/{projectId}:
@@ -242,9 +270,11 @@ router.delete("/:projectId/tasks/:taskId", authMiddleware,deleteTaskInProject);
  *     description: Returns list of all projects
  *     tags:
  *       - Projects
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of projects
+ *         description: Successfully fetched projects
  *         content:
  *           application/json:
  *             schema:
@@ -267,7 +297,10 @@ router.delete("/:projectId/tasks/:taskId", authMiddleware,deleteTaskInProject);
  *                   updatedAt:
  *                     type: string
  *                     example: "2026-02-13T06:28:00.000Z"
+ *       401:
+ *         description: Unauthorized (Invalid or missing token)
  */
+
 
 
 

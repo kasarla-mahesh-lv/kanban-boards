@@ -160,6 +160,18 @@ export type ResetPasswordPayload = {
   confirmPassword: string;
   otp?: string;
 };
+export type CreateTaskPayload = {
+  title: string;
+  description?: string;
+  priority?: string;
+  projectId: string;
+  columnId: string;
+};
+
+export type CreateTaskResponse = {
+  message?: string;
+  task: Task; 
+};
 
 /* ======================= AUTH API CALLS ======================= */
 export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> => {
@@ -736,6 +748,9 @@ export const logoutApi = (): void => {
   console.log("👋 Logged out successfully");
 };
 
+// ... (rest of your existing code for projects, teams, etc. remains the same)
+
+// ... (rest of your Api/ApiCommon.ts remains the same)
 /* ======================= PROJECT TYPES ======================= */
 export type Project = { _id: string; title: string; description?: string };
 export type Task = { _id: string; title: string; description?: string; priority?: string };
@@ -782,6 +797,22 @@ export const getProjectColumnsApi = (projectId: string): Promise<Column[]> =>
 
 export const createColumnApi = (projectId: string, payload: { title: string }): Promise<Column> =>
   apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
+
+ export const createTaskApi = (payload: CreateTaskPayload) =>
+  apiPost<CreateTaskResponse, CreateTaskPayload>("/projects/create-task", payload);
+
+/* ======================= MEMBERS API CALLS ======================= */
+// export const getProjectMembersApi = (projectId: string): Promise<Member[]> =>
+//   apiGet<Member[]>(`/projects/${projectId}/members`);
+// export const searchProjectMembersApi = (projectId: string, query: string): Promise<Member[]> =>
+//   apiGet<Member[]>(`/projects/${projectId}/members/search`, { params: { q: query } });
+
+/* ======================= MEMBERS API CALLS ======================= */
+// export const getProjectMembersApi = (projectId: string): Promise<Member[]> =>
+//   apiGet<Member[]>(`/projects/${projectId}/members`);
+
+// export const searchProjectMembersApi = (projectId: string, query: string): Promise<Member[]> =>
+//   apiGet<Member[]>(`/projects/${projectId}/members/search`, { params: { q: query } });
 
 /* ======================= TEAM/MEMBERS API CALLS ======================= */
 export const getProjectMembersApi = async (projectId: string): Promise<Member[]> => {

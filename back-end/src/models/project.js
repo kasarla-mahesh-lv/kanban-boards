@@ -21,6 +21,7 @@ const taskSchema = new mongoose.Schema(
     dueDate: {
       type: Date
     },
+  
 
     // Priority
     priority: {
@@ -52,6 +53,13 @@ const projectSchema = new mongoose.Schema(
       required: true
     },
     description: String,
+    members: [
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    role: { type: String, enum: ["Admin", "Manager", "TL", "Employee"], default: "Employee" }
+  }
+],
+
 
     tasks: [taskSchema]
   },

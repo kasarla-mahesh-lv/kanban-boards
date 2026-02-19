@@ -23,16 +23,20 @@ const PORT = process.env.PORT || 5000;
 
 /* -------------------- Middlewares -------------------- */
 app.use(express.json());
+
 app.use(
   cors({
     origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders:["Authorization"],
+    exposedHeaders: ["Authorization"],
   })
 );
 
+app.options("*", cors()); // ✅ add this
+
 app.use(morgan("dev"));
+
 
 /* -------------------- Health -------------------- */
 app.get("/", (req, res) => {
@@ -45,7 +49,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 /* -------------------- Routes -------------------- */
 app.use("/api/auth", authRoutes);
 // app.use("/api/boards", boardRoutes);
+//app.use("/api/columns", columnRoutes);
+app.use("/api/projects", columnRoutes);
 app.use("/api/columns", columnRoutes);
+
 app.use("/api/cards", cardRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/history", historyRoutes);
