@@ -364,22 +364,6 @@ const [newColumnName, setNewColumnName] = useState("");
 
     setEditDraft(null);
   };
-//   const handleAddColumn = () => {
-//   if (!newColumnName.trim()) return;
-
-//   const newColumn: UIColumn = {
-//     _id: `temp-${Date.now()}`,
-//     title: newColumnName.trim(),
-//     key: newColumnName.toLowerCase().replace(/\s/g, ""),
-//     order: columns.length,
-//     tasks: [],
-//   };
-
-//   setColumns((prev) => [...prev, newColumn]);
-//   setNewColumnName("");
-//   setShowAddInput(false);
-// };
-
 const handleAddColumn = async () => {
   const name = newColumnName.trim();
 
