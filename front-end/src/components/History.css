@@ -272,6 +272,8 @@
   display: flex;
   gap: 10px;
   align-items: center;
+  background-color: white;
+  color:black
 }
 
 .history-search {
@@ -279,12 +281,15 @@
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   min-width: 280px;
+  border:none;
+  background-color: white;
+  color:black
 }
 
 .history-filter {
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  /* border: 1px solid #e5e7eb; */
 }
 
 .history-refresh {
@@ -293,6 +298,7 @@
   border: 1px solid #e5e7eb;
   cursor: pointer;
   background: #fff;
+  color:black;
 }
 
 .history-state {

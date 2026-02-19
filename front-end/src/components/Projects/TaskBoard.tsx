@@ -1,62 +1,70 @@
-import { useState } from "react";
-import type { Task, TaskStatus } from "./types";
-import KanbanColumn from "./KanbanColumn";
+import React, { useState } from "react";
+import AddTaskModal from "./AddTaskModal";
+import TaskDeatils from "./TaskDetail";
 
-const INITIAL_TASKS: Task[] = [
-  { id: "1", projectId: "1", code: "PRJ-12", title: "Something", status: "backlog" },
-  { id: "2", projectId: "1", code: "PRJ-16", title: "Header component", status: "todo" },
-  { id: "3", projectId: "1", code: "PRJ-17", title: "Layout component", status: "inprogress" },
-  { id: "4", projectId: "1", code: "PRJ-20", title: "Create APIs", status: "done" },
-  { id: "5", projectId: "2", code: "PRJ-30", title: "HR Dashboard", status: "todo" },
-];
-
-type Props = {
-  projectId: string;
+type Task = {
+  id: number;
+  title: string;
+  description?: string;
+  priority?: string;
 };
 
-const TaskBoard = ({ projectId }: Props) => {
+const TaskBoard = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  const [allTasks, setAllTasks] = useState<Task[]>(INITIAL_TASKS);
+  const addTask = (payload: any) => {
+    const newTask = {
+      id: Date.now(),
+      ...payload,
+    };
 
-  const moveTask = (taskId: string, newStatus: TaskStatus) => {
-    setAllTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId ? { ...t, status: newStatus } : t
-      )
-    );
+    setTasks((prev) => [...prev, newTask]);
   };
 
-    
-  const projectTasks = allTasks.filter(
-    (t) => t.projectId === projectId
-  );
-
   return (
-    <div style={{ display: "flex", gap: 16 }}>
-      <KanbanColumn
-        title="Backlog"
-        status="backlog"
-        tasks={projectTasks.filter((t) => t.status === "backlog")}
-        onDropTask={moveTask}
-      />
-      <KanbanColumn
-        title="Todo"
-        status="todo"
-        tasks={projectTasks.filter((t) => t.status === "todo")}
-        onDropTask={moveTask}
-      />
-      <KanbanColumn
-        title="In Progress"
-        status="inprogress"
-        tasks={projectTasks.filter((t) => t.status === "inprogress")}
-        onDropTask={moveTask}
-      />
-      <KanbanColumn
-        title="Done"
-        status="done"
-        tasks={projectTasks.filter((t) => t.status === "done")}
-        onDropTask={moveTask}
-      />
+    <div style={{ padding: 20 }}>
+      <button onClick={() => setShowModal(true)}>+ Add Task</button>
+
+      {/* TASK LIST */}
+      <div style={{ marginTop: 20 }}>
+        {tasks.map((task) => (
+          <div
+            key={task.id}
+            className="task-card"
+            onClick={() => setSelectedTask(task)}
+            style={{
+              padding: 12,
+              border: "1px solid #ddd",
+              borderRadius: 10,
+              marginBottom: 10,
+              cursor: "pointer",
+              background: "#f8fafc",
+            }}
+          >
+            <b>{task.title}</b>
+            <div>{task.priority}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ADD TASK MODAL */}
+      {showModal && (
+        <AddTaskModal
+          columnTitle="Todo"
+          onClose={() => setShowModal(false)}
+          onAdd={addTask}
+        />
+      )}
+
+      {/* TASK DETAILS DRAWER */}
+      {selectedTask && (
+        <TaskDeatils
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+        />
+      )}
     </div>
   );
 };

@@ -16,6 +16,16 @@ const {
  *     description: Column related APIs
  */
 
+
+router.get("/boards/:boardId/columns", getColumnsByBoard); // ✅ ADD THIS
+
+
+router.post("/boards/:boardId/columns",authMiddleware, createColumn);
+router.patch("/boards/:boardId/columns/:columnId",authMiddleware, updateColumn);
+router.delete("/boards/:boardId/columns/:columnId",authMiddleware, deleteColumn);
+
+module.exports = router;
+
 /**
  * @openapi
  * /api/projects/{projectId}/columns:
@@ -32,6 +42,7 @@ const {
  *       200:
  *         description: Columns list
  */
+router.get("/boards/:projectId/columns", authMiddleware, getColumnsByBoard);
 router.get("/:projectId/columns", authMiddleware, getColumnsByProject);
 
 /**
