@@ -1,3 +1,17 @@
+/* =========================================================
+   PROJECT BOARD LAYOUT
+========================================================= */
+
+.project-board {
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px 28px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #f5f8ff 0%, #ffffff 100%);
+}
+
+/* ---------- Header ---------- */
+
 /* =========================
    Project Board - Professional UI
    Works with your classNames:
@@ -24,17 +38,17 @@
 /* ---- Header (Title left, button right) ---- */
 .project-board-header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
   gap: 16px;
   margin-bottom: 14px;
 }
 
 .project-board-header h1 {
   margin: 0;
-  font-size: 40px;
+  font-size: 38px;
   font-weight: 900;
-  letter-spacing: -0.5px;
   color: #0f172a;
 }
 
@@ -44,523 +58,7 @@
   color: #64748b;
 }
 
-/* ---- Add Column button ---- */
-/* .add-col-btn {
-  border: none;
-  cursor: pointer;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 900;
-  color: #0f172a;
-  background: transparent;
-  transition: background 140ms ease, transform 140ms ease;
-} */
-
-.add-col-btn:hover {
-  background: #f1f5f9;
-  transform: translateY(-1px);
-}
-
-.add-col-btn:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-/* ---- Error banner ---- */
-.board-error {
-  width: 100%;
-  padding: 12px 14px;
-  margin: 10px 0 14px;
-  border-radius: 14px;
-  background: #fff1f2;
-  border: 1px solid #fecdd3;
-  color: #9f1239;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 10px 20px rgba(225, 29, 72, 0.08);
-  animation: slideDown 220ms ease both;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ---- Board body layout ---- */
-.board-body {
-  display: flex;
-  position: relative;
-}
-
-/* ---- Columns grid ---- */
-.columns-row {
-  display: flex;
-  gap: 22px;
-  align-items: flex-start;
-  width: 100%;
-  overflow-x: auto;
-  padding-bottom: 10px;
-}
-/* ---- Add Group Button (Vaiz style) ---- */
-.add-group-column {
-  /* min-width: 20px;
-  height: 36px;
-  border-radius: 16px;
-
-  background: #f1f5f9;
-  color: #64748b;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-weight: 800;
-  font-size: 14px;
-
-  cursor: pointer;
-  transition: all 160ms ease; */
-    width: 18px;
-  height: 18px;
-  border-radius: 6px;
-  border: 1px solid #5b5ce2;
-  background: transparent;
-  color: #5b5ce2;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.add-group-column:hover {
-  background: #e2e8f0;
-  color: #334155;
-}
-
-
-
-
-/* responsive */
-@media (max-width: 1200px) {
-  .columns-row {
-    grid-template-columns: repeat(2, minmax(250px, 1fr));
-  }
-}
-@media (max-width: 760px) {
-  .project-board {
-    padding: 16px;
-  }
-  .columns-row {
-    grid-template-columns: 1fr;
-  }
-  .project-board-header h1 {
-    font-size: 30px;
-  }
-}
-
-/* ---- Column Card ---- */
-.column-card {
-  flex: 0 0 320px;   /* 👈 fixed width like Jira/Trello */
-  max-width: 360px;
-  min-height: 600px;
-
-  background: #ffffff;
-  border-radius: 20px;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
-
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-@keyframes popIn {
-  from { opacity: 0; transform: translateY(10px) scale(0.99); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.column-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.14);
-  border-color: rgba(79, 70, 229, 0.35);
-}
-
-/* ---- Column title row (top bar) ---- */
-.column-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-
-  padding: 14px 14px 12px;
-  border-bottom: 1px solid #eef2f7;
-  position: relative;
-}
-
-.column-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 4px;
-  width: 100%;
-  background: linear-gradient(90deg, #4f46e5, #22c55e);
-  opacity: 0.95;
-}
-
-/* Title text */
-.column-title span:first-child {
-  font-size: 16px;
-  font-weight: 950;
-  color: #0f172a;
-}
-
-/* Count badge */
-.count {
-  min-width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 999px;
-  background: #eef2ff;
-  border: 1px solid #e0e7ff;
-  color: #4338ca;
-  font-weight: 900;
-  font-size: 13px;
-}
-
-/* ---- Tasks area (scroll inside column) ---- */
-.tasks-area {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-/* Nice scrollbar (optional) */
-.tasks-area::-webkit-scrollbar {
-  width: 10px;
-}
-.tasks-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-.tasks-area::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
-  border-radius: 999px;
-  border: 2px solid #ffffff;
-}
-.tasks-area::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
-}
-
-/* Empty state */
-.no-tasks {
-  border: 1px dashed #cbd5e1;
-  border-radius: 14px;
-  padding: 20px 12px;
-  text-align: center;
-  color: #94a3b8;
-  background: #fbfdff;
-  font-weight: 600;
-}
-
-/* ---- Task item (basic) ---- */
-.task-item {
-  background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  border-radius: 16px;
-  padding: 12px;
-
-  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.06);
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-  animation: taskIn 200ms ease both;
-}
-
-@keyframes taskIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.task-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
-  border-color: rgba(15, 23, 42, 0.12);
-}
-
-/* ---- Add Task button ---- */
-.add-task-btn {
-  margin: 14px 12px 14px;
-  width: calc(100% - 24px);
-  border: none;
-  cursor: pointer;
-
-  padding: 13px 14px;
-  border-radius: 16px;
-  font-weight: 950;
-  font-size: 15px;
-  color: #ffffff;
-
-  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22);
-
-  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
-}
-
-.add-task-btn:hover {
-  filter: brightness(1.06);
-  transform: translateY(-2px);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.30);
-}
-
-.add-task-btn:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-/* =========================
-   MODAL (AddTaskModal)
-========================= */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 16px;
-  animation: fadeIn 140ms ease both;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.modal-box {
-  width: 520px;
-  max-width: 95vw;
-  background: #ffffff;
-  border-radius: 18px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
-  padding: 16px;
-  animation: slideUp 180ms ease both;
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px) scale(0.99); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.modal-head {
-  margin-bottom: 10px;
-}
-
-.modal-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 950;
-  color: #0f172a;
-}
-
-.modal-sub {
-  margin: 6px 0 0;
-  font-size: 12px;
-  color: #64748b;
-}
-
-/* form */
-.form-group { 
-  margin-top: 12px; 
-}
-
-.label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 900;
-  color: #334155;
-}
-
-.input,
-.textarea {
-  width: 100%;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 10px 12px;
-  font-size: 13px;
-  outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-  background: #fff;
-}
-
-.input:focus,
-.textarea:focus {
-  border-color: rgba(79, 70, 229, 0.55);
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
-}
-
-.textarea {
-  min-height: 96px;
-  resize: vertical;
-}
-
-/* actions */
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.btn-primary {
-  border: none;
-  background: linear-gradient(90deg, #4f46e5, #22c55e);
-  color: #ffffff;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 950;
-  cursor: pointer;
-  transition: transform 140ms ease, filter 140ms ease;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.06);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-.btn-ghost {
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  color: #0f172a;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 950;
-  cursor: pointer;
-  transition: background 140ms ease, transform 140ms ease;
-}
-
-.btn-ghost:hover {
-  background: #f8fafc;
-  transform: translateY(-1px);
-}
-
-.btn-ghost:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-/* disabled state */
-.btn-primary:disabled,
-.btn-ghost:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  transform: none;
-}
-
-
-
-
-.add-group-column:hover {
-  background: #e2e8f0;
-  color: #334155;
-}
-
-
-
-
-
-
-
-
-
-
-.add-group-wrapper {
-  min-width: 320px;
-}
-
-.add-group-column {
-  height: 30px;
-  border-radius: 18px;
-  background: #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.add-group-input-container {
-  background: transparent;
-  min-width: 320px;
-}
-.add-group-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  border: 2px solid #60a5fa;
-  outline: none;
-  font-size: 14px;
-  transition: 0.2s ease;
-}
-.add-group-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.add-group-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 10px;
-}
-
-
-.add-group-btn {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.add-group-btn:hover {
-  background: #2563eb;
-
-}
-.cancel-btn {
-  border-radius: 8px;
-  background: transparent;
-  border: none;
-  color: #475569;
-  font-weight: 600;
-  cursor: pointer;
-  
-}
-.cancel-btn:hover {
-  text-decoration: none;
-}
-/* ---- Board actions (only Add Column button remains) ---- */
-.board-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-/* Project Settings Button and Panel Styles */
+/* ---------- Action Buttons ---------- */
 
 .board-actions {
   display: flex;
@@ -576,231 +74,316 @@
   border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
+  border: 1px solid #dbeafe;
+  background: #e0ecff;
+  color: #1e40af;
+  transition: all 0.2s ease;
+}
+
+.add-col-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
   transition: background-color 0.2s, transform 0.1s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .add-col-btn:hover {
-  background-color: #3a5bd9;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: #1d4ed8;
+  transform: translateY(-2px);
 }
 
-.add-col-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Settings Button Styles */
-.settings-btn {
-  background-color: #f0f2f5;
-  color: #2c3e50;
-  border: 1px solid #e0e4e8;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.settings-btn:hover {
-  background-color: #e4e8ec;
-  border-color: #cbd0d6;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.settings-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.settings-btn .icon {
-  font-size: 16px;
-  display: inline-block;
-  transition: transform 0.3s ease;
-}
-
-.settings-btn:hover .icon {
-  transform: rotate(90deg);
-}
-
-/* Filter Button Styles */
-.filter-btn {
-  background-color: #f0f2f5;
-  color: #2c3e50;
-  border: 1px solid #e0e4e8;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  position: relative;
-}
-
+.settings-btn:hover,
 .filter-btn:hover {
-  background-color: #e4e8ec;
-  border-color: #cbd0d6;
+  background: #dbeafe;
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.filter-btn .icon {
-  font-size: 16px;
-}
+/* =========================================================
+   BOARD COLUMNS
+========================================================= */
 
-.filter-active-indicator {
-  color: #4a6cf7;
-  font-size: 12px;
-  margin-left: 4px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-/* Settings Overlay and Panel */
-.settings-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+.board-body {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s ease-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.columns-row {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 12px;
 }
 
-.settings-panel {
-  background-color: white;
-  border-radius: 16px;
-  width: 600px;
-  max-width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.3s ease-out;
+/* ---------- Column Card ---------- */
+
+.column-card {
+  flex: 0 0 320px;
+  max-width: 360px;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 15px 40px rgba(37, 99, 235, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.2s ease;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.column-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(37, 99, 235, 0.15);
 }
 
-.settings-header {
+/* ---------- Column Header ---------- */
+
+.column-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #eef2f6;
+  padding: 14px;
+  border-bottom: 1px solid #eef2f7;
+  position: relative;
 }
 
-.settings-header h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #1a2639;
+.column-title::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #2563eb, #60a5fa);
 }
 
-.close-settings-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #6b7a8f;
-  width: 32px;
-  height: 32px;
+.column-title span:first-child {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+/* Count Badge */
+
+.count {
+  min-width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #e0ecff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s;
 }
-
-.close-settings-btn:hover {
-  background-color: #f0f2f5;
-  color: #dc3545;
-  transform: scale(1.1);
-}
-
-.settings-content {
-  padding: 24px;
-}
-
-.settings-section {
-  margin-bottom: 28px;
-}
-
-.settings-section h3 {
-  margin: 0 0 12px 0;
-  font-size: 16px;
+.add-task-btn {
+  margin: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f1f5f9;              /* soft light gray */
+  color: #334155;                    /* subtle dark text */
+  border: 1px dashed #cbd5e1;         /* soft dashed border */
   font-weight: 600;
-  color: #2c3e50;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #eef2f6;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.settings-section p {
-  margin: 8px 0;
-  color: #6b7a8f;
-  line-height: 1.6;
+.add-task-btn:hover {
+  background: #e2e8f0;               /* slightly darker on hover */
+  border-color: #94a3b8;
+  color: #1e293b;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .board-actions {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
 
-  .add-col-btn,
-  .settings-btn,
-  .filter-btn {
-    padding: 8px 16px;
-    font-size: 13px;
-  }
+/* ---------- Tasks Area ---------- */
 
-  .settings-panel {
-    width: 95%;
-    max-height: 90vh;
-  }
+.tasks-area {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Empty State */
+
+.no-tasks {
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+  text-align: center;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #f8fbff;
+}
+
+/* =========================================================
+   TASK CARD
+========================================================= */
+
+.task-item {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.05);
+  transition: all 0.2s ease;
+}
+
+.task-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.12);
+}
+
+.task-title {
+  font-size: 14px;
+  font-weight: 700;
+
+  color: #0f172a;
+}
+
+/* Priority Badges */
+
+.priority-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  color: white;
+}
+
+.priority-badge.low { background: #22c55e; }
+.priority-badge.medium { background: #f59e0b; }
+.priority-badge.high { background: #ef4444; }
+
+/* =========================================================
+   MODAL (Universal)
+========================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  /* background: rgba(15, 23, 42, 0.45); */
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 9999;
+}
+
+.modal-box {
+  width: 520px;
+  max-width: 95%;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 30px 70px rgba(37, 99, 235, 0.25);
+}
+
+/* Modal Header */
+
+.modal-head h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.modal-head p {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Form */
+
+.form-group {
+  margin-top: 14px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: white;
+  color: #1e293b;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* Modal Actions */
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-ghost {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  background:#1d4ed8;
+  border-color: #cbd5e1;
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c7d2fe;
+  border-radius: 10px;
 }
