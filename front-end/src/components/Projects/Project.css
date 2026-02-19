@@ -436,6 +436,7 @@
 }
 /* Project Settings Button and Panel Styles */
 
+/* ---- Board actions (only Add Column button remains) ---- */
 .board-actions {
   display: flex;
   gap: 12px;

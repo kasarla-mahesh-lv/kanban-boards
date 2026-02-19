@@ -1,6 +1,5 @@
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
-
 /* ======================= AXIOS INSTANCE ======================= */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -130,7 +129,7 @@ export type LoginResponse = {
   user?: { id: string; name?: string; email: string };
   requiresOtp?: boolean;
   otpSent?: boolean;
-  mfaRequired? : boolean;
+  mfaRequired?: boolean;
 };
 
 export type RegisterPayload = {
@@ -164,15 +163,15 @@ export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> =>
     console.log("📝 Login API called with:", payload.email);
     const res = await api.post("/auth/login", payload);
     console.log("✅ Login response:", res);
+    
     if (res?.headers?.authorization) {
-      console.log(res?.headers?.authorization, "_________________________________")
+      console.log(res?.headers?.authorization, "_________________________________");
       localStorage.setItem("token", res?.headers?.authorization);
       sessionStorage.setItem("token", res?.headers?.authorization);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       return res.data;
     }
 
-    // return true;
     const message = res.data.message || "";
     const otpSent = message.toLowerCase().includes("otp sent") ||
       message.toLowerCase().includes("sent to email");
@@ -189,27 +188,31 @@ export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> =>
 };
 
 export const verifyOtpApi = async (payload: VerifyOtpPayload): Promise<any> => {
-  const data = {
-    email: payload.email,
-    otp: payload.otp,
-    type: payload.type || "register"
-  };
+  try {
+    const data = {
+      email: payload.email,
+      otp: payload.otp,
+      type: payload.type || "register"
+    };
 
-  console.log("🔐 Verifying OTP with data:", data);
+    console.log("🔐 Verifying OTP with data:", data);
 
-  const res = await api.post("/auth/verify-otp", data);
+    const res = await api.post("/auth/verify-otp", data);
 
-  console.log("✅ Verify OTP response:", res);
+    console.log("✅ Verify OTP response:", res);
 
+    if (payload.type === "login" && res?.headers?.authorization) {
+      console.log("🎉 Login successful, storing token");
+      localStorage.setItem("token", res?.headers?.authorization);
+      sessionStorage.setItem("token", res?.headers?.authorization);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+    }
 
-  if (payload.type === "login" && res?.headers?.authorization) {
-    console.log("🎉 Login successful, storing token");
-    localStorage.setItem("token", res?.headers?.authorization);
-    sessionStorage.setItem("token", res?.headers?.authorization);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
+    return res.data;
+  } catch (error) {
+    console.error("❌ Verify OTP error:", error);
+    throw error;
   }
-
-  return res.data;
 };
 
 export const registerApi = async (payload: RegisterPayload): Promise<RegisterResponse> => {
@@ -267,12 +270,10 @@ export const logoutApi = (): void => {
   sessionStorage.removeItem("token");
 };
 
-// ... (rest of your existing code for projects, teams, etc. remains the same)
-
 /* ======================= PROJECT TYPES ======================= */
 export type Project = { _id: string; title: string; description?: string };
 export type Task = { _id: string; title: string; description?: string; priority?: string };
-export type Column = { _id: string; title: string; key: string; tasks: Task[] };
+export type Column = { _id: string; name: string; order: number; tasks?: Task[] };
 
 export type Member = {
   _id: string;
@@ -307,10 +308,10 @@ export const deleteProjectApi = (id: string) =>
 
 /* ======================= COLUMNS API CALLS ======================= */
 export const getProjectColumnsApi = (projectId: string) =>
-  apiGet<Column[]>(`/projects/get-columns-tasks?projectId=${projectId}`);
+  apiGet<any[]>(`/projects/get-columns-tasks?projectId=${projectId}`);
 
 export const createColumnApi = (projectId: string, payload: { title: string }) =>
-  apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
+  apiPost<any, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
 
 /* ======================= TEAM/MEMBERS API CALLS ======================= */
 export const getProjectMembersApi = async (projectId: string): Promise<Member[]> => {

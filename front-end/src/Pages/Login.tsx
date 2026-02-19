@@ -14,8 +14,10 @@ import {
   resetPasswordApi,
   loginApi,
   forgotPasswordApi,
+  sendOtpApi,
 } from "../components/Api/ApiCommon";
 import "./Login.css";
+
 type Props = {
   onClose?: () => void;
 };
@@ -38,6 +40,7 @@ const Login = ({ onClose }: Props) => {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpTimer, setOtpTimer] = useState(0);
+  const [loginToken, setLoginToken] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -74,10 +77,8 @@ const Login = ({ onClose }: Props) => {
     if (value.length <= 10) setMobilenumber(value);
   };
 
-  /* ================= LOGIN WITH OTP ================= */
+  /* ================= LOGIN ================= */
   const handleLogin = async () => {
-    console.log("email");
-
     if (!email || !password) {
       toast.error("All fields required ❌");
       return;
@@ -87,20 +88,32 @@ const Login = ({ onClose }: Props) => {
       setLoading(true);
       const loginData = await loginApi({ email, password });
       console.log(loginData, "loginData");
-      if (loginData?.mfaRequired == false) {
+      
+      if (loginData?.mfaRequired === false) {
+        if (loginData.token) {
+          localStorage.setItem("token", loginData.token);
+        }
+        localStorage.setItem("user", JSON.stringify({ email }));
         toast.success("Login successful ✅");
         resetAll();
         onClose?.();
         nav("/", { replace: true });
+        return;
       }
-
+      
+      // Store token temporarily for MFA
+      setLoginToken(loginData.token || "");
+      
+      // Send OTP to email
+      await forgotPasswordApi({ email });
+      
+      // Switch to OTP verification mode
       setMode("loginOtp");
       setOtpSent(true);
       setOtpTimer(OTP_DURATION);
       toast.success("OTP sent to your email 📩");
-      return true;
     } catch (error: any) {
-      toast.error(error?.message || "Invalid credentials ❌");
+      toast.error(error?.response?.data?.message || error?.message || "Invalid credentials ❌");
     } finally {
       setLoading(false);
     }
@@ -125,6 +138,13 @@ const Login = ({ onClose }: Props) => {
         otp,
         type: "login"
       });
+      
+      // Store the token that we got from login
+      if (loginToken) {
+        localStorage.setItem("token", loginToken);
+      }
+      localStorage.setItem("user", JSON.stringify({ email }));
+      
       toast.success("Login successful ✅");
       resetAll();
       onClose?.();
@@ -156,6 +176,10 @@ const Login = ({ onClose }: Props) => {
     try {
       setLoading(true);
       await registerApi({ name, email, password, mobilenumber });
+      
+      // Send OTP
+      await forgotPasswordApi({ email });
+      
       setOtpSent(true);
       setOtpTimer(OTP_DURATION);
       toast.success("OTP sent to email 📩");
@@ -185,6 +209,7 @@ const Login = ({ onClose }: Props) => {
         otp,
         type: "register"
       });
+      
       toast.success("Registration successful 🎉");
       resetAll();
       setMode("login");
@@ -215,7 +240,6 @@ const Login = ({ onClose }: Props) => {
     }
   };
 
-  // FIXED: Added confirmPassword validation and send both password and confirmPassword
   const handleResetPassword = async () => {
     if (!otp) {
       toast.error("Enter OTP ❌");
@@ -244,12 +268,11 @@ const Login = ({ onClose }: Props) => {
 
     try {
       setLoading(true);
-      // Send both newPassword and confirmPassword to match backend validation
       await resetPasswordApi({
         email,
         otp,
         newPassword: password,
-        confirmPassword: confirmPassword  // Added confirmPassword
+        confirmPassword: confirmPassword
       });
       toast.success("Password reset successful 🔐");
       resetAll();
@@ -271,6 +294,7 @@ const Login = ({ onClose }: Props) => {
     setOtp("");
     setOtpSent(false);
     setOtpTimer(0);
+    setLoginToken("");
   };
 
   const resendOtp = async () => {
@@ -278,11 +302,11 @@ const Login = ({ onClose }: Props) => {
       setLoading(true);
 
       if (mode === "loginOtp") {
-        await loginApi({ email, password });
+        await forgotPasswordApi({ email });
       } else if (mode === "forgot") {
         await forgotPasswordApi({ email });
       } else {
-        await registerApi({ name, email, password, mobilenumber });
+        await forgotPasswordApi({ email });
       }
 
       setOtpTimer(OTP_DURATION);
@@ -302,8 +326,10 @@ const Login = ({ onClose }: Props) => {
         <h2>
           {mode === "login" && "Welcome Back"}
           {mode === "loginOtp" && "Verify OTP"}
-          {mode === "register" && "Create Account"}
-          {mode === "forgot" && "Reset Password"}
+          {mode === "register" && !otpSent && "Create Account"}
+          {mode === "register" && otpSent && "Verify OTP"}
+          {mode === "forgot" && !otpSent && "Reset Password"}
+          {mode === "forgot" && otpSent && "Enter New Password"}
         </h2>
 
         {/* ================= REGISTER ================= */}
@@ -389,15 +415,15 @@ const Login = ({ onClose }: Props) => {
             </div>
 
             <p className="otp-timer">⏱ OTP expires in {formatTime(otpTimer)}</p>
-
+            
             {otpTimer === 0 && (
               <button className="resend-btn" onClick={resendOtp} disabled={loading}>
                 {loading ? "Sending..." : "Resend OTP"}
               </button>
             )}
 
-            <button
-              className="login-btn"
+            <button 
+              className="login-btn" 
               onClick={handleVerifyOtpAndRegister}
               disabled={loading || otpTimer <= 0 || !otp}
             >
@@ -437,7 +463,7 @@ const Login = ({ onClose }: Props) => {
             </div>
 
             <button className="login-btn" onClick={handleLogin} disabled={loading}>
-              <FaSignInAlt /> {loading ? "Sending OTP..." : "Login"}
+              <FaSignInAlt /> {loading ? "Processing..." : "Login"}
             </button>
 
             <p className="switch-text">
@@ -497,7 +523,7 @@ const Login = ({ onClose }: Props) => {
         )}
 
         {/* ================= FORGOT PASSWORD ================= */}
-        {mode === "forgot" && (
+        {mode === "forgot" && !otpSent && (
           <>
             <div className="input-box">
               <FaEnvelope className="input-icon" />
@@ -509,68 +535,76 @@ const Login = ({ onClose }: Props) => {
               />
             </div>
 
-            {!otpSent ? (
-              <button className="login-btn" onClick={handleSendForgotOtp} disabled={loading}>
-                {loading ? "Sending..." : "Send OTP"}
-              </button>
-            ) : (
-              <>
-                <div className="info-text">
-                  <p>OTP sent to {email}</p>
-                </div>
+            <button className="login-btn" onClick={handleSendForgotOtp} disabled={loading}>
+              {loading ? "Sending..." : "Send OTP"}
+            </button>
 
-                <div className="input-box">
-                  <input
-                    placeholder="Enter 6-digit OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    maxLength={6}
-                  />
-                </div>
+            <p className="switch-text">
+              <span onClick={() => {
+                resetAll();
+                setMode("login");
+              }}>← Back to Login</span>
+            </p>
+          </>
+        )}
 
-                <div className="input-box">
-                  <FaLock className="input-icon" />
-                  <input
-                    type="password"
-                    placeholder="New Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
+        {/* ================= FORGOT PASSWORD OTP & NEW PASSWORD ================= */}
+        {mode === "forgot" && otpSent && (
+          <>
+            <div className="info-text">
+              <p>OTP sent to {email}</p>
+            </div>
 
-                {password && !isStrongPassword && (
-                  <p className="hint-text">
-                    Use 8+ chars with Upper, Lower, Number & Special char
-                  </p>
-                )}
+            <div className="input-box">
+              <input
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                maxLength={6}
+              />
+            </div>
 
-                <div className="input-box">
-                  <FaLock className="input-icon" />
-                  <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
-                </div>
+            <div className="input-box">
+              <FaLock className="input-icon" />
+              <input
+                type="password"
+                placeholder="New Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-                <p className="otp-timer">⏱ OTP expires in {formatTime(otpTimer)}</p>
-
-                {otpTimer === 0 && (
-                  <button className="resend-btn" onClick={resendOtp} disabled={loading}>
-                    {loading ? "Sending..." : "Resend OTP"}
-                  </button>
-                )}
-
-                <button
-                  className="login-btn"
-                  onClick={handleResetPassword}
-                  disabled={loading || otpTimer <= 0 || !otp || !password || !confirmPassword}
-                >
-                  {loading ? "Resetting..." : "Reset Password"}
-                </button>
-              </>
+            {password && !isStrongPassword && (
+              <p className="hint-text">
+                Use 8+ chars with Upper, Lower, Number & Special char
+              </p>
             )}
+
+            <div className="input-box">
+              <FaLock className="input-icon" />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+
+            <p className="otp-timer">⏱ OTP expires in {formatTime(otpTimer)}</p>
+
+            {otpTimer === 0 && (
+              <button className="resend-btn" onClick={resendOtp} disabled={loading}>
+                {loading ? "Sending..." : "Resend OTP"}
+              </button>
+            )}
+
+            <button 
+              className="login-btn" 
+              onClick={handleResetPassword}
+              disabled={loading || otpTimer <= 0 || !otp || !password || !confirmPassword}
+            >
+              {loading ? "Resetting..." : "Reset Password"}
+            </button>
 
             <p className="switch-text">
               <span onClick={() => {
