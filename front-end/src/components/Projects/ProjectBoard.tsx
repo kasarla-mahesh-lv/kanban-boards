@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { useParams } from "react-router-dom";
@@ -378,12 +379,13 @@ const [newColumnName, setNewColumnName] = useState("");
 //   setNewColumnName("");
 //   setShowAddInput(false);
 // };
+
 const handleAddColumn = async () => {
   const name = newColumnName.trim();
 
   if (!name || !projectId) return;
 
-  // Duplicate check (case insensitive)
+  // ✅ Duplicate check (case insensitive)
   const isDuplicate = columns.some(
     (col) => col.title.trim().toLowerCase() === name.toLowerCase()
   );
@@ -402,7 +404,7 @@ const handleAddColumn = async () => {
     setNewColumnName("");
     setShowAddInput(false);
 
-    // ✅ Reload columns
+    // ✅ Reload columns from backend
     await loadColumns(projectId);
 
   } catch (error: any) {
@@ -412,6 +414,7 @@ const handleAddColumn = async () => {
     setLoading(false);
   }
 };
+
 
 
 
