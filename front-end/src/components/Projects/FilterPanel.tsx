@@ -1,9 +1,16 @@
+<<<<<<< Updated upstream
 import React, { useEffect, useState, useMemo } from "react";
 import {
   getProjectMembersApi,
   searchProjectMembersApi,
   createTeamMemberApi,
   deleteTeamMemberApi,
+=======
+import React, { useEffect, useState,  useMemo } from "react";
+import {
+  getProjectMembersApi,
+  searchProjectMembersApi,
+>>>>>>> Stashed changes
   getProjectTypesApi,
   getProjectMilestonesApi,
   getBlockersApi,
@@ -82,6 +89,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   const [typeSearchQuery, setTypeSearchQuery] = useState("");
   const [milestoneSearchQuery, setMilestoneSearchQuery] = useState("");
 
+<<<<<<< Updated upstream
   // New state for member management
   const [showAddMemberForm, setShowAddMemberForm] = useState(false);
   const [newMemberName, setNewMemberName] = useState("");
@@ -91,6 +99,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+=======
+>>>>>>> Stashed changes
   // Fetch all filter data when panel opens
   useEffect(() => {
     if (!projectId || !isOpen) return;
@@ -100,7 +110,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         // Fetch members
         setLoading(prev => ({ ...prev, members: true }));
         const membersData = await getProjectMembersApi(projectId);
+<<<<<<< Updated upstream
         console.log("Fetched members:", membersData);
+=======
+>>>>>>> Stashed changes
         setMembers(membersData);
         setFilteredMembers(membersData);
         setLoading(prev => ({ ...prev, members: false }));
@@ -186,6 +199,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     setFilters(currentFilters);
   }, [currentFilters]);
 
+<<<<<<< Updated upstream
   // FIXED: Add new member with proper error handling
   const handleAddMember = async () => {
     // Validation
@@ -268,6 +282,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     }
   };
 
+=======
+>>>>>>> Stashed changes
   const handleCheckboxGroup = (key: keyof Filters, value: string, checked: boolean) => {
     setFilters((prev) => {
       const arr = prev[key] as string[];
@@ -402,7 +418,11 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
             />
           </div>
 
+<<<<<<< Updated upstream
           {/* ASSIGNEE - Updated with member management */}
+=======
+          {/* ASSIGNEE */}
+>>>>>>> Stashed changes
           <div className="filter-section">
             <h4>Assignee</h4>
             <label className="checkbox-label">
@@ -421,7 +441,11 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
               </div>
               
               {openDropdown === "members" && (
+<<<<<<< Updated upstream
                 <div className="dropdown-content members-dropdown">
+=======
+                <div className="dropdown-content">
+>>>>>>> Stashed changes
                   <div className="dropdown-search">
                     <span className="icon">🔍</span>
                     <input 
@@ -431,6 +455,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                       onChange={(e) => setMemberSearchQuery(e.target.value)}
                     />
                   </div>
+<<<<<<< Updated upstream
 
                   {/* Add Member Toggle Button */}
                   <div className="add-member-toggle">
@@ -496,6 +521,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
                   {/* Unassigned Option */}
                   <div className="dropdown-option unassigned-option">
+=======
+                  <div className="dropdown-option">
+>>>>>>> Stashed changes
                     <label className="checkbox-label">
                       <input 
                         type="checkbox" 
@@ -505,12 +533,16 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                       Unassigned
                     </label>
                   </div>
+<<<<<<< Updated upstream
 
                   {/* Members List with Delete Option - FIXED: Using _id instead of id */}
+=======
+>>>>>>> Stashed changes
                   {loading.members ? (
                     <div className="dropdown-loading">Loading members...</div>
                   ) : (
                     filteredMembers.map((member) => (
+<<<<<<< Updated upstream
                       <div key={member._id} className="dropdown-option member-item">
                         <label className="checkbox-label member-checkbox">
                           <input
@@ -518,6 +550,15 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                             checked={filters.assignees.includes(member._id)}
                             onChange={(e) => 
                               handleCheckboxGroup("assignees", member._id, e.target.checked)
+=======
+                      <div key={member.id} className="dropdown-option">
+                        <label className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={filters.assignees.includes(member.id)}
+                            onChange={(e) => 
+                              handleCheckboxGroup("assignees", member.id, e.target.checked)
+>>>>>>> Stashed changes
                             }
                           />
                           <span className="member-avatar">
@@ -532,6 +573,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                             <span className="member-email">{member.email}</span>
                           )}
                         </label>
+<<<<<<< Updated upstream
                         <button 
                           className="delete-member-btn"
                           onClick={() => handleDeleteMember(member._id, member.name)}
@@ -553,6 +595,11 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                   {deleteError && (
                     <div className="error-message">{deleteError}</div>
                   )}
+=======
+                      </div>
+                    ))
+                  )}
+>>>>>>> Stashed changes
                 </div>
               )}
             </div>
@@ -999,6 +1046,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                     <div className="dropdown-loading">Loading creators...</div>
                   ) : (
                     members.map((member) => (
+<<<<<<< Updated upstream
                       <div key={member._id} className="dropdown-option">
                         <label className="checkbox-label">
                           <input
@@ -1006,6 +1054,15 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                             checked={filters.selectCreators.includes(member._id)}
                             onChange={(e) => 
                               handleCheckboxGroup("selectCreators", member._id, e.target.checked)
+=======
+                      <div key={member.id} className="dropdown-option">
+                        <label className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={filters.selectCreators.includes(member.id)}
+                            onChange={(e) => 
+                              handleCheckboxGroup("selectCreators", member.id, e.target.checked)
+>>>>>>> Stashed changes
                             }
                           />
                           <span className="member-avatar">👤</span> {member.name}

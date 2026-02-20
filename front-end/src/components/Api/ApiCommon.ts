@@ -1,7 +1,6 @@
 // front-end/src/components/Api/ApiCommon.ts
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
-
 /* ======================= AXIOS INSTANCE ======================= */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -10,11 +9,19 @@ const api = axios.create({
 
 /* ======================= TOKEN INTERCEPTOR ======================= */
 api.interceptors.request.use((config) => {
+<<<<<<< Updated upstream
   const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
   if (token) {
     config.headers = config.headers ?? {};
     // Ensure token is properly formatted
+=======
+  // Change from sessionStorage to localStorage to match your Login component
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    config.headers = config.headers ?? {};
+>>>>>>> Stashed changes
     config.headers.Authorization = token.startsWith("Bearer ")
       ? token
       : `Bearer ${token}`;
@@ -127,11 +134,17 @@ export type LoginPayload = { email: string; password: string };
 export type LoginResponse = {
   message: string;
   token?: string;
+<<<<<<< Updated upstream
   user?: { id: string; name?: string; email: string; mfaEnabled?: boolean };
   requiresOtp?: boolean;
   otpSent?: boolean;
   mfaRequired?: boolean;
   mfaEnabled?: boolean;
+=======
+  user: { id: string; name?: string; email: string };
+  // Add this if your backend returns a flag for OTP requirement
+  requiresOtp?: boolean;
+>>>>>>> Stashed changes
 };
 
 export type RegisterPayload = {
@@ -174,6 +187,7 @@ export type CreateTaskResponse = {
 };
 
 /* ======================= AUTH API CALLS ======================= */
+<<<<<<< Updated upstream
 export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> => {
   try {
     console.log("📝 Login API called with:", payload.email);
@@ -267,6 +281,41 @@ export const loginApi = async (payload: LoginPayload): Promise<LoginResponse> =>
   } catch (error) {
     console.error("❌ Login API error:", error);
     throw error;
+=======
+export const loginApi = async (
+  payload: LoginPayload
+): Promise<LoginResponse> => {
+  // First attempt login to verify credentials
+  const res = await api.post<LoginResponse>("/auth/login", payload);
+
+  // Get token from headers
+  const authHeader =
+    res.headers["authorization"] || res.headers["Authorization"];
+
+  // DON'T store token here anymore - we'll store it after OTP verification
+  // Just return the response data with token
+  return {
+    ...res.data,
+    token: authHeader || res.data.token
+  };
+};
+
+/**
+ * ✅ NEW API: Verify OTP and get final token
+ * This should be called after OTP verification during login
+ */
+export const verifyLoginOtpApi = async (
+  payload: VerifyOtpPayload
+): Promise<LoginResponse> => {
+  const res = await api.post<LoginResponse>("/auth/verify-login-otp", payload);
+  
+  const authHeader =
+    res.headers["authorization"] || res.headers["Authorization"];
+  
+  if (res.status === 200 && authHeader) {
+    // Store token in localStorage after OTP verification
+    localStorage.setItem("token", authHeader);
+>>>>>>> Stashed changes
   }
 };
 
@@ -778,6 +827,20 @@ export type FilterPreset = {
   createdAt: string;
 };
 
+/**
+ * ✅ NEW API: Resend OTP
+ */
+export const resendOtpApi = (payload: SendOtpPayload) =>
+  apiPost<any, SendOtpPayload>("/auth/resend-otp", payload);
+
+/**
+ * ✅ NEW API: Logout
+ */
+export const logoutApi = (): void => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+};
+
 /* ======================= PROJECT API CALLS ======================= */
 export const getProjectsApi = (): Promise<Project[]> => 
   apiGet<Project[]>("/projects");
@@ -798,6 +861,7 @@ export const getProjectColumnsApi = (projectId: string): Promise<Column[]> =>
 export const createColumnApi = (projectId: string, payload: { title: string }): Promise<Column> =>
   apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
 
+<<<<<<< Updated upstream
  export const createTaskApi = (payload: CreateTaskPayload) =>
   apiPost<CreateTaskResponse, CreateTaskPayload>("/projects/create-task", payload);
 
@@ -935,6 +999,130 @@ export const deleteFilterPresetApi = (projectId: string, presetId: string) =>
   apiDelete<{ message: string }>(`/projects/${projectId}/filters/presets/${presetId}`);
 
 /* ======================= FILTER OPTIONS API CALLS ======================= */
+=======
+/* ======================= FILTER / MEMBERS API CALLS ======================= */
+export type Member = {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+};
+
+export type FilterPreset = {
+  id: string;
+  name: string;
+  filters: any;
+  projectId: string;
+  createdBy: string;
+  createdAt: string;
+};
+
+export type TaskType = {
+  id: string;
+  name: string;
+  color?: string;
+  icon?: string;
+};
+
+export type Milestone = {
+  id: string;
+  name: string;
+  dueDate?: string;
+  status?: string;
+};
+
+export type BlockRelation = {
+  id: string;
+  title: string;
+  type: string;
+  status: string;
+};
+
+/**
+ * GET /projects/:projectId/members
+ * Fetch all members of a project
+ */
+export const getProjectMembersApi = (projectId: string): Promise<Member[]> =>
+  apiGet<Member[]>(`/projects/${projectId}/members`);
+
+/**
+ * GET /projects/:projectId/members/search?q=:query
+ * Search members in a project
+ */
+export const searchProjectMembersApi = (projectId: string, query: string): Promise<Member[]> =>
+  apiGet<Member[]>(`/projects/${projectId}/members/search`, { params: { q: query } });
+
+/**
+ * GET /projects/:projectId/types
+ * Fetch all task types for a project
+ */
+export const getProjectTypesApi = (projectId: string): Promise<TaskType[]> =>
+  apiGet<TaskType[]>(`/projects/${projectId}/types`);
+
+/**
+ * GET /projects/:projectId/milestones
+ * Fetch all milestones for a project
+ */
+export const getProjectMilestonesApi = (projectId: string): Promise<Milestone[]> =>
+  apiGet<Milestone[]>(`/projects/${projectId}/milestones`);
+
+/**
+ * GET /tasks/blockers?projectId=:projectId
+ * Fetch all tasks that can be blockers
+ */
+export const getBlockersApi = (projectId: string): Promise<BlockRelation[]> =>
+  apiGet<BlockRelation[]>(`/tasks/blockers`, { params: { projectId } });
+
+/**
+ * GET /tasks/blocking?projectId=:projectId
+ * Fetch all tasks that can be blocked
+ */
+export const getBlockingApi = (projectId: string): Promise<BlockRelation[]> =>
+  apiGet<BlockRelation[]>(`/tasks/blocking`, { params: { projectId } });
+
+/**
+ * GET /projects/:projectId/filters/presets
+ * Fetch all saved filter presets for a project
+ */
+export const getFilterPresetsApi = (projectId: string): Promise<FilterPreset[]> =>
+  apiGet<FilterPreset[]>(`/projects/${projectId}/filters/presets`);
+
+/**
+ * POST /projects/:projectId/filters/presets
+ * Save a new filter preset
+ */
+export const saveFilterPresetApi = (
+  projectId: string, 
+  payload: { name: string; filters: any }
+): Promise<FilterPreset> =>
+  apiPost<FilterPreset, typeof payload>(`/projects/${projectId}/filters/presets`, payload);
+
+/**
+ * PUT /projects/:projectId/filters/presets/:presetId
+ * Update an existing filter preset
+ */
+export const updateFilterPresetApi = (
+  projectId: string,
+  presetId: string,
+  payload: { name?: string; filters?: any }
+): Promise<FilterPreset> =>
+  apiPut<FilterPreset, typeof payload>(`/projects/${projectId}/filters/presets/${presetId}`, payload);
+
+/**
+ * DELETE /projects/:projectId/filters/presets/:presetId
+ * Delete a filter preset
+ */
+export const deleteFilterPresetApi = (
+  projectId: string,
+  presetId: string
+): Promise<{ message: string }> =>
+  apiDelete<{ message: string }>(`/projects/${projectId}/filters/presets/${presetId}`);
+
+/**
+ * GET /projects/:projectId/filters/options
+ * Get all filter options (types, milestones, etc.) in one call
+ */
+>>>>>>> Stashed changes
 export const getFilterOptionsApi = (projectId: string): Promise<{
   types: TaskType[];
   milestones: Milestone[];
@@ -943,7 +1131,21 @@ export const getFilterOptionsApi = (projectId: string): Promise<{
   blocking: BlockRelation[];
 }> => apiGet(`/projects/${projectId}/filters/options`);
 
+<<<<<<< Updated upstream
 export const applyFiltersApi = (projectId: string, filters: any): Promise<{ columns: Column[] }> =>
   apiPost<{ columns: Column[] }, any>(`/projects/${projectId}/tasks/filter`, filters);
 
+=======
+/**
+ * POST /projects/:projectId/tasks/filter
+ * Apply filters to get filtered tasks (server-side filtering)
+ */
+export const applyFiltersApi = (
+  projectId: string,
+  filters: any
+): Promise<{ columns: Column[] }> =>
+  apiPost<{ columns: Column[] }, any>(`/projects/${projectId}/tasks/filter`, filters);
+
+/* ======================= EXPORT AXIOS INSTANCE (optional) ======================= */
+>>>>>>> Stashed changes
 export default api;

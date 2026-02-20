@@ -20,11 +20,16 @@ import {
   //verifyMfaOtpApi,
 } from "../components/Api/ApiCommon";
 import "./Login.css";
+<<<<<<< Updated upstream
+=======
+import { loginApi } from "../components/Api/ApiCommon";
+>>>>>>> Stashed changes
 
 type Props = {
   onClose?: () => void;
 };
 
+<<<<<<< Updated upstream
 type Mode = "login" | "register" | "forgot" | "loginOtp" | "mfaVerification";
 
 interface LoginResponse {
@@ -62,6 +67,9 @@ interface VerifyOtpResponse {
   success?: boolean;
   token?: string;
 }*/
+=======
+type Mode = "login" | "register" | "forgot" | "loginOtp";
+>>>>>>> Stashed changes
 
 const OTP_DURATION = 120;
 
@@ -108,6 +116,7 @@ const Login = ({ onClose }: Props) => {
     return () => clearInterval(interval);
   }, [otpTimer]);
 
+<<<<<<< Updated upstream
   /* ================= AUTO FOCUS OTP INPUT ================= */
   useEffect(() => {
     if (mode === 'loginOtp' || mode === 'mfaVerification' || 
@@ -122,6 +131,8 @@ const Login = ({ onClose }: Props) => {
     }
   }, [mode, otpSent]);
 
+=======
+>>>>>>> Stashed changes
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -134,6 +145,7 @@ const Login = ({ onClose }: Props) => {
     if (value.length <= 10) setMobilenumber(value);
   };
 
+<<<<<<< Updated upstream
   /* ================= KEYBOARD HANDLER ================= */
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !loading) {
@@ -156,6 +168,9 @@ const Login = ({ onClose }: Props) => {
   };
 
   /* ================= LOGIN ================= */
+=======
+  /* ================= LOGIN WITH OTP ================= */
+>>>>>>> Stashed changes
   const handleLogin = async () => {
     if (!email || !password) {
       toast.error("All fields required ❌");
@@ -164,6 +179,7 @@ const Login = ({ onClose }: Props) => {
 
     try {
       setLoading(true);
+<<<<<<< Updated upstream
       console.log("Attempting login with:", { email });
       
       const loginResponse = await loginApi({ email, password }) as LoginResponse;
@@ -236,6 +252,58 @@ if (loginResponse.requiresOtp || loginResponse.otpSent) {
       } else {
         toast.error(error?.response?.data?.message || error?.message || "Login failed ❌");
       }
+=======
+      // First attempt login to get token
+      const res = await loginApi({ email, password });
+      console.log(res, "res--------------------");
+      
+      // Store token temporarily
+      setLoginToken(res.token);
+      
+      // Send OTP to email
+      await sendOtpApi({ email });
+      
+      // Switch to OTP verification mode
+      setMode("loginOtp");
+      setOtpSent(true);
+      setOtpTimer(OTP_DURATION);
+      toast.success("OTP sent to your email 📩");
+      
+    } catch {
+      toast.error("Invalid credentials ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================= VERIFY LOGIN OTP ================= */
+  const handleVerifyLoginOtp = async () => {
+    if (!otp) {
+      toast.error("Enter OTP ❌");
+      return;
+    }
+
+    if (otpTimer <= 0) {
+      toast.error("OTP expired ❌");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Verify OTP
+      await verifyOtpApi({ email, otp });
+      
+      // Store the token that we got from login
+      localStorage.setItem("token", loginToken);
+      localStorage.setItem("user", JSON.stringify({ email }));
+      
+      toast.success("Login successful ✅");
+      resetAll();
+      onClose?.();
+      nav("/", { replace: true });
+    } catch {
+      toast.error("Invalid OTP ❌");
+>>>>>>> Stashed changes
     } finally {
       setLoading(false);
     }
@@ -405,11 +473,17 @@ const handleVerifyMfaOtp = async () => {
 
     try {
       setLoading(true);
+<<<<<<< Updated upstream
       await registerApi({ name, email, password, mobilenumber });
       
       // Send OTP
       await forgotPasswordApi({ email });
       
+=======
+            await registerApi({ name, email, password, mobilenumber });
+    
+      // await sendOtpApi({ email });
+>>>>>>> Stashed changes
       setOtpSent(true);
       setOtpTimer(OTP_DURATION);
       toast.success("OTP sent to email 📩");
@@ -435,6 +509,7 @@ const handleVerifyMfaOtp = async () => {
 
     try {
       setLoading(true);
+<<<<<<< Updated upstream
       await verifyOtpApi({
         email,
         otp,
@@ -447,6 +522,15 @@ const handleVerifyMfaOtp = async () => {
     } catch (error: any) {
       console.error("OTP verification error:", error);
       toast.error(error?.response?.data?.message || error?.message || "OTP verification failed ❌");
+=======
+      await verifyOtpApi({ email, otp });
+      // await registerApi({ name, email, password, mobilenumber });
+      toast.success("Registration successful 🎉");
+      resetAll();
+      setMode("login");
+    } catch {
+      toast.error("User already exists ❌");
+>>>>>>> Stashed changes
     } finally {
       setLoading(false);
     }
@@ -527,9 +611,26 @@ const handleVerifyMfaOtp = async () => {
     setOtp("");
     setOtpSent(false);
     setOtpTimer(0);
+<<<<<<< Updated upstream
     setMfaRequired(false);
     setShowPassword(false);
     setShowConfirmPassword(false);
+=======
+    setLoginToken("");
+  };
+
+  const resendOtp = async () => {
+    try {
+      setLoading(true);
+      await sendOtpApi({ email });
+      setOtpTimer(OTP_DURATION);
+      toast.success("OTP resent 📩");
+    } catch {
+      toast.error("Failed to resend OTP ❌");
+    } finally {
+      setLoading(false);
+    }
+>>>>>>> Stashed changes
   };
 
   const resendOtp = async () => {
@@ -565,8 +666,12 @@ const handleVerifyMfaOtp = async () => {
 
         <h2>
           {mode === "login" && "Welcome Back"}
+<<<<<<< Updated upstream
           {mode === "loginOtp" && "Verify Login OTP"}
           {mode === "mfaVerification" && "MFA Verification"}
+=======
+          {mode === "loginOtp" && "Verify OTP"}
+>>>>>>> Stashed changes
           {mode === "register" && "Create Account"}
           {mode === "forgot" && "Reset Password"}
         </h2>
@@ -576,17 +681,25 @@ const handleVerifyMfaOtp = async () => {
           <>
             <div className="input-box">
               <FaUser className="input-icon" />
+<<<<<<< Updated upstream
               <input
                 placeholder="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyPress={handleKeyPress}
                 disabled={loading}
+=======
+              <input 
+                placeholder="Name" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+>>>>>>> Stashed changes
               />
             </div>
 
             <div className="input-box">
               <FaEnvelope className="input-icon" />
+<<<<<<< Updated upstream
               <input
                 type="email"
                 placeholder="Email Address"
@@ -594,6 +707,12 @@ const handleVerifyMfaOtp = async () => {
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyPress={handleKeyPress}
                 disabled={loading}
+=======
+              <input 
+                placeholder="Email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+>>>>>>> Stashed changes
               />
             </div>
 
@@ -641,6 +760,7 @@ const handleVerifyMfaOtp = async () => {
             )}
 
             <button className="login-btn" onClick={handleRegister} disabled={loading}>
+<<<<<<< Updated upstream
               {loading ? (
                 <>
                   <LoadingSpinner />
@@ -649,6 +769,9 @@ const handleVerifyMfaOtp = async () => {
               ) : (
                 "Register"
               )}
+=======
+              {loading ? "Sending OTP..." : "Register"}
+>>>>>>> Stashed changes
             </button>
 
             <p className="switch-text">
@@ -668,6 +791,7 @@ const handleVerifyMfaOtp = async () => {
             </div>
 
             <div className="input-box">
+<<<<<<< Updated upstream
               <input
                 placeholder="Enter 6-digit OTP"
                 value={otp}
@@ -675,6 +799,12 @@ const handleVerifyMfaOtp = async () => {
                 maxLength={6}
                 onKeyPress={handleKeyPress}
                 disabled={loading}
+=======
+              <input 
+                placeholder="Enter OTP" 
+                value={otp} 
+                onChange={(e) => setOtp(e.target.value)} 
+>>>>>>> Stashed changes
               />
             </div>
 
@@ -682,6 +812,7 @@ const handleVerifyMfaOtp = async () => {
             
             {otpTimer === 0 && (
               <button className="resend-btn" onClick={resendOtp} disabled={loading}>
+<<<<<<< Updated upstream
                 {loading ? (
                   <>
                     <LoadingSpinner />
@@ -690,12 +821,16 @@ const handleVerifyMfaOtp = async () => {
                 ) : (
                   "Resend OTP"
                 )}
+=======
+                Resend OTP
+>>>>>>> Stashed changes
               </button>
             )}
 
             <button 
               className="login-btn" 
               onClick={handleVerifyOtpAndRegister}
+<<<<<<< Updated upstream
               disabled={loading || otpTimer <= 0 || !isValidOtp(otp)}
             >
               {loading ? (
@@ -706,6 +841,11 @@ const handleVerifyMfaOtp = async () => {
               ) : (
                 "Verify OTP & Register"
               )}
+=======
+              disabled={loading || otpTimer <= 0}
+            >
+              {loading ? "Verifying..." : "Verify OTP & Register"}
+>>>>>>> Stashed changes
             </button>
 
             <p className="switch-text">
@@ -722,6 +862,7 @@ const handleVerifyMfaOtp = async () => {
           <>
             <div className="input-box">
               <FaEnvelope className="input-icon" />
+<<<<<<< Updated upstream
               <input
                 type="email"
                 placeholder="Email Address"
@@ -729,11 +870,18 @@ const handleVerifyMfaOtp = async () => {
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyPress={handleKeyPress}
                 disabled={loading}
+=======
+              <input 
+                placeholder="Email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+>>>>>>> Stashed changes
               />
             </div>
 
             <div className="input-box password-box">
               <FaLock className="input-icon" />
+<<<<<<< Updated upstream
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
@@ -763,6 +911,18 @@ const handleVerifyMfaOtp = async () => {
                   <FaSignInAlt /> Login
                 </>
               )}
+=======
+              <input 
+                type="password" 
+                placeholder="Password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+              />
+            </div>
+
+            <button className="login-btn" onClick={handleLogin} disabled={loading}>
+              <FaSignInAlt /> {loading ? "Sending OTP..." : "Login"}
+>>>>>>> Stashed changes
             </button>
 
             <p className="switch-text">
@@ -897,11 +1057,53 @@ const handleVerifyMfaOtp = async () => {
           </>
         )}
 
+        {/* ================= LOGIN OTP VERIFICATION ================= */}
+        {mode === "loginOtp" && (
+          <>
+            <div className="info-text">
+              <p>OTP sent to {email}</p>
+            </div>
+
+            <div className="input-box">
+              <input 
+                placeholder="Enter OTP" 
+                value={otp} 
+                onChange={(e) => setOtp(e.target.value)} 
+                maxLength={6}
+              />
+            </div>
+
+            <p className="otp-timer">⏱ OTP expires in {formatTime(otpTimer)}</p>
+            
+            {otpTimer === 0 && (
+              <button className="resend-btn" onClick={resendOtp} disabled={loading}>
+                Resend OTP
+              </button>
+            )}
+
+            <button 
+              className="login-btn" 
+              onClick={handleVerifyLoginOtp}
+              disabled={loading || otpTimer <= 0 || !otp}
+            >
+              {loading ? "Verifying..." : "Verify OTP & Login"}
+            </button>
+
+            <p className="switch-text">
+              <span onClick={() => {
+                resetAll();
+                setMode("login");
+              }}>← Back to Login</span>
+            </p>
+          </>
+        )}
+
         {/* ================= FORGOT PASSWORD ================= */}
         {mode === "forgot" && !otpSent && (
           <>
             <div className="input-box">
               <FaEnvelope className="input-icon" />
+<<<<<<< Updated upstream
               <input
                 type="email"
                 placeholder="Email Address"
@@ -922,11 +1124,32 @@ const handleVerifyMfaOtp = async () => {
                 ) : (
                   "Send OTP"
                 )}
+=======
+              <input 
+                placeholder="Email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+              />
+            </div>
+
+            {!otpSent && (
+              <button className="login-btn" onClick={handleSendForgotOtp} disabled={loading}>
+                {loading ? "Sending..." : "Send OTP"}
+>>>>>>> Stashed changes
               </button>
             ) : (
               <>
+<<<<<<< Updated upstream
                 <div className="info-text">
                   <p>OTP sent to {email}</p>
+=======
+                <div className="input-box">
+                  <input 
+                    placeholder="OTP" 
+                    value={otp} 
+                    onChange={(e) => setOtp(e.target.value)} 
+                  />
+>>>>>>> Stashed changes
                 </div>
 
                 <div className="input-box">
@@ -942,6 +1165,7 @@ const handleVerifyMfaOtp = async () => {
 
                 <div className="input-box password-box">
                   <FaLock className="input-icon" />
+<<<<<<< Updated upstream
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="New Password"
@@ -958,6 +1182,14 @@ const handleVerifyMfaOtp = async () => {
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
+=======
+                  <input 
+                    type="password" 
+                    placeholder="New Password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                  />
+>>>>>>> Stashed changes
                 </div>
 
             <div className="input-box">
@@ -1004,6 +1236,7 @@ const handleVerifyMfaOtp = async () => {
                   </button>
                 )}
 
+<<<<<<< Updated upstream
                 <button
                   className="login-btn"
                   onClick={handleResetPassword}
@@ -1017,6 +1250,26 @@ const handleVerifyMfaOtp = async () => {
                   ) : (
                     "Reset Password"
                   )}
+=======
+                <div className="input-box">
+                  <FaLock className="input-icon" />
+                  <input 
+                    type="password" 
+                    placeholder="Confirm Password" 
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                  />
+                </div>
+
+                <p className="otp-timer">⏱ OTP expires in {formatTime(otpTimer)}</p>
+
+                <button 
+                  className="login-btn" 
+                  onClick={handleResetPassword}
+                  disabled={loading || otpTimer <= 0}
+                >
+                  {loading ? "Resetting..." : "Reset Password"}
+>>>>>>> Stashed changes
                 </button>
               </>
             )}
@@ -1060,6 +1313,7 @@ const handleVerifyMfaOtp = async () => {
   );
 };
 
+<<<<<<< Updated upstream
 export default Login;
 
 
@@ -1071,3 +1325,6 @@ export default Login;
 
 
 
+=======
+export default Login;
+>>>>>>> Stashed changes

@@ -449,6 +449,7 @@
   cursor: not-allowed;
   transform: none;
 }
+<<<<<<< Updated upstream
 /* ---- Board actions (only Add Column button remains) ---- */
 .board-actions {
   display: flex;
@@ -456,6 +457,8 @@
   align-items: center;
 }
 /* Project Settings Button and Panel Styles */
+=======
+>>>>>>> Stashed changes
 
 /* ---- Board actions (only Add Column button remains) ---- */
 .board-actions {
@@ -464,6 +467,7 @@
   align-items: center;
 }
 
+<<<<<<< Updated upstream
 .add-col-btn {
   background-color: #4a6cf7;
   color: white;
@@ -785,3 +789,5 @@
   background: #c7d2fe;
   border-radius: 10px;
 }
+=======
+>>>>>>> Stashed changes

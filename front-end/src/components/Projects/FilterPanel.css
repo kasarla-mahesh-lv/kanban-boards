@@ -3,6 +3,10 @@
    Complete filter sidebar with all dropdowns, icons, date picker
    Matching Screenshot 2026-02-12 104659.png, 104712.png, etc.
 ========================= */
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 .filter-panel {
   position: fixed;
   right: -420px;
@@ -574,7 +578,10 @@
 
 .form-group {
   margin-bottom: 20px;
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
 }
 
 .label {
@@ -882,6 +889,7 @@
 .filter-presets-list {
   scrollbar-width: thin;
   scrollbar-color: rgba(203, 213, 225, 0.2) transparent;
+<<<<<<< Updated upstream
 }
 /* Member Management Styles */
 .members-dropdown {
@@ -1064,4 +1072,6 @@
   background: var(--bg-secondary, #f9f9f9);
   border-radius: 4px;
   margin: 10px;
+=======
+>>>>>>> Stashed changes
 }
