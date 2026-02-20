@@ -1,13 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-
 import { useParams } from "react-router-dom";
 import { type Project, getProjectColumnsApi, createTaskApi,createColumnApi } from "../Api/ApiCommon";
-
 import FilterPanel from "./FilterPanel";
 import AddTaskModal from "./AddTaskModal";
-
 import "./Project.css";
-
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
 
 interface Filters {
