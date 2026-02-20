@@ -55,7 +55,16 @@ try{
     Your OTP is ${otp}`
 );
 
-    res.status(200).json({message:"OTP sent to email"});
+   res.status(200).json({
+  message: "OTP sent to email",
+  user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role   // ✅ add
+  }
+});
+
 
 }catch(error){
     res.status(500).json({message:error.message});
@@ -139,8 +148,6 @@ try{
     res.status(500).json({ message: error.message });
   }
 };
-
-
 exports.login = async (req, res) => {
   try {
     const { error } = loginSchema.validate(req.body);
@@ -158,7 +165,6 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
-        // ✅ ✅ MAIN CHANGE: If MFA is OFF => direct token => dashboard
     if (!user.mfaEnabled) {
       const token = jwt.sign(
         { userId: user._id },
@@ -166,20 +172,26 @@ exports.login = async (req, res) => {
         { expiresIn: "1d" }
       );
 
-      // optional: save token in DB like you are doing in verifyOtp
       user.tokens.push({ token });
       await user.save();
-
       res.setHeader("Authorization", `Bearer ${token}`);
+
+
 
       return res.status(200).json({
         message: "Login success ✅",
         mfaRequired: false,
-        user: { id: user._id, name: user.name, email: user.email }
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role, // ✅ correct
+        },
+      
       });
     }
 
-    // ✅ Generate login OTP only
+    // MFA ON: send login OTP...
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 2 * 60 * 1000);
 
@@ -188,24 +200,17 @@ exports.login = async (req, res) => {
     await user.save();
 
 
-
-    await sendMail(
-      email,
-      "Login OTP",
-      `Your login OTP is ${otp}. It is valid for 2 minutes.`
-    );
-
+    await sendMail(email, "Login OTP", `Your login OTP is ${otp}. Valid for 2 minutes.`);
 
     return res.status(200).json({
       message: "OTP sent to email. Please verify OTP using /verify-otp with type=login"
     });
 
   } catch (error) {
-    console.log(error,"error");
-    
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
+
 
 
 
@@ -320,7 +325,7 @@ exports.verifyMfaOtp = async (req, res) => {
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const { otp } = req.body;
-    if (!otp) return res.status(400).json({ message: "OTP required" });
+    if (!otp) return res.status(400).json({ message: "OTP required" });f
 
     const user = await UserModel.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -427,6 +432,3 @@ exports.verifyDisableMfaOtp = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-
-
-
