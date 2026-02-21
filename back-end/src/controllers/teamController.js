@@ -1,7 +1,10 @@
 // src/controllers/teamController.js
 const mongoose = require("mongoose");
 const Team = require("../models/team");
+const User = require("../models/User"); // ✅ Import User model
 const ProjectModel = require("../models/project");
+const jwt = require("jsonwebtoken"); // ✅ Add this
+const { sendInvitationEmail } = require("../services/emailServices"); // ✅ Add this
 
 // ✅ GET /api/team -> Get all team members
 exports.getAllTeamMembers = async (req, res) => {
@@ -13,7 +16,7 @@ exports.getAllTeamMembers = async (req, res) => {
   }
 };
 
-// ✅ POST /api/team -> Create new team member
+// ✅ POST /api/team -> Create new team member with EMAIL INVITATION
 exports.createTeamMember = async (req, res) => {
   try {
     const { name, email, projectId } = req.body;
@@ -41,20 +44,68 @@ exports.createTeamMember = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Check if email already exists
-    const existingTeamMember = await Team.findOne({ email: email.toLowerCase() });
-    if (existingTeamMember) {
-      return res.status(400).json({ message: "Email already exists" });
+    const emailLower = email.toLowerCase().trim();
+
+    // ✅ CHECK 1: Email + ProjectId combination (same person, same project)
+    const existingInSameProject = await Team.findOne({ 
+      email: emailLower, 
+      projectId 
+    });
+    if (existingInSameProject) {
+      return res.status(400).json({ 
+        message: "This user is already assigned to this project" 
+      });
     }
+
+    // ✅ CHECK 2: Email exists in ANY project (same person, any project)
+    const existingInAnyProject = await Team.findOne({ 
+      email: emailLower 
+    });
+    if (existingInAnyProject) {
+      return res.status(400).json({ 
+        message: "This email is already assigned to another project" 
+      });
+    }
+
+    // ✅ CHECK 3: Check if user is already registered in system
+    const registeredUser = await User.findOne({ email: emailLower });
+    if (registeredUser) {
+      return res.status(400).json({ 
+        message: "This user is already registered in the system" 
+      });
+    }
+
+    // ✅ Create invitation token (valid for 7 days)
+    const invitationToken = jwt.sign(
+      { email: emailLower, projectId, name },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     const newTeamMember = await Team.create({
       name: name.trim(),
-      email: email.toLowerCase().trim(),
-      projectId
+      email: emailLower,
+      projectId,
+      status: "pending", // ✅ New field
+      invitationToken, // ✅ New field
+      invitedAt: new Date() // ✅ New field
     });
 
+    // ✅ Send invitation email
+    try {
+      await sendInvitationEmail(newTeamMember.email, invitationToken, projectId);
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Delete the member if email fails
+      await Team.findByIdAndDelete(newTeamMember._id);
+      return res.status(500).json({
+        message: "Email sending failed. Team member was not created.",
+        emailError: emailError.message
+      });
+    }
+
     return res.status(201).json({
-      message: "Team member created successfully",
+      message: "Team member created and invitation email sent",
       teamMember: newTeamMember
     });
   } catch (err) {
@@ -173,6 +224,63 @@ exports.deleteTeamMember = async (req, res) => {
     }
 
     return res.status(200).json({ message: "Team member deleted successfully" });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ POST /api/team/accept-invitation -> Accept team invitation from email link
+exports.acceptInvitation = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: "Token is required" });
+    }
+
+    // Verify token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({ message: "Invalid or expired invitation token" });
+    }
+
+    const { email, projectId } = decoded;
+
+    // Find and update team member
+    const teamMember = await Team.findOneAndUpdate(
+      { email, projectId, status: "pending" },
+      {
+        status: "active",
+        invitationToken: null,
+        acceptedAt: new Date()
+      },
+      { new: true }
+    ).populate("projectId");
+
+    if (!teamMember) {
+      return res.status(404).json({ message: "Invalid invitation or already accepted" });
+    }
+
+    // Generate auth token for frontend
+    const authToken = jwt.sign(
+      { 
+        teamId: teamMember._id, 
+        email: teamMember.email,
+        projectId: teamMember.projectId,
+        name: teamMember.name
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    return res.status(200).json({
+      message: "Invitation accepted successfully",
+      authToken,
+      redirectUrl: "/dashboard",
+      teamMember
+    });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }

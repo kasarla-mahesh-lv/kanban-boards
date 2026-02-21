@@ -17,7 +17,7 @@ const {
  */
 
 
-router.get("/boards/:boardId/columns", getColumnsByProject); // ✅ ADD THIS
+// router.get("/boards/:boardId/columns", getColumnsByBoard); // ✅ ADD THIS
 
 
 router.post("/boards/:boardId/columns",authMiddleware, createColumn);
@@ -42,7 +42,8 @@ module.exports = router;
  *       200:
  *         description: Columns list
  */
-router.get("/projects/:projectId/columns", authMiddleware, getColumnsByProject);
+// router.get("/boards/:projectId/columns", authMiddleware, getColumnsByBoard);
+router.get("/:projectId/columns", authMiddleware, getColumnsByProject);
 
 /**
  * @openapi
