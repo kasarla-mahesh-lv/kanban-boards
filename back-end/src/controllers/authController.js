@@ -325,7 +325,7 @@ exports.verifyMfaOtp = async (req, res) => {
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const { otp } = req.body;
-    if (!otp) return res.status(400).json({ message: "OTP required" });f
+    if (!otp) return res.status(400).json({ message: "OTP required" });
 
     const user = await UserModel.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
