@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const columnSchema = new mongoose.Schema(
   {
-    projectId: { type: mongoose.Schema.Types.ObjectId, ref: "Project", required: true },
+    projectId: { type: mongoose.Schema.Types.ObjectId, ref: "Projects", required: true },
 
     // ✅ always store lowercase
     name: { type: String, required: true, trim: true, lowercase: true },

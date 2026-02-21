@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const authMiddleware = require("../middlewares/authmiddlewares");
+
 const {
   createProject,
   getAllProjects,
@@ -11,61 +13,37 @@ const {
   updateTaskInProject,
   deleteTaskInProject,
   openProject,
-  createTaskInProject,
   getColumnsTasks,
 } = require("../controllers/projectController");
 
-const authMiddleware = require("../middlewares/authmiddlewares");
-//const requirePermission = require("../middlewares/requirePermission");
 
-// ✅ all projects
+// ✅ GET all projects
 router.get("/", authMiddleware, getAllProjects);
 
-// ✅ create project
+// ✅ CREATE project
 router.post("/", authMiddleware, createProject);
 
-// ✅ open project (keep before /:projectId)
+// ✅ OPEN project (MUST BEFORE :projectId)
 router.get("/:projectId/open", authMiddleware, openProject);
 
-// ✅ tasks
-router.get("/:projectId/tasks", authMiddleware, getProjectTasks);
-router.get("/:projectId/tasks/:taskId", authMiddleware, getTaskByTaskIdInProject);
-
-// ✅ RBAC: permissions
-// router.post(
-//   "/:projectId/tasks",
-//   authMiddleware,
-//   requirePermission("task:create"),
-//   addTaskToProject
-// );
-
-// router.patch(
-//   "/:projectId/tasks/:taskId",
-//   authMiddleware,
-//   requirePermission("task:update"),
-//   updateTaskInProject
-// );
-
-// router.delete(
-//   "/:projectId/tasks/:taskId",
-//   authMiddleware,
-//   requirePermission("task:delete"),
-//   deleteTaskInProject
-// );
-
-// (optional) your existing endpoints
-router.post("/create-task", authMiddleware, createTaskInProject);
-router.get("/get-columns-tasks", getColumnsTasks);
-
-// ✅ project details (keep last)
+// ✅ GET project details (KEEP LAST)
 router.get("/:projectId", authMiddleware, getProjectById);
-router.post("/:projectId/tasks",authMiddleware,addTaskToProject);
 
+// ✅ TASK ROUTES
+router.get("/:projectId/tasks", authMiddleware, getProjectTasks);
+router.post("/:projectId/tasks", authMiddleware, addTaskToProject);
+router.get("/:projectId/tasks/:taskId", authMiddleware, getTaskByTaskIdInProject);
+router.patch("/:projectId/tasks/:taskId", authMiddleware, updateTaskInProject);
+router.delete("/:projectId/tasks/:taskId", authMiddleware, deleteTaskInProject);
+
+// ✅ GROUPED (Columns + Tasks)
+router.get("/:projectId/columns-tasks", authMiddleware, getColumnsTasks);
 
 module.exports = router;
 
 //-------------------- Swagger Documentation --------------------
 /**
+ * 
  * @openapi
  * /api/projects/{projectId}/open:
  *   get:
@@ -177,9 +155,9 @@ router.post("/",authMiddleware, createProject);
  *               description:
  *                 type: string
  *                 example: "API work"
- *               status:
+ *               columnId:
  *                 type: string
- *                 example: "todo"
+ *                 example: "TODO_COLUMN_ID"
  *     responses:
  *       201:
  *         description: Task added

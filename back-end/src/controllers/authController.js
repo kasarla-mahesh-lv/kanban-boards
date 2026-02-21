@@ -63,6 +63,7 @@ try{
 };
 
 
+
  exports.verifyOtp = async (req, res) => {
   try {
     const { error } = verifyOtpSchema.validate(req.body);

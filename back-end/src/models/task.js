@@ -10,40 +10,25 @@ const subtaskSchema = new mongoose.Schema(
 
 const taskSchema = new mongoose.Schema(
   {
-    // 🔹 Basic Info
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    title: { type: String, required: true, trim: true },
+    description: { type: String, default: "" },
 
-    description: {
-      type: String,
-      default: "",
-    },
-
-    // 🔹 Relationships
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
+      ref: "Projects", // ✅ your project model name
       required: true,
+      index: true,
     },
 
-    // 🔥 Instead of enum → reference Column
     columnId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Column",
       required: true,
+      index: true,
     },
 
-    // 🔹 Assignment
-    assignee: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
-    },
+    assignee: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
-    // 🔹 Optional Fields
     priority: {
       type: String,
       enum: ["Low", "Medium", "High", "Critical"],
@@ -56,41 +41,17 @@ const taskSchema = new mongoose.Schema(
       default: "Task",
     },
 
-    dueDate: {
-      type: Date,
-      default: null,
-    },
+    dueDate: { type: Date, default: null },
+    milestone: { type: String, default: "" },
 
-    milestone: {
-      type: String,
-      default: "",
-    },
-
-    blockers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Task",
-      },
-    ],
-
-    blocking: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Task",
-      },
-    ],
+    blockers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }],
+    blocking: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }],
 
     subtasks: [subtaskSchema],
 
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    //createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
 
-module.exports =
-  mongoose.models.Task || mongoose.model("Task", taskSchema);
- 
+module.exports = mongoose.models.Task || mongoose.model("Task", taskSchema);

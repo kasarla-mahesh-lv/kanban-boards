@@ -2,68 +2,61 @@ const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      default: ""
-    },
+    title: { type: String, required: true },
+    description: { type: String, default: "" },
 
-    // Todo / In Progress / Done
     status: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Column",
+      type: String,
+      enum: ["backlog", "todo", "in progress", "done"],
+      default: "todo",
     },
 
-    // Due date
-    dueDate: {
-      type: Date
-    },
-  
+    dueDate: { type: Date },
 
-    // Priority
     priority: {
       type: String,
       enum: ["low", "medium", "high"],
-      default: "medium"
+      default: "medium",
     },
 
-    // Assigned user (future ready)
     assignee: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+      ref: "User",
+      default: null,
     },
 
-    // Blocking / Blocked by
-    blockers: [
-      {
-        type: mongoose.Schema.Types.ObjectId // taskId
-      }
-    ]
+    blockers: [{ type: String }],
   },
+  
+
   { timestamps: true }
 );
-
 const projectSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true
-    },
-    description: String,
+    title: { type: String, required: true },
+
+    description: { type: String, default: "" },
+
     members: [
-  {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    role: { type: String, enum: ["Admin", "Manager", "TL", "Employee"], default: "Employee" }
-  }
-],
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        role: { type: String },
+      },
+    ],
 
 
-    tasks: [taskSchema]
+
+    // ✅ ADD THIS LINE
+    taskCount: { type: Number, default: 0 },
+
+    tasks: [taskSchema]   // if still using embedded
   },
   { timestamps: true }
 );
+
+  
+  
+  
+
 
 module.exports = mongoose.model("Projects", projectSchema);

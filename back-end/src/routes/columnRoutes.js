@@ -16,19 +16,9 @@ const {
  *     description: Column related APIs
  */
 
-
-// router.get("/boards/:boardId/columns", getColumnsByBoard); // ✅ ADD THIS
-
-
-router.post("/boards/:boardId/columns",authMiddleware, createColumn);
-router.patch("/boards/:boardId/columns/:columnId",authMiddleware, updateColumn);
-router.delete("/boards/:boardId/columns/:columnId",authMiddleware, deleteColumn);
-
-module.exports = router;
-
 /**
  * @openapi
- * /api/projects/{projectId}/columns:
+ * /api/columns/projects/{projectId}:
  *   get:
  *     tags: [Columns]
  *     summary: Get all columns in a project
@@ -42,12 +32,11 @@ module.exports = router;
  *       200:
  *         description: Columns list
  */
-// router.get("/boards/:projectId/columns", authMiddleware, getColumnsByBoard);
-router.get("/:projectId/columns", authMiddleware, getColumnsByProject);
+router.get("/projects/:projectId", authMiddleware, getColumnsByProject);
 
 /**
  * @openapi
- * /api/projects/{projectId}/columns:
+ * /api/columns/projects/{projectId}:
  *   post:
  *     tags: [Columns]
  *     summary: Create a column in a project (Add Group)
@@ -74,7 +63,7 @@ router.get("/:projectId/columns", authMiddleware, getColumnsByProject);
  *       409:
  *         description: Duplicate column name
  */
-router.post("/:projectId/columns", authMiddleware, createColumn);
+router.post("/projects/:projectId", authMiddleware, createColumn);
 
 /**
  * @openapi
@@ -97,10 +86,8 @@ router.post("/:projectId/columns", authMiddleware, createColumn);
  *             properties:
  *               name:
  *                 type: string
- *                 example: "In Progress"
  *               order:
  *                 type: number
- *                 example: 2
  *     responses:
  *       200:
  *         description: Column updated
