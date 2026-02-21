@@ -167,10 +167,21 @@ export type CreateTaskPayload = {
   projectId: string;
   columnId: string;
 };
-
+export type UpdateTaskPayload = {
+  title?: string;
+  description?: string;
+  priority?: string;
+  // status removed
+  projectId?: string;
+  columnId?: string;
+};
 export type CreateTaskResponse = {
   message?: string;
   task: Task; 
+};
+export type UpdateTaskResponse = {
+  message?: string;
+  task?: Task;
 };
 
 /* ======================= AUTH API CALLS ======================= */
@@ -798,8 +809,43 @@ export const getProjectColumnsApi = (projectId: string): Promise<Column[]> =>
 export const createColumnApi = (projectId: string, payload: { title: string }): Promise<Column> =>
   apiPost<Column, typeof payload>(`/columns/boards/${projectId}/columns`, payload);
 
- export const createTaskApi = (payload: CreateTaskPayload) =>
-  apiPost<CreateTaskResponse, CreateTaskPayload>("/projects/create-task", payload);
+ export const createTaskApi = async (payload: CreateTaskPayload) => {
+  try {
+    console.log("Creating task with payload:", payload);
+    
+    // Make sure we're sending the correct data structure
+    const response = await apiPost<CreateTaskResponse, CreateTaskPayload>(
+      "/projects/create-task", 
+      payload
+    );
+    
+    console.log("Create task response:", response);
+    return response;
+  } catch (error) {
+    console.error("Create task error:", error);
+    throw error;
+  }
+};
+
+export const updateTaskApi = async (
+  projectId: string,
+  taskId: string,
+  updates: UpdateTaskPayload,
+  columnId?: string
+) => {
+  // Remove projectId and columnId from the body as they're in the URL
+  // Only send the fields that should actually be updated
+  const body: Partial<UpdateTaskPayload> = {
+    ...(updates.title !== undefined && { title: updates.title }),
+    ...(updates.description !== undefined && { description: updates.description }),
+    ...(updates.priority !== undefined && { priority: updates.priority }),
+  };
+  
+  // If you need to update the column/status, you might need a separate endpoint
+  // or your backend might handle it differently
+  
+  return apiPatch(`/projects/${projectId}/tasks/${taskId}`, body);
+};
 
 /* ======================= MEMBERS API CALLS ======================= */
 // export const getProjectMembersApi = (projectId: string): Promise<Member[]> =>
