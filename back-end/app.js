@@ -59,7 +59,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/roles", roleRoutes);
-
+app.use("/api/permissions", permissionRoutes);
 /* -------------------- Start App -------------------- */
 (async () => {
   // Connect to MongoDB

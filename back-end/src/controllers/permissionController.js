@@ -1,6 +1,5 @@
 const Permission = require("../models/permissions");
 
-// GET /api/permissions
 exports.getAllPermissions = async (req, res) => {
   try {
     const permissions = await Permission.find().sort({ createdAt: -1 });
