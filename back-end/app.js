@@ -68,3 +68,5 @@ app.use("/api/team", teamRoutes);
     console.log(`🚀 Server running on port ${PORT}`);
   });
 })();
+
+module.exports = app;
