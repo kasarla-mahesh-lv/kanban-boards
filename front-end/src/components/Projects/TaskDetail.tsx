@@ -30,6 +30,7 @@ type Subtask = { id: number; title: string };
 const typesList = ["Bug", "Feature", "Task", "Label"];
 
 type Props = {
+  task: Task;
   taskTitle?: string;
   projectId: string;
   onClose: () => void;

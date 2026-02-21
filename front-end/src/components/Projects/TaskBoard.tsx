@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import AddTaskModal from "./AddTaskModal";
-import TaskDeatils from "./TaskDetail";
+import TaskSidebar from "./TaskDetail";
 
 type Task = {
   id: number;
@@ -60,7 +60,7 @@ const TaskBoard = () => {
 
       {/* TASK DETAILS DRAWER */}
       {selectedTask && (
-        <TaskDeatils
+        <TaskSidebar
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
         />
