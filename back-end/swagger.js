@@ -56,6 +56,11 @@ const swaggerOptions = {
       {
        name: "Team",
        description: "Team member related APIs"
+    },
+    {
+     name:"permissions",
+     description:"project management"
+
     }
     
   
