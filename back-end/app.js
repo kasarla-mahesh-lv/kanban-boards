@@ -7,6 +7,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const connectDB = require("./src/config/mongo");
 const roleRoutes = require("./src/routes/roleRoutes");
+const permissionRoutes = require("./src/routes/permissionRoutes");
 
 
 // Routes
