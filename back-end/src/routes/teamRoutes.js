@@ -8,7 +8,9 @@ const {
   getTeamMemberById,
   getTeamMembersByProjectId,
   updateTeamMember,
-  deleteTeamMember
+  deleteTeamMember,
+  acceptInvitation,
+  teamMemberLogin, // ✅ ADD THIS
 } = require("../controllers/teamController");
 const authMiddleware = require("../middlewares/authmiddlewares");
 
@@ -30,6 +32,9 @@ router.patch("/:teamId", authMiddleware, updateTeamMember);
 // ✅ delete team member
 router.delete("/:teamId", authMiddleware, deleteTeamMember);
 
+// ✅ accept team invitation (NO AUTH NEEDED - accessed from email link)
+router.post("/accept-invitation", acceptInvitation);
+
 /**
  * @openapi
  * /api/team:
@@ -50,7 +55,7 @@ router.delete("/:teamId", authMiddleware, deleteTeamMember);
  *   post:
  *     tags: [Team]
  *     summary: Create a new team member
- *     description: Add a new team member to a project with name, email, and projectId
+ *     description: Add a new team member to a project with name, email, and projectId. Sends invitation email automatically.
  *     requestBody:
  *       required: true
  *       content:
@@ -70,9 +75,9 @@ router.delete("/:teamId", authMiddleware, deleteTeamMember);
  *                 example: "6789xyz789xyz789"
  *     responses:
  *       201:
- *         description: Team member created successfully
+ *         description: Team member created and invitation email sent
  *       400:
- *         description: Bad request - validation error
+ *         description: Bad request - validation error or duplicate user
  *       404:
  *         description: Project not found
  *       500:
@@ -199,4 +204,34 @@ router.delete("/:teamId", authMiddleware, deleteTeamMember);
  *         description: Server error
  */
 
+/**
+ * @openapi
+ * /api/team/accept-invitation:
+ *   post:
+ *     tags: [Team]
+ *     summary: Accept team invitation from email
+ *     description: Accept a team invitation using the token from the email link
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token]
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *     responses:
+ *       200:
+ *         description: Invitation accepted successfully, returns authToken
+ *       400:
+ *         description: Invalid or expired token
+ *       404:
+ *         description: Invalid invitation
+ *       500:
+ *         description: Server error
+ */
+
+router.post("/login", teamMemberLogin);
 module.exports = router;

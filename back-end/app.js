@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const connectDB = require("./src/config/mongo");
+const roleRoutes = require("./src/routes/roleRoutes");
 
 
 // Routes
@@ -16,7 +17,6 @@ const cardRoutes = require("./src/routes/cardRoutes");
 const projectRoutes = require("./src/routes/projectRoutes");
 const historyRoutes = require("./src/routes/historyRoutes");
 const teamRoutes = require("./src/routes/teamRoutes");
-
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -57,7 +57,7 @@ app.use("/api/cards", cardRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/team", teamRoutes);
-
+app.use("/api/roles", roleRoutes);
 
 /* -------------------- Start App -------------------- */
 (async () => {
@@ -68,3 +68,5 @@ app.use("/api/team", teamRoutes);
     console.log(`🚀 Server running on port ${PORT}`);
   });
 })();
+
+module.exports = app;
