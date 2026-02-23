@@ -23,9 +23,8 @@ try{
       // 🔥 FETCH USER FIRST
      let user = await UserModel.findOne({ email });
 
-    // already verified user
-    if(user && user.isVerified)
-        return res.status(400).json({message:"User already registered, please login"});
+    if (user && user.isVerified !== false)
+    return res.status(400).json({ message: "User already registered, please login" });
 
     // generate OTP
     const otp = Math.floor(100000 + Math.random()*900000).toString();
@@ -55,7 +54,16 @@ try{
     Your OTP is ${otp}`
 );
 
-    res.status(200).json({message:"OTP sent to email"});
+   res.status(200).json({
+  message: "OTP sent to email",
+  user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role   // ✅ add
+  }
+});
+
 
 }catch(error){
     res.status(500).json({message:error.message});
@@ -140,8 +148,6 @@ try{
     res.status(500).json({ message: error.message });
   }
 };
-
-
 exports.login = async (req, res) => {
   try {
     const { error } = loginSchema.validate(req.body);
@@ -152,8 +158,14 @@ exports.login = async (req, res) => {
     const user = await UserModel.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid email 📩" });
 
-    if (!user.isVerified) {
+
+    if (user?.isVerified === false) {
       return res.status(401).json({ message: "Please verify OTP before login" });
+    }
+
+    if (user?.isVerified === undefined) {
+       user.isVerified = true;
+      await user.save();
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -167,20 +179,26 @@ exports.login = async (req, res) => {
         { expiresIn: "1d" }
       );
 
-      // optional: save token in DB like you are doing in verifyOtp
       user.tokens.push({ token });
       await user.save();
-
       res.setHeader("Authorization", `Bearer ${token}`);
+
+
 
       return res.status(200).json({
         message: "Login success ✅",
         mfaRequired: false,
-        user: { id: user._id, name: user.name, email: user.email }
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role, // ✅ correct
+        },
+      
       });
     }
 
-    // ✅ Generate login OTP only
+    // MFA ON: send login OTP...
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 2 * 60 * 1000);
 
@@ -189,24 +207,17 @@ exports.login = async (req, res) => {
     await user.save();
 
 
-
-    await sendMail(
-      email,
-      "Login OTP",
-      `Your login OTP is ${otp}. It is valid for 2 minutes.`
-    );
-
+    await sendMail(email, "Login OTP", `Your login OTP is ${otp}. Valid for 2 minutes.`);
 
     return res.status(200).json({
       message: "OTP sent to email. Please verify OTP using /verify-otp with type=login"
     });
 
   } catch (error) {
-    console.log(error,"error");
-    
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
+
 
 
 
@@ -326,13 +337,13 @@ exports.verifyMfaOtp = async (req, res) => {
     const user = await UserModel.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!user.mfaOtp || !user.mfaOtpExpiresAt)
+    if (!user?.mfaOtp || !user?.mfaOtpExpiresAt)
       return res.status(400).json({ message: "Please request MFA OTP first" });
 
-    if (user.mfaOtpExpiresAt < Date.now())
+    if (user?.mfaOtpExpiresAt < Date.now())
       return res.status(400).json({ message: "OTP expired" });
 
-    if (user.mfaOtp !== otp)
+    if (user?.mfaOtp !== otp)
       return res.status(400).json({ message: "Invalid OTP" });
 
     user.mfaEnabled = true;
@@ -408,13 +419,13 @@ exports.verifyDisableMfaOtp = async (req, res) => {
     const user = await UserModel.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!user.disableMfaOtp || !user.disableMfaOtpExpiresAt)
+    if (!user?.disableMfaOtp || !user?.disableMfaOtpExpiresAt)
       return res.status(400).json({ message: "Please request OTP first" });
 
-    if (user.disableMfaOtpExpiresAt < Date.now())
+    if (user?.disableMfaOtpExpiresAt < Date.now())
       return res.status(400).json({ message: "OTP expired" });
 
-    if (user.disableMfaOtp !== otp)
+    if (user?.disableMfaOtp !== otp)
       return res.status(400).json({ message: "Invalid OTP" });
 
     user.mfaEnabled = false;
@@ -428,6 +439,3 @@ exports.verifyDisableMfaOtp = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-
-
-
