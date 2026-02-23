@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { usePermission } from "../PermissionContext";
 
 import { useParams } from "react-router-dom";
 import { type Project, getProjectColumnsApi, createTaskApi,createColumnApi } from "../Api/ApiCommon";
@@ -9,6 +10,7 @@ import AddTaskModal from "./AddTaskModal";
 import "./Project.css";
 
 const DEFAULT_COLUMNS = ["Backlog", "Todo", "In Progress", "Done"];
+
 
 interface Filters {
   search: string;
@@ -107,6 +109,7 @@ const MENU_GAP = 8;
 const ProjectBoard: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const [project] = useState<Project | null>(null);
+  const { hasPermission } = usePermission();
 
   const [columns, setColumns] = useState<UIColumn[]>([]);
   const [loading, setLoading] = useState(false);
@@ -397,7 +400,7 @@ const handleAddColumn = async () => {
     setLoading(true);
 
     // ✅ Correct backend call
-    await createColumnApi(projectId, { name });
+    await createColumnApi(projectId, { title:name });
 
     setNewColumnName("");
     setShowAddInput(false);
@@ -492,12 +495,15 @@ const handleAddColumn = async () => {
       />
 
       <div className="add-group-actions">
-        <button
-          className="add-group-btn"
-          onClick={handleAddColumn}
-        >
-          Add group
-        </button>
+       
+  <button
+    className="add-group-btn"
+    onClick={handleAddColumn}
+     disabled={!hasPermission("create_group")}
+  >
+    Add group
+  </button>
+
 
         <button
           className="cancel-btn"

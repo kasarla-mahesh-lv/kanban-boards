@@ -947,3 +947,9 @@ export const applyFiltersApi = (projectId: string, filters: any): Promise<{ colu
   apiPost<{ columns: Column[] }, any>(`/projects/${projectId}/tasks/filter`, filters);
 
 export default api;
+
+/* -----------------permission api calls----------------- */
+export const fetchPermissionsApi = async (): Promise<string[]> => {
+  const data = await apiGet<any>(`/permissions`);
+  return data.permissions;
+};

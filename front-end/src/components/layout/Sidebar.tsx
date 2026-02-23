@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../../components/Auth/AuthContext";
+import { usePermission } from "../PermissionContext";
 import Settings from "./Settings"; // Import ProjectSettings component
 import "./Sidebar.css";
 import {
@@ -29,6 +30,7 @@ type Team = { id: number; name: string; color: string; members: Member[] };
 const TEAM_KEY = "hrm-teams";
 
 const Sidebar: React.FC = () => {
+    const { hasPermission } = usePermission();
   const navigate = useNavigate();
   const { logout } = useAuth();
 
@@ -260,7 +262,13 @@ const Sidebar: React.FC = () => {
           <span>Logout</span>
         </div>
 
-        <div className="settings" onClick={openSettings}>
+        <div className="settings" onClick={() => {
+          if (hasPermission("open_settings")) {
+            navigate("/settings");
+          } else {
+            alert("You do not have permission to access settings.");
+          }
+        }}>
           <FaCog /> Settings
         </div>
       </div>

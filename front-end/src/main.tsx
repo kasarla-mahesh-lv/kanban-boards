@@ -12,13 +12,17 @@ import App from "./App.tsx";
 
 //ADD THIS (AuthProvider)
 import { AuthProvider } from "./components/Auth/AuthContext";
+import { PermissionProvider } from "./components/PermissionContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
+        <PermissionProvider>
         <App />
+        </PermissionProvider>
       </AuthProvider>
+     
     </BrowserRouter>
   </StrictMode>
 );

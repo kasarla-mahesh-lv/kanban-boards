@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
+import { fetchPermissionsApi } from "./Api/ApiCommon";
 
 // import {c
 //   getCurrentUserApi,
@@ -59,13 +60,39 @@ export const PermissionProvider = ({ children }: { children: React.ReactNode }) 
 //   }, []);
 
   // 🔥 Login
-  const login = useCallback(async (data: any) => {
-    setUser(data.user);
-    localStorage.setItem("token", data.token);
+ useEffect(() => {
+  const loadPermissions = async () => {
+    if (!user) return;
 
-    const permissions = await fetchPermissionsApi();
-    setPermissions(permissions);
-  }, []);
+    try {
+      console.log("🚀 Fetching permissions API");
+
+      const perms = await fetchPermissionsApi();
+
+      console.log("✅ Permissions Loaded:", perms);
+
+      setPermissions(perms);
+    } catch (err) {
+      console.error("Permission fetch error", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadPermissions();
+}, [user]);
+  const login = useCallback(async (data: any) => {
+  console.log("LOGIN CALLED ✅");
+
+  setUser(data.user);
+  localStorage.setItem("token", data.token);
+
+  const permissions = await fetchPermissionsApi();
+
+  console.log("Fetched permissions:", permissions);
+
+  setPermissions(permissions);
+}, []);
 
   const logout = useCallback(() => {
     setUser(null);
