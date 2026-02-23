@@ -7,6 +7,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const connectDB = require("./src/config/mongo");
 const roleRoutes = require("./src/routes/roleRoutes");
+const permissionRoutes = require("./src/routes/permissionRoutes");
 
 
 // Routes
@@ -58,7 +59,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/roles", roleRoutes);
-
+app.use("/api/permissions", permissionRoutes);
 /* -------------------- Start App -------------------- */
 (async () => {
   // Connect to MongoDB
