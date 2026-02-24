@@ -9,7 +9,8 @@ const {
   getTeamMembersByProjectId,
   updateTeamMember,
   deleteTeamMember,
-  acceptInvitation // ✅ ADD THIS
+  acceptInvitation,
+  teamMemberLogin, // ✅ ADD THIS
 } = require("../controllers/teamController");
 const authMiddleware = require("../middlewares/authmiddlewares");
 
@@ -232,4 +233,5 @@ router.post("/accept-invitation", acceptInvitation);
  *         description: Server error
  */
 
+router.post("/login", teamMemberLogin);
 module.exports = router;

@@ -20,7 +20,6 @@ const teamSchema = new mongoose.Schema(
       ref: "Projects",
       required: true
     },
-    // ✅ NEW FIELDS FOR EMAIL INVITATION
     status: {
       type: String,
       enum: ["pending", "active"],
@@ -30,6 +29,16 @@ const teamSchema = new mongoose.Schema(
       type: String,
       default: null
     },
+    // ✅ ADD THESE TWO FIELDS
+    tempPassword: {
+      type: String,
+      required: true
+    },
+    passwordChangedOnFirstLogin: {
+      type: Boolean,
+      default: false
+    },
+    // ✅ END OF NEW FIELDS
     invitedAt: {
       type: Date,
       default: null
