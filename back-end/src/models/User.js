@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema(
         required:true,
         minlength:10
     },
+    isInvitedUser:{
+        type:Boolean,
+        default:false
+    },
 
     // OTP fields
     otp:{ type:String, default:null },
