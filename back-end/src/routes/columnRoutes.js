@@ -8,6 +8,7 @@ const {
   deleteColumn,
   getColumnsByProject,
 } = require("../controllers/columnController");
+const permissionGate = require("../middlewares/permissionGate");
 
 /**
  * @openapi
@@ -32,7 +33,7 @@ const {
  *       200:
  *         description: Columns list
  */
-router.get("/projects/:projectId", authMiddleware, getColumnsByProject);
+router.get("/projects/:projectId", authMiddleware,permissionGate("VIEW_COLUMNSBYPROJECT"), getColumnsByProject);
 
 /**
  * @openapi
@@ -63,7 +64,7 @@ router.get("/projects/:projectId", authMiddleware, getColumnsByProject);
  *       409:
  *         description: Duplicate column name
  */
-router.post("/projects/:projectId", authMiddleware, createColumn);
+router.post("/projects/:projectId", authMiddleware,permissionGate("CREATE_COLUMN"), createColumn);
 
 /**
  * @openapi
@@ -92,7 +93,7 @@ router.post("/projects/:projectId", authMiddleware, createColumn);
  *       200:
  *         description: Column updated
  */
-router.patch("/:columnId", authMiddleware, updateColumn);
+router.patch("/:columnId", authMiddleware,permissionGate("UPDATE_COLUMN"), updateColumn);
 
 /**
  * @openapi
@@ -110,6 +111,6 @@ router.patch("/:columnId", authMiddleware, updateColumn);
  *       200:
  *         description: Column deleted
  */
-router.delete("/:columnId", authMiddleware, deleteColumn);
+router.delete("/:columnId", authMiddleware,permissionGate("DELETE_COLUMN"), deleteColumn);
 
 module.exports = router;

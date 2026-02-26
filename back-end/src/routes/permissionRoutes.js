@@ -1,8 +1,7 @@
 const router = require("express").Router();
-const {
-  getAllPermissions,
-  
-} = require("../controllers/permissionController");
+const {getAllPermissions,} = require("../controllers/permissionController");
+const authMiddleware = require("../middlewares/authmiddlewares");
+const permissionGate = require("../middlewares/permissionGate");
 
 
 /**
@@ -56,7 +55,7 @@ const {
  *       500:
  *         description: Server error
  */
-router.get("/", getAllPermissions);
+router.get("/",authMiddleware,permissionGate("VIEW_PERMISSIONS"), getAllPermissions);
 
 module.exports = router;
 

@@ -20,7 +20,6 @@ try{
         return res.status(400).json({ message: error.details[0].message });
      const { name, email, password, mobilenumber } = req.body;
 
-      // 🔥 FETCH USER FIRST
      let user = await UserModel.findOne({ email });
 
     if (user && user.isVerified !== false)
@@ -32,7 +31,7 @@ try{
 
     const hashedPassword = await bcrypt.hash(password,10);
 
-    // create or update temp user
+    
     user = await UserModel.findOneAndUpdate(
         {email},
         {
@@ -46,7 +45,7 @@ try{
         {upsert:true,new:true}
     );
 
-    // send mail
+    
     await sendMail(
     email,
     "OTP Verification",
@@ -77,12 +76,12 @@ try{
     const { error } = verifyOtpSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const { email, otp, type = "register" } = req.body; // ✅ type added
+    const { email, otp, type = "register" } = req.body; 
 
     const user = await UserModel.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
-    // ✅ REGISTER OTP verify
+    
     if (type === "register") {
       if (!user.otp || !user.expiresAt)
         return res.status(400).json({ message: "Please request OTP first" });
@@ -104,7 +103,7 @@ try{
       });
     }
 
-    // ✅ LOGIN OTP verify → return token here only
+    
     if (type === "login") {
       if (!user.loginOtp || !user.loginOtpExpiresAt)
         return res.status(400).json({ message: "Please login first to get OTP" });
@@ -121,7 +120,7 @@ try{
         { expiresIn: "1d" }
       );
 
-      // clear login otp
+      
       user.loginOtp = null;
       user.loginOtpExpiresAt = null;
       await user.save();
@@ -133,7 +132,7 @@ try{
       res.setHeader("Authorization", `Bearer ${token}`);
 
       return res.status(200).json({
-        message: "Login OTP verified ✅",
+        message: "Login OTP verified",
         user: {
           id: user._id,
           name: user.name,
@@ -142,7 +141,7 @@ try{
       });
     }
 
-    // safety
+    
     return res.status(400).json({ message: "Invalid type" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -171,8 +170,8 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
-        // ✅ ✅ MAIN CHANGE: If MFA is OFF => direct token => dashboard
-    if (!user.mfaEnabled) {
+        
+    if (!user?.mfaEnabled) {
       const token = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET,
@@ -186,13 +185,13 @@ exports.login = async (req, res) => {
 
 
       return res.status(200).json({
-        message: "Login success ✅",
+        message: "Login success ",
         mfaRequired: false,
         user: {
           id: user._id,
           name: user.name,
           email: user.email,
-          role: user.role, // ✅ correct
+          role: user.role, 
         },
       
       });

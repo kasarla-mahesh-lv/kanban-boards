@@ -11,24 +11,24 @@ const {
   deleteTaskInProject,
   getColumnsTasks
 } = require("../controllers/taskController");
+const permissionGate = require("../middlewares/permissionGate");
 
-// list tasks in project
-router.get("/projects/:projectId/tasks", authMiddleware,getProjectTasks);
+router.get("/projects/:projectId/tasks", authMiddleware,permissionGate("VIEW_PROJECTTASKS"),getProjectTasks);
 
-// create task in project
-router.post("/projects/:projectId/tasks", authMiddleware,addTaskToProject);
 
-// get one task
-router.get("/projects/:projectId/tasks/:taskId", authMiddleware,getTaskByTaskIdInProject);
+router.post("/projects/:projectId/tasks", authMiddleware,permissionGate("CREATE_TASKTOPROJECT") ,addTaskToProject);
 
-// update task
-router.patch("/projects/:projectId/tasks/:taskId", authMiddleware,updateTaskInProject);
 
-// delete task
-router.delete("/projects/:projectId/tasks/:taskId", authMiddleware,deleteTaskInProject);
+router.get("/projects/:projectId/tasks/:taskId", authMiddleware,permissionGate("VIEW_TASKBYTASKIDINPROJECT"),getTaskByTaskIdInProject);
 
-// columns + tasks together
-router.get("/projects/:projectId/columns-tasks", authMiddleware,getColumnsTasks);
+
+router.patch("/projects/:projectId/tasks/:taskId", authMiddleware,permissionGate("UPDATE_TASKINPROJECT"),updateTaskInProject);
+
+
+router.delete("/projects/:projectId/tasks/:taskId", authMiddleware,permissionGate("DELETE_TASKINPROJECT"),deleteTaskInProject);
+
+
+router.get("/projects/:projectId/columns-tasks", authMiddleware,permissionGate("VIEW_COLUMNSTASKS"),getColumnsTasks);
 
 /**
  * @openapi
@@ -197,8 +197,6 @@ router.get("/projects/:projectId/columns-tasks", authMiddleware,getColumnsTasks)
  *       401:
  *         description: Unauthorized (Invalid or missing token)
  */
-
-
 
 
 module.exports = router;
