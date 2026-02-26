@@ -24,9 +24,13 @@ const taskSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
-
-    blockers: [{ type: String }],
+blockers: [
+      {
+        type: mongoose.Schema.Types.ObjectId // taskId
+      }
+    ]
   },
+  
   
 
   { timestamps: true }

@@ -18,7 +18,7 @@ const {
 
 /**
  * @openapi
- * /api/columns/projects/{projectId}:
+ * /api/projects/{projectId}/columns:
  *   get:
  *     tags: [Columns]
  *     summary: Get all columns in a project
@@ -36,7 +36,7 @@ router.get("/projects/:projectId", authMiddleware, getColumnsByProject);
 
 /**
  * @openapi
- * /api/columns/projects/{projectId}:
+ * /api/projects/{projectId}/columns:
  *   post:
  *     tags: [Columns]
  *     summary: Create a column in a project (Add Group)
