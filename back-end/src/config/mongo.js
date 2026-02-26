@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 const runSeeders = require("../../utility/index");
 const connectDB = async () => {
@@ -6,7 +7,7 @@ const connectDB = async () => {
     console.log("✅ MongoDB connected");
      await runSeeders();
   } catch (err) {
-    console.error("❌ MongoDB connection failed:", err.message);
+     console.error("❌ MongoDB connection failed:", err.message);
     process.exit(1);
   }
 };

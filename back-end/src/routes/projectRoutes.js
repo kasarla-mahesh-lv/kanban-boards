@@ -1,71 +1,37 @@
 const express = require("express");
 const router = express.Router();
 
+const authMiddleware = require("../middlewares/authmiddlewares");
+
 const {
   createProject,
   getAllProjects,
   getProjectById,
-  getProjectTasks,
-  addTaskToProject,
-  getTaskByTaskIdInProject,
-  updateTaskInProject,
-  deleteTaskInProject,
   openProject,
-  createTaskInProject,
-  getColumnsTasks,
+  
 } = require("../controllers/projectController");
 
-const authMiddleware = require("../middlewares/authmiddlewares");
-//const requirePermission = require("../middlewares/requirePermission");
 
-// ✅ all projects
+// ✅ GET all projects
 router.get("/", authMiddleware, getAllProjects);
 
-// ✅ create project
+// ✅ CREATE project
 router.post("/", authMiddleware, createProject);
 
-// ✅ open project (keep before /:projectId)
+// ✅ OPEN project (MUST BEFORE :projectId)
 router.get("/:projectId/open", authMiddleware, openProject);
 
-// ✅ tasks
-router.get("/:projectId/tasks", authMiddleware, getProjectTasks);
-router.get("/:projectId/tasks/:taskId", authMiddleware, getTaskByTaskIdInProject);
-
-// ✅ RBAC: permissions
-// router.post(
-//   "/:projectId/tasks",
-//   authMiddleware,
-//   requirePermission("task:create"),
-//   addTaskToProject
-// );
-
-// router.patch(
-//   "/:projectId/tasks/:taskId",
-//   authMiddleware,
-//   requirePermission("task:update"),
-//   updateTaskInProject
-// );
-
-// router.delete(
-//   "/:projectId/tasks/:taskId",
-//   authMiddleware,
-//   requirePermission("task:delete"),
-//   deleteTaskInProject
-// );
-
-// (optional) your existing endpoints
-router.post("/create-task", authMiddleware, createTaskInProject);
-router.get("/get-columns-tasks", getColumnsTasks);
-
-// ✅ project details (keep last)
+// ✅ GET project details (KEEP LAST)
 router.get("/:projectId", authMiddleware, getProjectById);
-router.post("/:projectId/tasks",authMiddleware,addTaskToProject);
+
+
 
 
 module.exports = router;
 
 //-------------------- Swagger Documentation --------------------
 /**
+ * 
  * @openapi
  * /api/projects/{projectId}/open:
  *   get:
@@ -132,135 +98,6 @@ router.post("/",authMiddleware, createProject);
  */
 
 //router.get("/:projectId",authMiddleware, getProjectById);
-
-/**
- * @openapi
- * /api/projects/{projectId}/tasks:
- *   get:
- *     tags: [Projects]
- *     summary: Get all tasks of a project
- *     parameters:
- *       - in: path
- *         name: projectId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Task list
- */
-//router.get("/:projectId/tasks",authMiddleware, getProjectTasks);
-
-/**
- * @openapi
- * /api/projects/{projectId}/tasks:
- *   post:
- *     tags: [Projects]
- *     summary: Add task to project
- *     parameters:
- *       - in: path
- *         name: projectId
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [title]
- *             properties:
- *               title:
- *                 type: string
- *                 example: "Build backend"
- *               description:
- *                 type: string
- *                 example: "API work"
- *               status:
- *                 type: string
- *                 example: "todo"
- *     responses:
- *       201:
- *         description: Task added
- */
-//router.post("/:projectId/tasks",authMiddleware, addTaskToProject);
-
-
-
-/**
- * @openapi
- * /api/projects/{projectId}/tasks/{taskId}:
- *   get:
- *     tags: [Projects]
- *     summary: Get task details inside project
- *     parameters:
- *       - in: path
- *         name: projectId
- *         required: true
- *         schema:
- *           type: string
- *       - in: path
- *         name: taskId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Task details
- */
-router.get("/:projectId/tasks/:taskId",authMiddleware, getTaskByTaskIdInProject);
-
-/**
- * @openapi
- * /api/projects/{projectId}/tasks/{taskId}:
- *   patch:
- *     tags: [Projects]
- *     summary: Update task in project
- *     parameters:
- *       - in: path
- *         name: projectId
- *         required: true
- *       - in: path
- *         name: taskId
- *         required: true
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               status:
- *                 type: string
- *     responses:
- *       200:
- *         description: Task updated
- */
-router.patch("/:projectId/tasks/:taskId",authMiddleware, updateTaskInProject);
-
-/**
- * @openapi
- * /api/projects/{projectId}/tasks/{taskId}:
- *   delete:
- *     tags: [Projects]
- *     summary: Delete task from project
- *     parameters:
- *       - in: path
- *         name: projectId
- *         required: true
- *       - in: path
- *         name: taskId
- *         required: true
- *     responses:
- *       200:
- *         description: Task deleted
- */
-router.delete("/:projectId/tasks/:taskId", authMiddleware,deleteTaskInProject);
 
 /**
  * @openapi

@@ -18,6 +18,9 @@ const cardRoutes = require("./src/routes/cardRoutes");
 const projectRoutes = require("./src/routes/projectRoutes");
 const historyRoutes = require("./src/routes/historyRoutes");
 const teamRoutes = require("./src/routes/teamRoutes");
+const taskRoutes = require("./src/routes/taskRoutes");
+
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -37,6 +40,7 @@ app.use(
 app.options("*", cors()); // ✅ add this
 
 app.use(morgan("dev"));
+app.use("/api", taskRoutes);
 
 
 /* -------------------- Health -------------------- */
@@ -51,7 +55,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 // app.use("/api/boards", boardRoutes);
 
-app.use("/api/projects", columnRoutes);
+//app.use("/api/projects", columnRoutes);
 app.use("/api/columns", columnRoutes);
 
 app.use("/api/cards", cardRoutes);
