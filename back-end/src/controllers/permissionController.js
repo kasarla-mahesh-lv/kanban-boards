@@ -13,3 +13,4 @@ exports.getAllPermissions = async (req, res) => {
   }
 };
 
+

@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const historyController = require("../controllers/historyController");
 const authMiddleware = require("../middlewares/authmiddlewares");
+const permissionGate = require("../middlewares/permissionGate");
 
 /**
  * @swagger
@@ -12,7 +13,7 @@ const authMiddleware = require("../middlewares/authmiddlewares");
  *       200:
  *         description: Full history fetched successfully
  */
-router.get("/",authMiddleware,historyController.getAllHistory);
+router.get("/",authMiddleware,permissionGate("VIEW_HISTORY"),historyController.getAllHistory);
 /**
  * @swagger
  * /api/history/{taskId}:
@@ -30,7 +31,7 @@ router.get("/",authMiddleware,historyController.getAllHistory);
  *       200:
  *         description: Task history fetched successfully
  */
-router.get("/:taskId", authMiddleware, historyController.getTaskHistory);
+router.get("/:taskId", authMiddleware,permissionGate("VIEW_TASKHISTORY"), historyController.getTaskHistory);
 /**
  * @swagger
  * /api/history:
@@ -58,6 +59,6 @@ router.get("/:taskId", authMiddleware, historyController.getTaskHistory);
  *         description: History created successfully
  */
 
-router.post("/", authMiddleware, historyController.createHistory);
+router.post("/", authMiddleware,permissionGate("CREATE_HISTORY"), historyController.createHistory);
 
 module.exports = router;

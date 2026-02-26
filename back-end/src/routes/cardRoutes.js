@@ -7,7 +7,6 @@
 
 const router = require("express").Router();
 
-
 const {
   createCard,
   updateCard,
@@ -16,6 +15,7 @@ const {
   moveCard,
 } = require("../controllers/cardController");
 const authMiddleware = require("../middlewares/authmiddlewares");
+const permissionGate=require("../middlewares/permissionGate");
 
 /**
  * @openapi
@@ -52,7 +52,7 @@ const authMiddleware = require("../middlewares/authmiddlewares");
  *       404:
  *         description: Column not found
  */
-router.post("/columns/:columnId/cards",authMiddleware, createCard);
+router.post("/columns/:columnId/cards",authMiddleware,permissionGate("CREATE_CARD"), createCard);
 
 /**
  * @openapi
@@ -84,7 +84,7 @@ router.post("/columns/:columnId/cards",authMiddleware, createCard);
  *       404:
  *         description: Card not found
  */
-router.patch("/cards/:id",authMiddleware, updateCard);
+router.patch("/cards/:id",authMiddleware,permissionGate("UPDATE_CARD"), updateCard);
 
 
 /**
@@ -133,7 +133,7 @@ router.patch("/cards/:id",authMiddleware, updateCard);
  *       200:
  *         description: Card moved successfully
  */
-router.patch("/:id/move",authMiddleware, moveCard);
+router.patch("/:id/move",authMiddleware,permissionGate("UPDATE_MOVECARD"), moveCard);
 
 /**
  * @openapi
@@ -145,7 +145,7 @@ router.patch("/:id/move",authMiddleware, moveCard);
  *       200:
  *         description: Cards list
  */
-router.get("/", authMiddleware,getAllCards);
+router.get("/", authMiddleware,permissionGate("VIEW_CARDS"),getAllCards);
 
 /**
  * @openapi
@@ -165,6 +165,6 @@ router.get("/", authMiddleware,getAllCards);
  *       404:
  *         description: Card not found
  */
-router.delete("/cards/:cardId",authMiddleware, deleteCard);
+router.delete("/cards/:cardId",authMiddleware,permissionGate("DELETE_CARD"), deleteCard);
 
 module.exports = router;

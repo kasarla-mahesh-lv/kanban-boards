@@ -8,23 +8,24 @@ const {
   markAllAsRead,
   deleteNotification,
 } = require("../controllers/notificationController");
+const authMiddleware = require("../middlewares/authmiddlewares");
 
 // ✅ list (optional query: ?isRead=false)
-router.get("/", getNotifications);
+router.get("/",authMiddleware, getNotifications);
 
 // ✅ unread count
-router.get("/unread-count", getUnreadCount);
+router.get("/unread-count",authMiddleware, getUnreadCount);
 
 // ✅ create notification (manual/admin/internal use)
-router.post("/", createNotification);
+router.post("/",authMiddleware, createNotification);
 
 // ✅ mark one read
-router.patch("/:id/read", markAsRead);
+router.patch("/:id/read",authMiddleware, markAsRead);
 
 // ✅ mark all read
-router.patch("/read-all", markAllAsRead);
+router.patch("/read-all",authMiddleware, markAllAsRead);
 
 // ✅ delete
-router.delete("/:id", deleteNotification);
+router.delete("/:id",authMiddleware, deleteNotification);
 
 module.exports = router;

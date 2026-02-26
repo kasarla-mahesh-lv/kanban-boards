@@ -10,26 +10,22 @@ const {
   openProject,
   
 } = require("../controllers/projectController");
+const permissionGate = require("../middlewares/permissionGate");
 
 
-// ✅ GET all projects
-router.get("/", authMiddleware, getAllProjects);
+router.get("/", authMiddleware,permissionGate("VIEW_PROJECTS"), getAllProjects);
 
-// ✅ CREATE project
-router.post("/", authMiddleware, createProject);
 
-// ✅ OPEN project (MUST BEFORE :projectId)
-router.get("/:projectId/open", authMiddleware, openProject);
+router.post("/", authMiddleware,permissionGate("CREATE_PROJECT"), createProject);
 
-// ✅ GET project details (KEEP LAST)
-router.get("/:projectId", authMiddleware, getProjectById);
 
+router.get("/:projectId/open", authMiddleware,permissionGate("VIEW_OPENPROJECT"), openProject);
+
+
+router.get("/:projectId", authMiddleware,permissionGate("VIEW_PROJECTBYID"), getProjectById);
 
 
 
-module.exports = router;
-
-//-------------------- Swagger Documentation --------------------
 /**
  * 
  * @openapi
@@ -78,7 +74,7 @@ module.exports = router;
  *       201:
  *         description: Project created
  */
-router.post("/",authMiddleware, createProject);
+
 
 /**
  * @openapi
@@ -137,8 +133,4 @@ router.post("/",authMiddleware, createProject);
  *       401:
  *         description: Unauthorized (Invalid or missing token)
  */
-
-
-
-
 module.exports = router;

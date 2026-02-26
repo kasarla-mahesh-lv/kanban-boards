@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-// ✅ controllers ni okate place lo import cheyyi (top lo)
+
 const {
   getAllTeamMembers,
   createTeamMember,
@@ -10,30 +10,31 @@ const {
   updateTeamMember,
   deleteTeamMember,
   acceptInvitation,
-  teamMemberLogin, // ✅ ADD THIS
+  teamMemberLogin, 
 } = require("../controllers/teamController");
 const authMiddleware = require("../middlewares/authmiddlewares");
+const permissionGate = require("../middlewares/permissionGate");
 
 // ✅ all team members
-router.get("/", authMiddleware, getAllTeamMembers);
+router.get("/", authMiddleware,permissionGate("VIEW_TEAMMEMBERS"), getAllTeamMembers);
 
 // ✅ create team member
-router.post("/", authMiddleware, createTeamMember);
+router.post("/", authMiddleware,permissionGate("CREATE_TEAMMEMBER"), createTeamMember);
 
 // ✅ get team members by project
-router.get("/project/:projectId", authMiddleware, getTeamMembersByProjectId);
+router.get("/project/:projectId", authMiddleware,permissionGate("VIEW_TEAMMEMBERBYPROJECTID"), getTeamMembersByProjectId);
 
 // ✅ get single team member
-router.get("/:teamId", authMiddleware, getTeamMemberById);
+router.get("/:teamId", authMiddleware,permissionGate("VIEW_TEAMMEMBERBYID"), getTeamMemberById);
 
 // ✅ update team member
-router.patch("/:teamId", authMiddleware, updateTeamMember);
+router.patch("/:teamId", authMiddleware,permissionGate("UPDATE_TEAMMEMBER"), updateTeamMember);
 
 // ✅ delete team member
-router.delete("/:teamId", authMiddleware, deleteTeamMember);
+router.delete("/:teamId", authMiddleware,permissionGate("DELETE_TEAMMEMBER"), deleteTeamMember);
 
 // ✅ accept team invitation (NO AUTH NEEDED - accessed from email link)
-router.post("/accept-invitation", acceptInvitation);
+router.post("/accept-invitation",authMiddleware,permissionGate("CREATE_ACCEPTINVITATION"), acceptInvitation);
 
 /**
  * @openapi
@@ -233,5 +234,5 @@ router.post("/accept-invitation", acceptInvitation);
  *         description: Server error
  */
 
-router.post("/login", teamMemberLogin);
+router.post("/login",authMiddleware,permissionGate("CREATE_TEAMMEMBERLOGIN"), teamMemberLogin);
 module.exports = router;
