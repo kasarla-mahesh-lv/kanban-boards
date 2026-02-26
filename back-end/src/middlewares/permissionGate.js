@@ -37,5 +37,5 @@ const permissionGate = (requiredPermission) => {
   };
 };
 
-// Make sure this line is present
+
 module.exports = permissionGate;
