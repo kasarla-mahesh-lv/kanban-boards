@@ -1,17 +1,4 @@
-/* =========================================================
-   PROJECT BOARD - Professional UI
-   Classes used:
-   .project-board, .project-board-header, .board-actions, .add-col-btn,
-   .board-body, .columns-row, .column-card, .column-title, .count,
-   .tasks-area, .no-tasks, .task-item, .task-title,
-   .priority-badge (.low/.medium/.high),
-   .add-task-btn
-   Modal:
-   .modal-overlay, .modal-box, .modal-head, .form-group,
-   .modal-actions, .btn-ghost, .btn-primary
-   Task Menu:
-   .kebab-btn, .task-menu-portal, .task-menu, .task-menu-item
-========================================================= */
+
 
 /* ---- Page wrapper ---- */
 .project-board {

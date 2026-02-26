@@ -12,26 +12,23 @@
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-  position: fixed;              /* FIXED SIDEBAR */
+  position: fixed;
   top: 0;
   left: 0;
   width: 280px;
-  height: 100vh;                /* FULL HEIGHT */
+  height: 100vh;
   background: linear-gradient(180deg, #f8fafc, #eef2ff);
   padding: 22px;
   display: flex;
   flex-direction: column;
 
-  overflow-y: auto;             /* ENABLE SCROLL */
+  overflow-y: auto;
   overflow-x: hidden;
 
   box-shadow: 8px 0 30px rgba(0, 0, 0, 0.08);
   animation: slideIn 0.6s ease;
   font-family: "Inter", system-ui, sans-serif;
-  z-index: 1000;                /* STAYS ABOVE CONTENT */
-  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.08);
-  animation: slideIn 0.6s ease;
-  font-family: "Inter", system-ui, sans-serif;
+  z-index: 1000;
 }
 
 @keyframes slideIn {
@@ -223,10 +220,8 @@
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  /* color: var(--text-muted); */
   font-size: 16px;
   color: grey;
-
 }
 
 .project-item:hover {
@@ -234,9 +229,11 @@
   transform: translateX(4px);
 }
 
+/* ✅ Project active style */
 .project-item.active {
   background: rgb(113, 113, 244);
-  color:white
+  color: white;
+  box-shadow: 0 8px 18px rgba(99, 102, 241, 0.25);
 }
 
 .project-name {
@@ -260,10 +257,47 @@
   margin-top: auto;
   border-top: 1px solid var(--border-light);
   padding-top: 16px;
+  display: grid;
+  gap: 10px;
 }
 
+/* ✅ Roles button styled SAME as settings */
+.Roles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.Roles:hover {
+  background: var(--primary-soft);
+  transform: translateX(6px);
+}
+
+/* ✅ Active Roles (make it like "selected blue" clearly) */
+.RolesActive {
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
+}
+
+/* ✅ Logout */
 .login {
-   background: linear-gradient(180deg, #f8fafc, #eef2ff);
+  background: linear-gradient(180deg, #f8fafc, #eef2ff);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -279,9 +313,8 @@
   transform: translateX(6px);
 }
 
+/* ✅ Settings */
 .settings {
-  
-  
   display: flex;
   align-items: center;
   gap: 10px;
@@ -320,7 +353,6 @@
 }
 
 /* ================= ADD INPUT (Projects/Teams) ================= */
-
 .sidebar-input {
   width: 92%;
   margin: 6px 10px;
@@ -338,9 +370,7 @@
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
 }
 
-
 /* ================= PLUS BUTTON STYLE ================= */
-
 .projects-header svg,
 .menu-item svg:last-child {
   cursor: pointer;
@@ -353,9 +383,7 @@
   color: var(--primary);
 }
 
-
 /* ================= DELETE ICON (❌) ================= */
-
 .project-item span:last-child,
 .team-item span:last-child {
   margin-left: auto;
@@ -372,9 +400,7 @@
   color: var(--danger);
 }
 
-
 /* ================= EMPTY STATE ================= */
-
 .projects-list:empty::after,
 .teams-wrapper:empty::after {
   content: "No items yet";
@@ -383,5 +409,4 @@
   padding: 6px 12px;
   display: block;
   opacity: 0.6;
-  
 }

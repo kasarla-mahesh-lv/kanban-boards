@@ -1,0 +1,473 @@
+.rolesCard {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  overflow: hidden;
+}
+
+.rolesCardHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rolesCardTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Add Role Button Styles */
+.addRoleButton {
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.addRoleButton:hover {
+  background-color: #0052a3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 102, 204, 0.2);
+}
+
+.addRoleButton:active {
+  background-color: #004085;
+  transform: translateY(0);
+}
+
+.addRoleIcon {
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.rolesTableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.rolesTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.rolesTable thead th {
+  text-align: left;
+  font-size: 13px;
+  color: #4b5563;
+  font-weight: 700;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  white-space: nowrap;
+}
+
+.rolesTable thead th:first-child {
+  padding-left: 20px;
+}
+
+.rolesTable thead th:last-child {
+  padding-right: 20px;
+}
+
+.rolesTable tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.rolesTable tbody td:first-child {
+  padding-left: 20px;
+}
+
+.rolesTable tbody td:last-child {
+  padding-right: 20px;
+}
+
+.rolesTable tbody tr:hover {
+  background: #f9fafb;
+}
+
+
+.empIdCell {
+  font-weight: 700;
+  color: #111827;
+}
+
+.empIdText {
+  font-family: monospace;
+  font-weight: 600;
+  color: #111827;
+}
+
+.nameCell {
+  color: #374151;
+  font-weight: 500;
+}
+
+
+.positionBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  text-transform: capitalize;
+  transition: all 0.2s ease;
+}
+
+.positionBadge:hover {
+  background: #e5e7eb;
+}
+
+
+.newRow {
+  background-color: #f8fafc;
+  animation: highlightNew 1s ease;
+}
+
+.newRow td {
+  background-color: #f8fafc;
+  padding: 10px 16px;
+}
+
+.newRow td:first-child {
+  padding-left: 20px !important;
+}
+
+.newRow td:last-child {
+  padding-right: 20px !important;
+}
+
+.newRow input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.newRow input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.newRoleInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.newRoleInput:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.newRoleActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+
+.actionButton {
+  background-color: #e5e7eb;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.actionButton:hover {
+  background-color: #d1d5db;
+  color: #1f2937;
+}
+
+.actionButton:active {
+  transform: scale(0.95);
+}
+
+
+.saveButton,
+.cancelButton {
+  background-color: #e5e7eb;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
+
+.saveButton:hover,
+.cancelButton:hover {
+  background-color: #d1d5db;
+  color: #1f2937;
+}
+
+
+@keyframes highlightNew {
+  0% {
+    background-color: #f1f5f9;
+  }
+  50% {
+    background-color: #e6f7ff;
+  }
+  100% {
+    background-color: #f8fafc;
+  }
+}
+
+.rolesEmpty {
+  text-align: center;
+  color: #6b7280;
+  padding: 32px 20px;
+  font-style: italic;
+}
+
+
+.loadingMessage,
+.emptyMessage {
+  color: #6b7280;
+  font-size: 14px;
+  padding: 20px;
+  text-align: center;
+}
+
+.errorMessage {
+  color: #dc3545;
+  font-size: 14px;
+  padding: 12px 20px;
+  background-color: #fef2f2;
+  border-radius: 8px;
+  margin: 0 20px 16px 20px;
+  border: 1px solid #fee2e2;
+}
+
+
+.totalRoles {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #6b7280;
+  text-align: right;
+  padding: 12px 20px;
+  border-top: 1px dashed #e5e7eb;
+  font-weight: 500;
+}
+
+
+@media (max-width: 768px) {
+  .rolesCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .addRoleButton {
+    align-self: flex-start;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .rolesTable {
+    min-width: 100%;
+  }
+  
+  .rolesTable thead th,
+  .rolesTable tbody td {
+    padding: 12px 10px;
+  }
+  
+  .rolesTable thead th:first-child,
+  .rolesTable tbody td:first-child {
+    padding-left: 16px;
+  }
+  
+  .rolesTable thead th:last-child,
+  .rolesTable tbody td:last-child {
+    padding-right: 16px;
+  }
+  
+  .newRoleActions {
+    flex-direction: column;
+    gap: 4px;
+    align-items: stretch;
+  }
+  
+  .actionButton,
+  .saveButton,
+  .cancelButton {
+    width: 100%;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .newRow input {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  
+  .empIdCell {
+    padding-left: 4px;
+  }
+  
+  .positionBadge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .rolesTable {
+    min-width: 650px;
+  }
+  
+  .rolesTable thead th,
+  .rolesTable tbody td {
+    padding: 12px 14px;
+  }
+  
+  .rolesTable thead th:first-child,
+  .rolesTable tbody td:first-child {
+    padding-left: 18px;
+  }
+  
+  .rolesTable thead th:last-child,
+  .rolesTable tbody td:last-child {
+    padding-right: 18px;
+  }
+}
+
+
+@media (min-width: 1400px) {
+  .rolesTable tbody td {
+    padding: 16px 20px;
+  }
+}
+
+
+@keyframes buttonPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.addRoleButton:active {
+  animation: buttonPop 0.2s ease;
+}
+
+
+.actionButton[title],
+.saveButton[title],
+.cancelButton[title] {
+  position: relative;
+}
+
+.actionButton[title]:hover::after,
+.saveButton[title]:hover::after,
+.cancelButton[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+
+
+.actionButton:focus-visible,
+.saveButton:focus-visible,
+.cancelButton:focus-visible,
+.addRoleButton:focus-visible,
+.newRow input:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+
+
+.actionButton:disabled,
+.saveButton:disabled,
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionButton:disabled:hover,
+.saveButton:disabled:hover,
+.cancelButton:disabled:hover {
+  transform: none;
+  background-color: #e5e7eb;
+}
+
+
+.rolesTableWrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.rolesTableWrap::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.rolesTableWrap::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.rolesTableWrap::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+
+@media print {
+  .addRoleButton {
+    display: none;
+  }
+  
+  .rolesCard {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}

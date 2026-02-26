@@ -10,7 +10,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "./index.css";
 import App from "./App.tsx";
 
-//ADD THIS (AuthProvider)
 import { AuthProvider } from "./components/Auth/AuthContext";
 
 createRoot(document.getElementById("root")!).render(
