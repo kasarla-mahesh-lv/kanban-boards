@@ -7,7 +7,7 @@ const connectDB = async () => {
     console.log("✅ MongoDB connected");
      await runSeeders();
   } catch (err) {
-    console.error("❌ DB error:", err.message);
+     console.error("❌ MongoDB connection failed:", err.message);
     process.exit(1);
   }
 };
